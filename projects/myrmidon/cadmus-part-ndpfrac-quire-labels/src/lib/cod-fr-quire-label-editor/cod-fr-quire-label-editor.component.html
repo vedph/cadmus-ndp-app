@@ -1,0 +1,79 @@
+<form [formGroup]="form" (submit)="save()">
+  <!-- types -->
+  @if (typeFlags().length) {
+  <div>
+    <cadmus-ui-flag-set
+      [flags]="typeFlags()"
+      [checkedIds]="types.value"
+      (checkedIdsChange)="onTypeCheckedIdsChange($event)"
+    />
+  </div>
+  }
+
+  <!-- positions -->
+  @if (positionFlags().length) {
+  <div>
+    <cadmus-ui-flag-set
+      [flags]="positionFlags()"
+      [checkedIds]="positions.value"
+      (checkedIdsChange)="onPositionCheckedIdsChange($event)"
+    />
+  </div>
+  }
+
+  <!-- text -->
+  <div>
+    <mat-form-field>
+      <mat-label>text</mat-label>
+      <input matInput [formControl]="text" />
+      @if ($any(text).errors?.maxLength && (text.dirty || text.touched)) {
+      <mat-error>text too long</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- hand ID -->
+   TODO
+
+  <!-- ink-->
+  <div>
+    <mat-form-field>
+      <mat-label>ink</mat-label>
+      <input matInput [formControl]="ink" />
+      @if ($any(ink).errors?.maxLength && (ink.dirty || ink.touched)) {
+      <mat-error>ink too long</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- note -->
+  <div>
+    <mat-form-field>
+      <mat-label>note</mat-label>
+      <textarea matInput [formControl]="note" rows="3"></textarea>
+      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+      <mat-error>note too long</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- buttons -->
+  <div>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Discard changes"
+      (click)="cancel()"
+    >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      mat-icon-button
+      matTooltip="Accept changes"
+      [disabled]="form.invalid || form.pristine"
+    >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+</form>
