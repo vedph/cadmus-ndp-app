@@ -6,7 +6,6 @@ import {
   UntypedFormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { take } from 'rxjs/operators';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
+
 import {
   CloseSaveButtonsComponent,
   EditedObject,
@@ -33,11 +33,14 @@ import {
   CodFrQuireLabel,
   CodFrQuireLabelsPart,
 } from '../cod-fr-quire-labels-part';
-import { CodFrQuireLabelEditorComponent } from '../cod-fr-quire-label-editor/cod-fr-quire-label-editor.component';
+import { CodFrQuireLabelEditorComponent } from
+  '../cod-fr-quire-label-editor/cod-fr-quire-label-editor.component';
 
 /**
  * CodFrQuireLabelsPart editor component.
- * Thesauri: ...TODO list of thesauri IDs...
+ * Thesauri: doc-reference-types, doc-reference-tags, assertion-tags,
+ * external-id-tags, external-id-scopes,
+ * cod-fr-quire-label-types, cod-fr-quire-label-positions.
  */
 @Component({
   selector: 'cadmus-cod-fr-quire-labels',
@@ -78,17 +81,12 @@ export class CodFrQuireLabelsComponent
   public idTagEntries?: ThesaurusEntry[];
   // external-id-scopes
   public idScopeEntries?: ThesaurusEntry[];
-
   // cod-fr-quire-label-types
   public typeEntries?: ThesaurusEntry[];
   // cod-fr-quire-label-positions
   public positionEntries?: ThesaurusEntry[];
 
-  // TODO: add your thesauri entries here, e.g.:
-  // cod-binding-tags
-  // public tagEntries: ThesaurusEntry[] | undefined;
-
-  public entries: FormControl<CodFrQuireLabel[]>;
+  public labels: FormControl<CodFrQuireLabel[]>;
 
   constructor(
     authService: AuthJwtService,
@@ -98,7 +96,7 @@ export class CodFrQuireLabelsComponent
     super(authService, formBuilder);
     this.editedIndex = -1;
     // form
-    this.entries = formBuilder.control([], {
+    this.labels = formBuilder.control([], {
       // at least 1 entry
       validators: NgxToolsValidators.strictMinLengthValidator(1),
       nonNullable: true,
@@ -111,18 +109,53 @@ export class CodFrQuireLabelsComponent
 
   protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
     return formBuilder.group({
-      entries: this.entries,
+      entries: this.labels,
     });
   }
 
   private updateThesauri(thesauri: ThesauriSet): void {
-    // TODO setup your thesauri entries here, e.g.:
-    // let key = 'cod-binding-tags';
-    // if (this.hasThesaurus(key)) {
-    //   this.tagEntries = thesauri[key].entries;
-    // } else {
-    //   this.tagEntries = undefined;
-    // }
+    let key = 'doc-reference-types';
+    if (this.hasThesaurus(key)) {
+      this.refTypeEntries = thesauri[key].entries;
+    } else {
+      this.refTypeEntries = undefined;
+    }
+    key = 'doc-reference-tags';
+    if (this.hasThesaurus(key)) {
+      this.refTagEntries = thesauri[key].entries;
+    } else {
+      this.refTagEntries = undefined;
+    }
+    key = 'assertion-tags';
+    if (this.hasThesaurus(key)) {
+      this.assTagEntries = thesauri[key].entries;
+    } else {
+      this.assTagEntries = undefined;
+    }
+    key = 'external-id-tags';
+    if (this.hasThesaurus(key)) {
+      this.idTagEntries = thesauri[key].entries;
+    } else {
+      this.idTagEntries = undefined;
+    }
+    key = 'external-id-scopes';
+    if (this.hasThesaurus(key)) {
+      this.idScopeEntries = thesauri[key].entries;
+    } else {
+      this.idScopeEntries = undefined;
+    }
+    key = 'cod-fr-quire-label-types';
+    if (this.hasThesaurus(key)) {
+      this.typeEntries = thesauri[key].entries;
+    } else {
+      this.typeEntries = undefined;
+    }
+    key = 'cod-fr-quire-label-positions';
+    if (this.hasThesaurus(key)) {
+      this.positionEntries = thesauri[key].entries;
+    } else {
+      this.positionEntries = undefined;
+    }
   }
 
   private updateForm(part?: CodFrQuireLabelsPart | null): void {
@@ -130,7 +163,7 @@ export class CodFrQuireLabelsComponent
       this.form.reset();
       return;
     }
-    this.entries.setValue(part.labels || []);
+    this.labels.setValue(part.labels || []);
     this.form.markAsPristine();
   }
 
@@ -150,7 +183,7 @@ export class CodFrQuireLabelsComponent
     let part = this.getEditedPart(
       COD_FR_QUIRE_LABELS_PART_TYPEID
     ) as CodFrQuireLabelsPart;
-    part.labels = this.entries.value || [];
+    part.labels = this.labels.value || [];
     return part;
   }
 
@@ -173,15 +206,15 @@ export class CodFrQuireLabelsComponent
   }
 
   public saveLabel(entry: CodFrQuireLabel): void {
-    const entries = [...this.entries.value];
+    const entries = [...this.labels.value];
     if (this.editedIndex === -1) {
       entries.push(entry);
     } else {
       entries.splice(this.editedIndex, 1, entry);
     }
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.labels.setValue(entries);
+    this.labels.markAsDirty();
+    this.labels.updateValueAndValidity();
     this.closeLabel();
   }
 
@@ -193,11 +226,11 @@ export class CodFrQuireLabelsComponent
           if (this.editedIndex === index) {
             this.closeLabel();
           }
-          const entries = [...this.entries.value];
+          const entries = [...this.labels.value];
           entries.splice(index, 1);
-          this.entries.setValue(entries);
-          this.entries.markAsDirty();
-          this.entries.updateValueAndValidity();
+          this.labels.setValue(entries);
+          this.labels.markAsDirty();
+          this.labels.updateValueAndValidity();
         }
       });
   }
@@ -206,25 +239,25 @@ export class CodFrQuireLabelsComponent
     if (index < 1) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entry = this.labels.value[index];
+    const entries = [...this.labels.value];
     entries.splice(index, 1);
     entries.splice(index - 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.labels.setValue(entries);
+    this.labels.markAsDirty();
+    this.labels.updateValueAndValidity();
   }
 
   public moveLabelDown(index: number): void {
-    if (index + 1 >= this.entries.value.length) {
+    if (index + 1 >= this.labels.value.length) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entry = this.labels.value[index];
+    const entries = [...this.labels.value];
     entries.splice(index, 1);
     entries.splice(index + 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.labels.setValue(entries);
+    this.labels.markAsDirty();
+    this.labels.updateValueAndValidity();
   }
 }

@@ -64,7 +64,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   styleUrl: './cod-fr-quire-label-editor.component.css',
 })
 export class CodFrQuireLabelEditorComponent {
-  public readonly data = model<CodFrQuireLabel | undefined>();
+  public readonly label = model<CodFrQuireLabel | undefined>();
   public readonly cancelEdit = output();
 
   // doc-reference-types
@@ -134,7 +134,7 @@ export class CodFrQuireLabelEditorComponent {
 
     // when model changes, update form
     effect(() => {
-      const data = this.data();
+      const data = this.label();
       this.updateForm(data);
     });
   }
@@ -208,7 +208,7 @@ export class CodFrQuireLabelEditorComponent {
     }
 
     const data = this.getData();
-    this.data.set(data);
+    this.label.set(data);
 
     if (pristine) {
       this.form.markAsPristine();

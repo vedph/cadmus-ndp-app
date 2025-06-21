@@ -19,7 +19,7 @@
           <mat-icon>add_circle</mat-icon> label
         </button>
       </div>
-      @if (entries.value.length) {
+      @if (labels.value.length) {
       <table>
         <thead>
           <tr>
@@ -30,7 +30,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (entry of entries.value; track entry; let i = $index; let first =
+          @for (entry of labels.value; track entry; let i = $index; let first =
           $first; let last = $last) {
           <tr [class.selected]="entry === edited">
             <td class="fit-width">
@@ -98,8 +98,18 @@
           <mat-expansion-panel-header>
             <mat-panel-title>label #</mat-panel-title>
           </mat-expansion-panel-header>
-          TODO: editor control with: [model]="edited"
-          (modelChange)="saveLabel($event)" (editorClose)="closelabel()"
+          <cadmus-cod-fr-quire-label-editor
+            [typeEntries]="typeEntries"
+            [idTagEntries]="idTagEntries"
+            [assTagEntries]="assTagEntries"
+            [refTagEntries]="refTagEntries"
+            [idScopeEntries]="idScopeEntries"
+            [refTypeEntries]="refTypeEntries"
+            [positionEntries]="positionEntries"
+            [label]="edited"
+            (labelChange)="saveLabel($event!)"
+            (editorClose)="closeLabel()"
+            />
         </mat-expansion-panel>
       </fieldset>
       }
