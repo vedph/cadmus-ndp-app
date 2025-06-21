@@ -1,44 +1,27 @@
+import { PartEditorKeys } from '@myrmidon/cadmus-core';
+
+// general
 import {
   ASSERTED_HISTORICAL_DATES_PART_TYPEID,
   BIBLIOGRAPHY_PART_TYPEID,
   CATEGORIES_PART_TYPEID,
   COMMENT_PART_TYPEID,
-  CHRONOLOGY_FRAGMENT_TYPEID,
-  CHRONOTOPES_PART_TYPEID,
-  COMMENT_FRAGMENT_TYPEID,
   DECORATED_COUNTS_PART_TYPEID,
   DISTRICT_LOCATION_PART_TYPEID,
   DOC_REFERENCES_PART_TYPEID,
-  EXTERNAL_IDS_PART_TYPEID,
-  KEYWORDS_PART_TYPEID,
   HISTORICAL_DATE_PART_TYPEID,
+  CHRONOTOPES_PART_TYPEID,
+  EXTERNAL_IDS_PART_TYPEID,
   HISTORICAL_EVENTS_PART_TYPEID,
   INDEX_KEYWORDS_PART_TYPEID,
+  KEYWORDS_PART_TYPEID,
   METADATA_PART_TYPEID,
   NAMES_PART_TYPEID,
   NOTE_PART_TYPEID,
   PHYSICAL_MEASUREMENTS_PART_TYPEID,
   PHYSICAL_STATES_PART_TYPEID,
   PIN_LINKS_PART_TYPEID,
-  TOKEN_TEXT_PART_TYPEID,
-  PIN_LINKS_FRAGMENT_TYPEID,
 } from '@myrmidon/cadmus-part-general-ui';
-import {
-  APPARATUS_FRAGMENT_TYPEID,
-  ORTHOGRAPHY_FRAGMENT_TYPEID,
-} from '@myrmidon/cadmus-part-philology-ui';
-import { PartEditorKeys } from '@myrmidon/cadmus-core';
-
-// bibliography
-import { EXT_BIBLIOGRAPHY_PART_TYPEID } from '@myrmidon/cadmus-part-biblio-ui';
-
-// geography
-import { ASSERTED_LOCATIONS_PART_TYPEID } from '@myrmidon/cadmus-part-geo-asserted-locations';
-import { ASSERTED_TOPONYMS_PART_TYPEID } from '@myrmidon/cadmus-part-geo-asserted-toponyms';
-
-// epigraphy
-import { EPI_SUPPORT_FRR_PART_TYPEID } from '@myrmidon/cadmus-part-epigraphy-support-frr';
-import { EPI_SIGNS_PART_TYPEID } from '@myrmidon/cadmus-part-epigraphy-signs';
 
 // codicology
 import { COD_BINDINGS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-bindings';
@@ -52,13 +35,14 @@ import { COD_SHEET_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-s
 import { COD_SHELFMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-shelfmarks';
 import { COD_WATERMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-watermarks';
 
+// bibliography
+import { EXT_BIBLIOGRAPHY_PART_TYPEID } from '@myrmidon/cadmus-part-biblio-ui';
+
+// route constants
 const GENERAL = 'general';
 const PHILOLOGY = 'philology';
-const GEOGRAPHY = 'geography';
-const EPIGRAPHY = 'epigraphy';
 const CODICOLOGY = 'codicology';
 const BIBLIO = 'biblio';
-const TOKEN_TEXT_LAYER_PART_TYPEID = 'it.vedph.token-text-layer';
 
 /**
  * The parts and fragments editor keys for this UI.
@@ -125,23 +109,6 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   [PIN_LINKS_PART_TYPEID]: {
     part: GENERAL,
   },
-  [TOKEN_TEXT_PART_TYPEID]: {
-    part: GENERAL,
-  },
-  // geography
-  [ASSERTED_LOCATIONS_PART_TYPEID]: {
-    part: GEOGRAPHY,
-  },
-  [ASSERTED_TOPONYMS_PART_TYPEID]: {
-    part: GEOGRAPHY,
-  },
-  // epigraphy
-  [EPI_SUPPORT_FRR_PART_TYPEID]: {
-    part: EPIGRAPHY,
-  },
-  [EPI_SIGNS_PART_TYPEID]: {
-    part: EPIGRAPHY,
-  },
   // codicology
   [COD_BINDINGS_PART_TYPEID]: {
     part: CODICOLOGY,
@@ -176,16 +143,5 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   // bibliography
   [EXT_BIBLIOGRAPHY_PART_TYPEID]: {
     part: BIBLIO,
-  },
-  // layer parts
-  [TOKEN_TEXT_LAYER_PART_TYPEID]: {
-    part: GENERAL,
-    fragments: {
-      [CHRONOLOGY_FRAGMENT_TYPEID]: GENERAL,
-      [COMMENT_FRAGMENT_TYPEID]: GENERAL,
-      [APPARATUS_FRAGMENT_TYPEID]: PHILOLOGY,
-      [ORTHOGRAPHY_FRAGMENT_TYPEID]: PHILOLOGY,
-      [PIN_LINKS_FRAGMENT_TYPEID]: GENERAL,
-    },
   },
 };
