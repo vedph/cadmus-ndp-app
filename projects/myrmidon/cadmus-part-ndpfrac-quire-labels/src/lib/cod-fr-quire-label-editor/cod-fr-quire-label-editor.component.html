@@ -33,7 +33,18 @@
   </div>
 
   <!-- hand ID -->
-   TODO
+  <cadmus-refs-asserted-composite-id
+    [idScopeEntries]="idScopeEntries()"
+    [idTagEntries]="idTagEntries()"
+    [assTagEntries]="assTagEntries()"
+    [refTypeEntries]="refTypeEntries()"
+    [refTagEntries]="refTagEntries()"
+    [internalDefault]="true"
+    [id]="handId.value || undefined"
+    [canSwitchMode]="true"
+    [canEditTarget]="true"
+    (idChange)="onHandIdChange($event!)"
+  />
 
   <!-- ink-->
   <div>

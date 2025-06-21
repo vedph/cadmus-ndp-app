@@ -41,6 +41,10 @@ import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { CodFrQuireLabel } from '../cod-fr-quire-labels-part';
+import {
+  AssertedCompositeId,
+  AssertedCompositeIdComponent,
+} from '@myrmidon/cadmus-refs-asserted-ids';
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {
@@ -63,6 +67,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatTooltipModule,
     // bricks
     FlagSetComponent,
+    AssertedCompositeIdComponent,
   ],
   templateUrl: './cod-fr-quire-label-editor.component.html',
   styleUrl: './cod-fr-quire-label-editor.component.css',
@@ -70,6 +75,17 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 export class CodFrQuireLabelEditorComponent {
   public readonly data = model<CodFrQuireLabel | undefined>();
   public readonly cancelEdit = output();
+
+  // doc-reference-types
+  public readonly refTypeEntries = input<ThesaurusEntry[]>();
+  // doc-reference-tags
+  public readonly refTagEntries = input<ThesaurusEntry[]>();
+  // assertion-tags
+  public readonly assTagEntries = input<ThesaurusEntry[]>();
+  // external-id-tags
+  public readonly idTagEntries = input<ThesaurusEntry[]>();
+  // external-id-scopes
+  public readonly idScopeEntries = input<ThesaurusEntry[]>();
 
   // cod-fr-quire-label-types
   public readonly typeEntries = input<ThesaurusEntry[]>();
@@ -88,7 +104,7 @@ export class CodFrQuireLabelEditorComponent {
   public types: FormControl<string[]>;
   public positions: FormControl<string[]>;
   public text: FormControl<string | null>;
-  public handId: FormControl<string | null>;
+  public handId: FormControl<AssertedCompositeId | null>;
   public ink: FormControl<string | null>;
   public note: FormControl<string | null>;
   public form: FormGroup;
@@ -109,9 +125,7 @@ export class CodFrQuireLabelEditorComponent {
     this.text = this.formBuilder.control<string | null>(null, {
       validators: [Validators.maxLength(500)],
     });
-    this.handId = this.formBuilder.control<string | null>(null, {
-      validators: [Validators.maxLength(300)],
-    });
+    this.handId = this.formBuilder.control<AssertedCompositeId | null>(null);
     this.ink = this.formBuilder.control<string | null>(null, {
       validators: [Validators.maxLength(1000)],
     });
@@ -175,6 +189,12 @@ export class CodFrQuireLabelEditorComponent {
     this.positions.setValue(ids);
     this.positions.markAsDirty();
     this.positions.updateValueAndValidity();
+  }
+
+  public onHandIdChange(id: AssertedCompositeId | null): void {
+    this.handId.setValue(id);
+    this.handId.markAsDirty();
+    this.handId.updateValueAndValidity();
   }
 
   public cancel(): void {
