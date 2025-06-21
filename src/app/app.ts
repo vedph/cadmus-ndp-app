@@ -1,7 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { Thesaurus, ThesaurusEntry } from '@myrmidon/cadmus-core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -17,14 +16,18 @@ import { EnvService, RamStorageService } from '@myrmidon/ngx-tools';
 import { AuthJwtService, GravatarPipe, User } from '@myrmidon/auth-jwt-login';
 
 // bricks
-import { ASSERTED_COMPOSITE_ID_CONFIGS_KEY } from '@myrmidon/cadmus-refs-asserted-ids';
-import { RefLookupConfig } from '@myrmidon/cadmus-refs-lookup';
+import {
+  LOOKUP_CONFIGS_KEY,
+  RefLookupConfig,
+} from '@myrmidon/cadmus-refs-lookup';
+import { ViafRefLookupService } from '@myrmidon/cadmus-refs-viaf-lookup';
+
+// cadmus
 import { AppRepository } from '@myrmidon/cadmus-state';
 
 @Component({
   selector: 'app-root',
   imports: [
-    CommonModule,
     RouterModule,
     MatButtonModule,
     MatIconModule,
@@ -33,10 +36,10 @@ import { AppRepository } from '@myrmidon/cadmus-state';
     MatTooltipModule,
     GravatarPipe,
   ],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  templateUrl: './app.html',
+  styleUrl: './app.scss',
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class App implements OnInit, OnDestroy {
   private readonly _subs: Subscription[] = [];
 
   public user?: User;
@@ -51,31 +54,23 @@ export class AppComponent implements OnInit, OnDestroy {
     private _appRepository: AppRepository,
     private _router: Router,
     env: EnvService,
-    storage: RamStorageService
+    storage: RamStorageService,
+    viaf: ViafRefLookupService
   ) {
     this.version = env.get('version') || '';
 
-    // TODO: configure external lookup for asserted composite IDs
-    // storage.store(ASSERTED_COMPOSITE_ID_CONFIGS_KEY, [
-    //   {
-    //     name: 'VIAF',
-    //     iconUrl: '/img/viaf128.png',
-    //     description: 'Virtual International Authority File',
-    //     label: 'ID',
-    //     service: viaf,
-    //     itemIdGetter: (item: any) => item?.viafid,
-    //     itemLabelGetter: (item: any) => item?.term,
-    //   },
-    //   {
-    //     name: 'geonames',
-    //     iconUrl: '/img/geonames128.png',
-    //     description: 'GeoNames',
-    //     label: 'ID',
-    //     service: geonames,
-    //     itemIdGetter: (item: any) => item?.geonameId,
-    //     itemLabelGetter: (item: any) => item?.name,
-    //   },
-    // ] as RefLookupConfig[]);
+    // configure external lookup for asserted composite IDs
+    storage.store(LOOKUP_CONFIGS_KEY, [
+      {
+        name: 'VIAF',
+        iconUrl: '/img/viaf128.png',
+        description: 'Virtual International Authority File',
+        label: 'ID',
+        service: viaf,
+        itemIdGetter: (item: any) => item?.viafid,
+        itemLabelGetter: (item: any) => item?.term,
+      },
+    ] as RefLookupConfig[]);
   }
 
   public ngOnInit(): void {
