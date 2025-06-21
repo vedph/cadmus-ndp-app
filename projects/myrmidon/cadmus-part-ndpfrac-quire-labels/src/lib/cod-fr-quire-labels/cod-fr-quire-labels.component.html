@@ -1,0 +1,115 @@
+<form [formGroup]="form" (submit)="save()">
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>picture_in_picture</mat-icon>
+      </div>
+      <mat-card-title>{{
+        (modelName() | titlecase) || "Codicological Fragment Quire Labels Part"
+      }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          (click)="addLabel()"
+        >
+          <mat-icon>add_circle</mat-icon> label
+        </button>
+      </div>
+      @if (entries.value.length) {
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>types</th>
+            <th>positions</th>
+            <th>hand</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of entries.value; track entry; let i = $index; let first =
+          $first; let last = $last) {
+          <tr [class.selected]="entry === edited">
+            <td class="fit-width">
+              <button
+                type="button"
+                mat-icon-button
+                color="primary"
+                matTooltip="Edit this label"
+                (click)="editLabel(entry, i)"
+              >
+                <mat-icon class="mat-primary">edit</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                matTooltip="Move this label up"
+                [disabled]="first"
+                (click)="moveLabelUp(i)"
+              >
+                <mat-icon>arrow_upward</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                matTooltip="Move this label down"
+                [disabled]="last"
+                (click)="moveLabelDown(i)"
+              >
+                <mat-icon>arrow_downward</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                color="warn"
+                matTooltip="Delete this label"
+                (click)="deleteLabel(i)"
+              >
+                <mat-icon class="mat-warn">remove_circle</mat-icon>
+              </button>
+            </td>
+            <td>
+              @for (type of entry.types; track type) {
+              <span>{{
+                type | flatLookup : typeEntries : "id" : "value"
+              }}</span>
+              }
+            </td>
+            <td>
+              @for (position of entry.positions; track position) {
+              <span>{{
+                position | flatLookup : positionEntries : "id" : "value"
+              }}</span>
+              }
+            </td>
+            <td>
+              {{ entry.handId?.target?.gid }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      } @if (edited) {
+      <fieldset>
+        <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
+          <mat-expansion-panel-header>
+            <mat-panel-title>label #</mat-panel-title>
+          </mat-expansion-panel-header>
+          TODO: editor control with: [model]="edited"
+          (modelChange)="saveLabel($event)" (editorClose)="closelabel()"
+        </mat-expansion-panel>
+      </fieldset>
+      }
+    </mat-card-content>
+    <mat-card-actions>
+      <cadmus-close-save-buttons
+        [form]="form"
+        [noSave]="userLevel < 2"
+        (closeRequest)="close()"
+      />
+    </mat-card-actions>
+  </mat-card>
+</form>
