@@ -33,8 +33,8 @@ import {
   CodFrQuireLabel,
   CodFrQuireLabelsPart,
 } from '../cod-fr-quire-labels-part';
-import { CodFrQuireLabelEditorComponent } from
-  '../cod-fr-quire-label-editor/cod-fr-quire-label-editor.component';
+import { CodFrQuireLabelEditorComponent }
+  from '../cod-fr-quire-label-editor/cod-fr-quire-label-editor.component';
 
 /**
  * CodFrQuireLabelsPart editor component.
@@ -43,7 +43,7 @@ import { CodFrQuireLabelEditorComponent } from
  * cod-fr-quire-label-types, cod-fr-quire-label-positions.
  */
 @Component({
-  selector: 'cadmus-cod-fr-quire-labels',
+  selector: 'cadmus-cod-fr-quire-labels-part',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -61,10 +61,10 @@ import { CodFrQuireLabelEditorComponent } from
     CloseSaveButtonsComponent,
     CodFrQuireLabelEditorComponent,
   ],
-  templateUrl: './cod-fr-quire-labels.component.html',
-  styleUrl: './cod-fr-quire-labels.component.css',
+  templateUrl: './cod-fr-quire-labels-part.component.html',
+  styleUrl: './cod-fr-quire-labels-part.component.css',
 })
-export class CodFrQuireLabelsComponent
+export class CodFrQuireLabelsPartComponent
   extends ModelEditorComponentBase<CodFrQuireLabelsPart>
   implements OnInit
 {
