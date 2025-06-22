@@ -22,6 +22,9 @@ fieldset {
   border-radius: 6px;
   padding: 6px;
 }
+legend {
+  color: silver;
+}
 .entry {
-  margin: 0 12px;
+  margin-right: 8px;
 }
