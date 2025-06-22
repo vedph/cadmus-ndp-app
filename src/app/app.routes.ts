@@ -121,6 +121,15 @@ export const routes: Routes = [
       ),
     canActivate: [AuthJwtGuardService],
   },
+  // ndp- frac parts
+  {
+    path: 'items/:iid/ndp-frac',
+    loadChildren: () =>
+      import('@myrmidon/cadmus-part-ndpfrac-pg').then(
+        (module) => module.CadmusPartNdpFracPgModule
+      ),
+    canActivate: [AuthJwtGuardService],
+  },
   // cadmus - graph
   {
     path: 'graph',

@@ -38,11 +38,16 @@ import { COD_WATERMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-wat
 // bibliography
 import { EXT_BIBLIOGRAPHY_PART_TYPEID } from '@myrmidon/cadmus-part-biblio-ui';
 
+// local
+import { COD_FR_QUIRE_LABELS_PART_TYPEID }
+  from '../../projects/myrmidon/cadmus-part-ndpfrac-quire-labels/src/public-api';
+
 // route constants
 const GENERAL = 'general';
 const PHILOLOGY = 'philology';
 const CODICOLOGY = 'codicology';
 const BIBLIO = 'biblio';
+const NDP_FRAC = 'ndp-frac';
 
 /**
  * The parts and fragments editor keys for this UI.
@@ -143,5 +148,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   // bibliography
   [EXT_BIBLIOGRAPHY_PART_TYPEID]: {
     part: BIBLIO,
+  },
+  // ndp-frac
+  [COD_FR_QUIRE_LABELS_PART_TYPEID]: {
+    part: NDP_FRAC,
   },
 };
