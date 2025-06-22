@@ -25,13 +25,13 @@ export interface CodFrQuireLabelsPart extends Part {
  * The type ID used to identify the CodFrQuireLabelsPart type.
  */
 export const COD_FR_QUIRE_LABELS_PART_TYPEID =
-  'it.vedph.ndpfrac.cod-fr-quire-labels';
+  'it.vedph.ndp.cod-fr-quire-labels';
 
 /**
  * JSON schema for the CodFrQuireLabels part.
  * You can use the JSON schema tool at https://jsonschema.net/.
  */
-export const CodFrQuireLabels_PART_SCHEMA = {
+export const COD_FR_QUIRE_LABELS_PART_SCHEMA = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id:
     'www.vedph.it/cadmus/parts/ndpfrac/' +

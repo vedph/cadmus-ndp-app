@@ -126,7 +126,7 @@ export const routes: Routes = [
     path: 'items/:iid/ndp-frac',
     loadChildren: () =>
       import('@myrmidon/cadmus-part-ndpfrac-pg').then(
-        (module) => module.CadmusPartNdpFracPgModule
+        (module) => module.CADMUS_PART_NDPFRAC_PG_ROUTES
       ),
     canActivate: [AuthJwtGuardService],
   },
