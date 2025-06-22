@@ -33,22 +33,25 @@
   </div>
 
   <!-- hand ID -->
-  <cadmus-refs-asserted-composite-id
-    [idScopeEntries]="idScopeEntries()"
-    [idTagEntries]="idTagEntries()"
-    [assTagEntries]="assTagEntries()"
-    [refTypeEntries]="refTypeEntries()"
-    [refTagEntries]="refTagEntries()"
-    [internalDefault]="true"
-    [id]="handId.value || undefined"
-    [canSwitchMode]="true"
-    [canEditTarget]="true"
-    (idChange)="onHandIdChange($event!)"
-  />
+  <fieldset>
+    <legend>hand</legend>
+    <cadmus-refs-asserted-composite-id
+      [idScopeEntries]="idScopeEntries()"
+      [idTagEntries]="idTagEntries()"
+      [assTagEntries]="assTagEntries()"
+      [refTypeEntries]="refTypeEntries()"
+      [refTagEntries]="refTagEntries()"
+      [internalDefault]="true"
+      [id]="handId.value || undefined"
+      [canSwitchMode]="true"
+      [canEditTarget]="true"
+      (idChange)="onHandIdChange($event!)"
+    />
+  </fieldset>
 
   <!-- ink-->
   <div>
-    <mat-form-field>
+    <mat-form-field class="long-text">
       <mat-label>ink</mat-label>
       <input matInput [formControl]="ink" />
       @if ($any(ink).errors?.maxLength && (ink.dirty || ink.touched)) {
@@ -59,7 +62,7 @@
 
   <!-- note -->
   <div>
-    <mat-form-field>
+    <mat-form-field class="long-text">
       <mat-label>note</mat-label>
       <textarea matInput [formControl]="note" rows="3"></textarea>
       @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {

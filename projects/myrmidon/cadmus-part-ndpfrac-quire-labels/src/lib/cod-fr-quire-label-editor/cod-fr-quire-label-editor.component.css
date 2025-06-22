@@ -7,3 +7,16 @@
 .form-row * {
   flex: 0 0 auto;
 }
+.long-text {
+  width: 100%;
+  max-width: 800px;
+}
+fieldset {
+  margin: 8px 0;
+  border: 1px solid silver;
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+legend {
+  color: silver;
+}
