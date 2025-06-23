@@ -6,6 +6,10 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
   - [books](https://github.com/vedph/cadmus-ndp-books)
   - [fragments](https://github.com/vedph/cadmus-ndp-frac)
   - [drawings](https://github.com/vedph/cadmus-ndp-drawings)
+- other models:
+  - [codicology](https://github.com/vedph/cadmus-codicology)
+  - [epigraphy](https://github.com/vedph/cadmus-epigraphy)
+  - [iconography](https://github.com/vedph/cadmus-iconography)
 
 ## Docker
 
@@ -14,13 +18,3 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 1. `npm run build-lib`
 2. update version in `env.js` and `ng build`
 3. `docker build . -t vedph2020/cadmus-ndp-app:0.0.1 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
-
-## TODO
-
-- TODO list:
-  - add libraries for NDP models
-  - set API port in env.js
-  - complete and adjust part-editor-keys.ts
-  - complete and adjust app.routes.ts
-  - complete and adjust app.config.ts
-  - adjust Docker files

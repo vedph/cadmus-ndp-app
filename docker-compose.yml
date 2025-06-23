@@ -1,0 +1,85 @@
+services:
+  # MongoDB
+  cadmus-ndp-mongo:
+    image: mongo
+    container_name: cadmus-ndp-mongo
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    command: mongod --logpath=/dev/null
+    ports:
+      - 27017:27017
+    networks:
+      - cadmus-ndp-network
+
+ # PostgreSQL
+  cadmus-ndp-pgsql:
+    image: postgres
+    container_name: cadmus-ndp-pgsql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    networks:
+      - cadmus-ndp-network
+
+  # Biblio API
+  cadmus-biblio-api:
+    image: vedph2020/cadmus-biblio-api:8.0.1
+    container_name: cadmus-biblio-api
+    ports:
+      - 5000:8080
+    depends_on:
+      - cadmus-vela-mongo
+      - cadmus-vela-pgsql
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-vela-mongo:27017/{0}
+      - CONNECTIONSTRINGS__AUTH=Server=cadmus-vela-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - CONNECTIONSTRINGS__BIBLIO=Server=cadmus-vela-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - SEED__DELAY=50
+      - SERILOG__CONNECTIONSTRING=mongodb://cadmus-vela-mongo:27017/{0}-log
+      - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
+    networks:
+      - cadmus-vela-network
+
+  # Cadmus NDP API
+  cadmus-ndp-api:
+    image: vedph2020/cadmus-ndp-api:0.0.1
+    container_name: cadmus-ndp-api
+    ports:
+      - 5172:8080
+    depends_on:
+      - cadmus-ndp-mongo
+      - cadmus-ndp-pgsql
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-ndp-mongo:27017/{0}
+      - CONNECTIONSTRINGS__AUTH=Server=cadmus-ndp-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - CONNECTIONSTRINGS__INDEX=Server=cadmus-ndp-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - SERILOG__CONNECTIONSTRING=mongodb://cadmus-ndp-mongo:27017/{0}-log
+      - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
+      - SEED__DELAY=20
+      - MESSAGING__APIROOTURL=http://cadmusapi.azurewebsites.net
+      - MESSAGING__APPROOTURL=http://cadmusapi.com/
+      - MESSAGING__SUPPORTEMAIL=support@cadmus.com
+    networks:
+      - cadmus-ndp-network
+
+  # Cadmus NDP App
+  cadmus-app:
+    image: vedph2020/cadmus-ndp-app:0.0.1
+    container_name: cadmus-ndp-app
+    ports:
+      - 4200:80
+    depends_on:
+      - cadmus-ndp-api
+      - cadmus-biblio-api
+    networks:
+      - cadmus-ndp-network
+
+networks:
+  cadmus-ndp-network:
+    driver: bridge

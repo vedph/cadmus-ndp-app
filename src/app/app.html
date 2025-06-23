@@ -32,26 +32,10 @@
     @if (logged) {
     <button type="button" mat-button routerLink="/graph">Graph</button>
     }
-    <!-- profile menu -->
-    @if (user && user.roles.includes('admin')) {
-    <button type="button" mat-button [matMenuTriggerFor]="profileMenu">
-      Profile
-    </button>
-    <mat-menu #profileMenu>
-      <a mat-menu-item routerLink="/flags"> Flags </a>
-      <a mat-menu-item routerLink="/thesauri"> Thesauri </a>
-    </mat-menu>
+    <!-- stats menu -->
+    @if (logged) {
+    <button type="button" mat-button routerLink="/stats">Stats</button>
     }
-
-    <!-- demo menu -->
-    <button type="button" mat-button [matMenuTriggerFor]="demoMenu">
-      Demo
-    </button>
-    <mat-menu #demoMenu>
-      <button type="button" mat-menu-item routerLink="/demo/layers">
-        Text Layers
-      </button>
-    </mat-menu>
 
     <span class="tb-fill-remaining-space"></span>
 
@@ -94,6 +78,8 @@
       <mat-menu #adminMenu>
         <a mat-menu-item routerLink="/manage-users">Manage users</a>
         <a mat-menu-item routerLink="/register-user">Register user</a>
+        <a mat-menu-item routerLink="/flags"> Flags </a>
+        <a mat-menu-item routerLink="/thesauri"> Thesauri </a>
       </mat-menu>
     </div>
     }
