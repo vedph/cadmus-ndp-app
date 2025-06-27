@@ -17,6 +17,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 // vendors
 import { NgeMonacoModule } from '@cisstech/nge/monaco';
 import { NgeMarkdownModule } from '@cisstech/nge/markdown';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 // myrmidon
 import { authJwtInterceptor } from '@myrmidon/auth-jwt-login';
