@@ -1,0 +1,119 @@
+<form [formGroup]="form" (submit)="save()">
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>picture_in_picture</mat-icon>
+      </div>
+      <mat-card-title>
+        <mat-card-title>{{
+          (modelName() | titlecase) || "Codicological Fragment Rulings Part"
+        }}</mat-card-title>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          (click)="addRuling()"
+        >
+          <mat-icon>add_circle</mat-icon> ruling
+        </button>
+      </div>
+      @if (entries.value.length) {
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <td>features</td>
+            <td>system</td>
+            <td>type</td>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of entries.value; track entry; let i = $index; let first =
+          $first; let last = $last) {
+          <tr [class.selected]="entry === edited">
+            <td class="fit-width">
+              <button
+                type="button"
+                mat-icon-button
+                color="primary"
+                matTooltip="Edit this ruling"
+                (click)="editRuling(entry, i)"
+              >
+                <mat-icon class="mat-primary">edit</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                matTooltip="Move this ruling up"
+                [disabled]="first"
+                (click)="moveRulingUp(i)"
+              >
+                <mat-icon>arrow_upward</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                matTooltip="Move this ruling down"
+                [disabled]="last"
+                (click)="moveRulingDown(i)"
+              >
+                <mat-icon>arrow_downward</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                color="warn"
+                matTooltip="Delete this ruling"
+                (click)="deleteRuling(i)"
+              >
+                <mat-icon class="mat-warn">remove_circle</mat-icon>
+              </button>
+            </td>
+            <td>
+              @for (f of entry.features; track f) {
+              <span class="feature">{{
+                f | flatLookup : featureEntries : "id" : "value"
+              }}</span>
+              }
+            </td>
+            <td>
+              {{ entry.system | flatLookup : systemEntries : "id" : "value" }}
+            </td>
+            <td>
+              {{ entry.type | flatLookup : typeEntries : "id" : "value" }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      } @if (edited) {
+      <fieldset>
+        <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Ruling #{{ editedIndex + 1 }}</mat-panel-title>
+          </mat-expansion-panel-header>
+          <cadmus-cod-fr-ruling-editor
+            [featureEntries]="featureEntries"
+            [systemEntries]="systemEntries"
+            [typeEntries]="typeEntries"
+            [ruling]="edited"
+            (rulingChange)="saveRuling($event!)"
+            (editorClose)="closeRuling()"
+          />
+        </mat-expansion-panel>
+      </fieldset>
+      }
+    </mat-card-content>
+    <mat-card-actions>
+      <cadmus-close-save-buttons
+        [form]="form"
+        [noSave]="userLevel < 2"
+        (closeRequest)="close()"
+      />
+    </mat-card-actions>
+  </mat-card>
+</form>

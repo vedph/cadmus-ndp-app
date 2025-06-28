@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CodFrQuireLabelsFeatureComponent } from './cod-fr-quire-labels-feature.component';
+import { CodFrQuireLabelsFeatureComponent } from './cod-fr-quire-labels-part-feature.component';
 
 describe('CodFrQuireLabelsFeatureComponent', () => {
   let component: CodFrQuireLabelsFeatureComponent;

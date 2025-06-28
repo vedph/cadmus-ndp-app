@@ -9,6 +9,9 @@
       ],
       "@myrmidon/cadmus-part-ndpfrac-quire-labels": [
         "./dist/myrmidon/cadmus-part-ndpfrac-quire-labels"
+      ],
+      "@myrmidon/cadmus-part-ndpfrac-rulings": [
+        "./dist/myrmidon/cadmus-part-ndpfrac-rulings"
       ]
     },
     "outDir": "./dist/out-tsc",
@@ -44,6 +47,12 @@
     },
     {
       "path": "./projects/myrmidon/cadmus-part-ndpfrac-pg/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpfrac-rulings/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpfrac-rulings/tsconfig.spec.json"
     }
   ]
 }

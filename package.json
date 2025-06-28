@@ -8,8 +8,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build-lbl": "ng build @myrmidon/cadmus-part-ndpfrac-quire-labels",
+    "build-rul": "ng build @myrmidon/cadmus-part-ndpfrac-rulings",
     "build-pg": "ng build @myrmidon/cadmus-part-ndpfrac-pg",
-    "build-lib": "npm run build-lbl && npm run build-pg"
+    "build-lib": "npm run build-lbl && npm run build-rul && npm run build-pg"
   },
   "private": true,
   "dependencies": {
