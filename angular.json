@@ -185,6 +185,36 @@
           }
         }
       }
+    },
+    "@myrmidon/cadmus-part-ndpfrac-support": {
+      "projectType": "library",
+      "root": "projects/myrmidon/cadmus-part-ndpfrac-support",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-support/src",
+      "prefix": "cadmus",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {

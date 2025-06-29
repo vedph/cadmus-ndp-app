@@ -6,15 +6,15 @@ import { ItemService, ThesaurusService } from '@myrmidon/cadmus-api';
 import { EditPartFeatureBase, PartEditorService } from '@myrmidon/cadmus-state';
 import { CurrentItemBarComponent } from '@myrmidon/cadmus-ui-pg';
 
-import { CodFrQuireLabelsPartComponent } from '../cod-fr-quire-labels-part/cod-fr-quire-labels-part.component';
+import { CodFrSupportPartComponent } from '../cod-fr-support-part/cod-fr-support-part.component';
 
 @Component({
-  selector: 'cadmus-cod-fr-quire-labels-feature',
-  imports: [CodFrQuireLabelsPartComponent, CurrentItemBarComponent],
-  templateUrl: './cod-fr-quire-labels-part-feature.component.html',
-  styleUrls: ['./cod-fr-quire-labels-part-feature.component.css'],
+  selector: 'cadmus-cod-fr-support-part-feature',
+  imports: [CurrentItemBarComponent, CodFrSupportPartComponent],
+  templateUrl: './cod-fr-support-part-feature.component.html',
+  styleUrl: './cod-fr-support-part-feature.component.css',
 })
-export class CodFrQuireLabelsPartFeatureComponent
+export class CodFrSupportPartFeatureComponent
   extends EditPartFeatureBase
   implements OnInit
 {
@@ -38,13 +38,9 @@ export class CodFrQuireLabelsPartFeatureComponent
 
   protected override getReqThesauriIds(): string[] {
     return [
-      'doc-reference-types',
-      'doc-reference-tags',
-      'assertion-tags',
-      'external-id-tags',
-      'external-id-scopes',
-      'cod-fr-quire-label-types',
-      'cod-fr-quire-label-positions',
+      'cod-fr-support-materials',
+      'cod-fr-support-reuse-types',
+      'cod-fr-support-containers',
     ];
   }
 }

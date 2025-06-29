@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CodFrQuireLabelsFeatureComponent } from './cod-fr-quire-labels-part-feature.component';
+import { CodFrQuireLabelsPartFeatureComponent } from './cod-fr-quire-labels-part-feature.component';
 
 describe('CodFrQuireLabelsFeatureComponent', () => {
-  let component: CodFrQuireLabelsFeatureComponent;
-  let fixture: ComponentFixture<CodFrQuireLabelsFeatureComponent>;
+  let component: CodFrQuireLabelsPartFeatureComponent;
+  let fixture: ComponentFixture<CodFrQuireLabelsPartFeatureComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CodFrQuireLabelsFeatureComponent]
+      imports: [CodFrQuireLabelsPartFeatureComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CodFrQuireLabelsFeatureComponent);
+    fixture = TestBed.createComponent(CodFrQuireLabelsPartFeatureComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

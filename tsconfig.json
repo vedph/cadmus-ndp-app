@@ -12,6 +12,9 @@
       ],
       "@myrmidon/cadmus-part-ndpfrac-rulings": [
         "./dist/myrmidon/cadmus-part-ndpfrac-rulings"
+      ],
+      "@myrmidon/cadmus-part-ndpfrac-support": [
+        "./dist/myrmidon/cadmus-part-ndpfrac-support"
       ]
     },
     "outDir": "./dist/out-tsc",
@@ -53,6 +56,12 @@
     },
     {
       "path": "./projects/myrmidon/cadmus-part-ndpfrac-rulings/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.spec.json"
     }
   ]
 }
