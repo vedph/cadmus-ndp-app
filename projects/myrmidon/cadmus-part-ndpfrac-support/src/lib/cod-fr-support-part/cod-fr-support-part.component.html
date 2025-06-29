@@ -67,8 +67,8 @@
               e.value
             }}</mat-option>
           </mat-select>
-          @if ($any(container).errors?.required &&
-          (container.dirty || container.touched)) {
+          @if ($any(container).errors?.required && (container.dirty ||
+          container.touched)) {
           <mat-error>container required</mat-error>
           }
         </mat-form-field>
@@ -77,11 +77,11 @@
         <mat-form-field>
           <mat-label>container</mat-label>
           <input matInput [formControl]="container" />
-          @if ($any(container).errors?.required &&
-          (container.dirty || container.touched)) {
+          @if ($any(container).errors?.required && (container.dirty ||
+          container.touched)) {
           <mat-error>container required</mat-error>
-          } @if ($any(container).errors?.maxLength &&
-          (container.dirty || container.touched)) {
+          } @if ($any(container).errors?.maxLength && (container.dirty ||
+          container.touched)) {
           <mat-error>container too long</mat-error>
           }
         </mat-form-field>
@@ -136,16 +136,19 @@
 
       <!-- location -->
       <div>
-        <cadmus-mat-physical-grid-location
-          [location]="location.value || undefined"
-          [allowCustomSize]="true"
-          [allowResize]="true"
-          (locationChange)="onLocationChange($event!)"
-        />
-        @if ($any(location).errors?.required && (location.dirty ||
-        location.touched)) {
-        <mat-error>location required</mat-error>
-        }
+        <fieldset>
+          <legend>location</legend>
+          <cadmus-mat-physical-grid-location
+            [location]="location.value || undefined"
+            [allowCustomSize]="true"
+            [allowResize]="true"
+            (locationChange)="onLocationChange($event!)"
+          />
+          @if ($any(location).errors?.required && (location.dirty ||
+          location.touched)) {
+          <mat-error>location required</mat-error>
+          }
+        </fieldset>
       </div>
     </mat-card-content>
     <mat-card-actions>
