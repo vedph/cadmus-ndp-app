@@ -92,6 +92,7 @@
     "@myrmidon/cadmus-ui": "^13.0.0",
     "@myrmidon/cadmus-ui-flag-set": "^9.0.1",
     "@myrmidon/cadmus-ui-pg": "^14.0.0",
+    "@myrmidon/cod-layout-view": "^0.0.1",
     "@myrmidon/ngx-mat-tools": "^1.0.0",
     "@myrmidon/ngx-tools": "^2.0.0",
     "@myrmidon/paged-data-browsers": "^5.0.2",

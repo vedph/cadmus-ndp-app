@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -38,6 +39,9 @@ import {
   COD_FR_SUPPORT_PART_TYPEID,
 } from '../cod-fr-support-part';
 
+// import the custom element
+import '@myrmidon/cod-layout-view';
+
 /**
  * CodFrSupport part editor component.
  * Thesauri: cod-fr-support-materials, cod-fr-support-reuse-types,
@@ -62,6 +66,7 @@ import {
     // cadmus
     CloseSaveButtonsComponent,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './cod-fr-support-part.component.html',
   styleUrl: './cod-fr-support-part.component.css',
 })

@@ -20,3 +20,26 @@ fieldset {
 legend {
   color: silver;
 }
+div#viewer {
+  border: 1px solid silver;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+div#container {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "pane-general pane-layout";
+  gap: 8px;
+}
+
+/* lt-md */
+@media only screen and (max-width: 959px) {
+  div#container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "pane-general"
+      "pane-layout";
+  }
+}
