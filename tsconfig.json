@@ -4,6 +4,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@myrmidon/cadmus-part-ndpfrac-layout": [
+        "./dist/myrmidon/cadmus-part-ndpfrac-layout"
+      ],
       "@myrmidon/cadmus-part-ndpfrac-pg": [
         "./dist/myrmidon/cadmus-part-ndpfrac-pg"
       ],
@@ -62,6 +65,12 @@
     },
     {
       "path": "./projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.spec.json"
     }
   ]
 }

@@ -39,6 +39,7 @@ import { COD_WATERMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-wat
 import { EXT_BIBLIOGRAPHY_PART_TYPEID } from '@myrmidon/cadmus-part-biblio-ui';
 
 // local
+import { COD_FR_LAYOUT_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-layout/src/public-api';
 import { COD_FR_QUIRE_LABELS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-quire-labels/src/public-api';
 import { COD_FR_RULINGS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-rulings/src/public-api';
 import { COD_FR_SUPPORT_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-support/src/public-api';
@@ -151,6 +152,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
     part: BIBLIO,
   },
   // ndp-frac
+  [COD_FR_LAYOUT_PART_TYPEID]: {
+    part: NDP_FRAC,
+  },
   [COD_FR_QUIRE_LABELS_PART_TYPEID]: {
     part: NDP_FRAC,
   },

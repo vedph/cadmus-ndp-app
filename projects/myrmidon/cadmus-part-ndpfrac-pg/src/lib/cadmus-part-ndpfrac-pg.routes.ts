@@ -1,6 +1,11 @@
 import { Routes } from '@angular/router';
 
 import {
+  COD_FR_LAYOUT_PART_TYPEID,
+  CodFrLayoutPartFeatureComponent,
+} from '@myrmidon/cadmus-part-ndpfrac-layout';
+
+import {
   COD_FR_QUIRE_LABELS_PART_TYPEID,
   CodFrQuireLabelsPartFeatureComponent,
 } from '@myrmidon/cadmus-part-ndpfrac-quire-labels';
@@ -19,6 +24,12 @@ import {
 import { PendingChangesGuard } from '@myrmidon/cadmus-core';
 
 export const CADMUS_PART_NDPFRAC_PG_ROUTES: Routes = [
+  {
+    path: `${COD_FR_LAYOUT_PART_TYPEID}/:pid`,
+    pathMatch: 'full',
+    component: CodFrLayoutPartFeatureComponent,
+    canDeactivate: [PendingChangesGuard],
+  },
   {
     path: `${COD_FR_QUIRE_LABELS_PART_TYPEID}/:pid`,
     pathMatch: 'full',

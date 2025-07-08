@@ -8,6 +8,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
   - [drawings](https://github.com/vedph/cadmus-ndp-drawings)
 - other models:
   - [codicology](https://github.com/vedph/cadmus-codicology)
+  - [codicological formulas](https://github.com/vedph/cod-layout-view)
   - [epigraphy](https://github.com/vedph/cadmus-epigraphy)
   - [iconography](https://github.com/vedph/cadmus-iconography)
 

@@ -76,9 +76,7 @@ export class CodFrSupportPartComponent
 {
   public material: FormControl<string>;
   public location: FormControl<PhysicalGridLocation | null>;
-  public layout: FormControl<string>;
   public container: FormControl<string>;
-  public hasPricking: FormControl<boolean>;
   public reuse: FormControl<string | null>;
   public supposedReuse: FormControl<string | null>;
 
@@ -101,15 +99,10 @@ export class CodFrSupportPartComponent
       nonNullable: true,
     });
     this.location = formBuilder.control(null, Validators.required);
-    this.layout = formBuilder.control('', {
-      validators: Validators.maxLength(100),
-      nonNullable: true,
-    });
     this.container = formBuilder.control('', {
       validators: Validators.maxLength(100),
       nonNullable: true,
     });
-    this.hasPricking = formBuilder.control(false, { nonNullable: true });
     this.reuse = formBuilder.control(null, Validators.maxLength(100));
     this.supposedReuse = formBuilder.control(null, Validators.maxLength(100));
   }
@@ -122,9 +115,7 @@ export class CodFrSupportPartComponent
     return formBuilder.group({
       material: this.material,
       location: this.location,
-      layout: this.layout,
       container: this.container,
-      hasPricking: this.hasPricking,
       reuse: this.reuse,
       supposedReuse: this.supposedReuse,
     });
@@ -168,9 +159,7 @@ export class CodFrSupportPartComponent
         true
       ) as PhysicalGridLocation) || null
     );
-    this.layout.setValue(part.layout || '');
     this.container.setValue(part.container || '');
-    this.hasPricking.setValue(part.hasPricking || false);
     this.reuse.setValue(part.reuse || null);
     this.supposedReuse.setValue(part.supposedReuse || null);
     this.form.markAsPristine();
@@ -199,9 +188,7 @@ export class CodFrSupportPartComponent
     part.location = this.location.value
       ? this._coordsService.physicalGridCoordsToString(this.location.value)
       : '';
-    part.layout = this.layout.value?.trim() || '';
     part.container = this.container.value?.trim() || '';
-    part.hasPricking = this.hasPricking.value || false;
     part.reuse = this.reuse.value?.trim() || undefined;
     part.supposedReuse = this.supposedReuse.value?.trim() || undefined;
     return part;

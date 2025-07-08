@@ -6,9 +6,7 @@ import { Part } from '@myrmidon/cadmus-core';
 export interface CodFrSupportPart extends Part {
   material: string;
   location: string;
-  layout: string;
   container: string;
-  hasPricking?: boolean;
   reuse?: string;
   supposedReuse?: string;
 }
@@ -38,7 +36,6 @@ export const COD_FR_SUPPORT_PART_SCHEMA = {
     'userId',
     'material',
     'location',
-    'layout',
     'container',
   ],
   properties: {
@@ -78,14 +75,8 @@ export const COD_FR_SUPPORT_PART_SCHEMA = {
     location: {
       type: 'string',
     },
-    layout: {
-      type: 'string',
-    },
     container: {
       type: 'string',
-    },
-    hasPricking: {
-      type: 'boolean',
     },
     reuse: {
       type: 'string',

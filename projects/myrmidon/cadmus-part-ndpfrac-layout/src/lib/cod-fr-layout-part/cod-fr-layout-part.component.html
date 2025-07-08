@@ -1,0 +1,98 @@
+<form [formGroup]="form" (submit)="save()">
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>picture_in_picture</mat-icon>
+      </div>
+      <mat-card-title>
+        {{ (modelName() | titlecase) || "Codicological Fragment Layout Part" }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab label="layout">
+          <cadmus-cod-layout-formula
+            [data]="formulaData()"
+            [tagEntries]="dimTagEntries"
+            [unitEntries]="unitEntries"
+            (dataChange)="onFormulaDataChange($event!)"
+          />
+        </mat-tab>
+        <mat-tab label="metadata">
+          <div class="form-row">
+            <!-- pricking -->
+            <!-- pricking (bound) -->
+            @if (prickingEntries?.length) {
+            <mat-form-field>
+              <mat-label>pricking</mat-label>
+              <mat-select [formControl]="pricking">
+                <mat-option *ngFor="let e of prickingEntries" [value]="e.id">{{
+                  e.value
+                }}</mat-option>
+              </mat-select>
+              @if ($any(pricking).errors?.required && (pricking.dirty ||
+              pricking.touched)) {
+              <mat-error>pricking required</mat-error>
+              }
+            </mat-form-field>
+            } @else {
+            <!-- pricking (free) -->
+            <mat-form-field>
+              <mat-label>pricking</mat-label>
+              <input matInput [formControl]="pricking" />
+              @if ($any(pricking).errors?.required && (pricking.dirty ||
+              pricking.touched)) {
+              <mat-error>pricking required</mat-error>
+              } @if ($any(pricking).errors?.maxLength && (pricking.dirty ||
+              pricking.touched)) {
+              <mat-error>pricking too long</mat-error>
+              }
+            </mat-form-field>
+            }
+
+            <!-- columnCount -->
+            <mat-form-field class="nr">
+              <mat-label>column count</mat-label>
+              <input matInput type="number" [formControl]="columnCount" />
+              @if ($any(columnCount).errors?.required && (columnCount.dirty ||
+              columnCount.touched)) {
+              <mat-error>column count required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- counts -->
+          <div>
+            <cadmus-refs-decorated-counts
+              [counts]="counts.value"
+              [tagEntries]="countTagEntries"
+              [idEntries]="countIdEntries"
+              (countsChange)="onCountsChange($event!)"
+            />
+          </div>
+
+          <!-- note -->
+          <div>
+            <mat-form-field class="long-text">
+              <mat-label>note</mat-label>
+              <input matInput [formControl]="note" />
+              @if ($any(note).errors?.required && (note.dirty || note.touched))
+              {
+              <mat-error>note required</mat-error>
+              } @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+              <mat-error>note too long</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+    <mat-card-actions>
+      <cadmus-close-save-buttons
+        [form]="form"
+        [noSave]="userLevel < 2"
+        (closeRequest)="close()"
+      />
+    </mat-card-actions>
+  </mat-card>
+</form>
