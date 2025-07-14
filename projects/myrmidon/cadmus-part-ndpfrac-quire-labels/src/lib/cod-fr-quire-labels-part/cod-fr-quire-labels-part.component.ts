@@ -22,19 +22,21 @@ import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 
 import {
-  CloseSaveButtonsComponent,
+  ThesauriSet,
+  ThesaurusEntry,
   EditedObject,
+} from '@myrmidon/cadmus-core';
+import {
+  CloseSaveButtonsComponent,
   ModelEditorComponentBase,
 } from '@myrmidon/cadmus-ui';
-import { ThesauriSet, ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import {
   COD_FR_QUIRE_LABELS_PART_TYPEID,
   CodFrQuireLabel,
   CodFrQuireLabelsPart,
 } from '../cod-fr-quire-labels-part';
-import { CodFrQuireLabelEditorComponent }
-  from '../cod-fr-quire-label-editor/cod-fr-quire-label-editor.component';
+import { CodFrQuireLabelEditorComponent } from '../cod-fr-quire-label-editor/cod-fr-quire-label-editor.component';
 
 /**
  * CodFrQuireLabelsPart editor component.

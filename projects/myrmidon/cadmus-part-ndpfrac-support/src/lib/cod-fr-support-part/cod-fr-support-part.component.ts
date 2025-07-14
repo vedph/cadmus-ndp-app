@@ -27,10 +27,9 @@ import {
   PhysicalGridLocationComponent,
 } from '@myrmidon/cadmus-mat-physical-grid';
 
-import { ThesauriSet, ThesaurusEntry } from '@myrmidon/cadmus-core';
+import { ThesauriSet, ThesaurusEntry, EditedObject } from '@myrmidon/cadmus-core';
 import {
   CloseSaveButtonsComponent,
-  EditedObject,
   ModelEditorComponentBase,
 } from '@myrmidon/cadmus-ui';
 

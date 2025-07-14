@@ -35,7 +35,9 @@
               "leaflet",
               "webcola",
               "dagre",
-              "diff-match-patch"
+              "diff-match-patch",
+              "ngraph.graph",
+              "ngraph.forcelayout"
             ]
           },
           "configurations": {

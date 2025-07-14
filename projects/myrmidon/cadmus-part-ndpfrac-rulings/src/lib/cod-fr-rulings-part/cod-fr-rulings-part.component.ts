@@ -22,11 +22,14 @@ import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 
 import {
-  CloseSaveButtonsComponent,
+  ThesauriSet,
+  ThesaurusEntry,
   EditedObject,
+} from '@myrmidon/cadmus-core';
+import {
+  CloseSaveButtonsComponent,
   ModelEditorComponentBase,
 } from '@myrmidon/cadmus-ui';
-import { ThesauriSet, ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import {
   COD_FR_RULINGS_PART_TYPEID,
