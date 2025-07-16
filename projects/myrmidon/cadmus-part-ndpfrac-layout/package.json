@@ -19,10 +19,10 @@
     "@angular/core": "^20.0.0",
     "@myrmidon/cadmus-mat-physical-size": "^9.0.8",
     "@myrmidon/cadmus-refs-decorated-counts": "^9.0.0",
-    "@myrmidon/cadmus-codicology-ui": "^12.0.2",
-    "@myrmidon/cadmus-core": "^12.0.0",
-    "@myrmidon/cadmus-state": "^13.0.0",
-    "@myrmidon/cadmus-ui": "^13.0.0"
+    "@myrmidon/cadmus-codicology-ui": "^13.0.0",
+    "@myrmidon/cadmus-core": "^12.0.1",
+    "@myrmidon/cadmus-state": "^14.0.0",
+    "@myrmidon/cadmus-ui": "^14.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -17,11 +17,14 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 🐋 Quick Docker image build:
 
 1. `npm run build-lib`
-2. update version in `env.js` and `ng build`
+2. update version in `env.js` and `ng build --configuration=production`
 3. `docker build . -t vedph2020/cadmus-ndp-app:0.0.1 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
 
+### 0.0.1
+
+- 2025-07-16: updated Angular and packages.
 - 2025-07-14:
   - updated Angular.
   - updated packages after replacing graph rendering library in walker. This implied installing `force.graph` and `three.js`.
