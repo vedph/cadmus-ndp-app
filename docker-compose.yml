@@ -32,18 +32,18 @@ services:
     ports:
       - 5000:8080
     depends_on:
-      - cadmus-vela-mongo
-      - cadmus-vela-pgsql
+      - cadmus-ndp-mongo
+      - cadmus-ndp-pgsql
     environment:
       - ASPNETCORE_URLS=http://+:8080
-      - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-vela-mongo:27017/{0}
-      - CONNECTIONSTRINGS__AUTH=Server=cadmus-vela-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
-      - CONNECTIONSTRINGS__BIBLIO=Server=cadmus-vela-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-ndp-mongo:27017/{0}
+      - CONNECTIONSTRINGS__AUTH=Server=cadmus-ndp-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
+      - CONNECTIONSTRINGS__BIBLIO=Server=cadmus-ndp-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
       - SEED__DELAY=50
-      - SERILOG__CONNECTIONSTRING=mongodb://cadmus-vela-mongo:27017/{0}-log
+      - SERILOG__CONNECTIONSTRING=mongodb://cadmus-ndp-mongo:27017/{0}-log
       - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
     networks:
-      - cadmus-vela-network
+      - cadmus-ndp-network
 
   # Cadmus NDP API
   cadmus-ndp-api:
