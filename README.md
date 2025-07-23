@@ -22,6 +22,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2025-07-23: updated Angular and packages.
 - 2025-07-17:
   - updated Angular and packages.
   - added citation configurations.
