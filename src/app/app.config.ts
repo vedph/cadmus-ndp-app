@@ -74,6 +74,11 @@ export const appConfig: ApplicationConfig = {
       provide: 'itemBrowserKeys',
       useValue: ITEM_BROWSER_KEYS,
     },
+    // URLs excluded from JWT auth
+    {
+      provide: AUTH_JWT_EXCLUDED_URLS,
+      useValue: ['https://viaf.org/viaf/'],
+    },
     // text editor plugins
     // https://github.com/vedph/cadmus-bricks-shell-v2/blob/master/projects/myrmidon/cadmus-text-ed/README.md
     MdBoldCtePlugin,
