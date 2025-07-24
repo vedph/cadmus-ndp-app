@@ -20,7 +20,10 @@ import { NgeMarkdownModule } from '@cisstech/nge/markdown';
 import { NgxEchartsModule } from 'ngx-echarts';
 
 // myrmidon
-import { authJwtInterceptor } from '@myrmidon/auth-jwt-login';
+import {
+  jwtInterceptor,
+  AUTH_JWT_EXCLUDED_URLS,
+} from '@myrmidon/auth-jwt-login';
 import {
   MdBoldCtePlugin,
   MdItalicCtePlugin,
@@ -44,10 +47,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withViewTransitions()),
     provideAnimationsAsync(),
     provideNativeDateAdapter(),
-    provideHttpClient(
-      withInterceptors([authJwtInterceptor]),
-      withJsonpSupport()
-    ),
+    provideHttpClient(withInterceptors([jwtInterceptor]), withJsonpSupport()),
     // vendor
     importProvidersFrom(NgeMonacoModule.forRoot({})),
     importProvidersFrom(NgeMarkdownModule),
