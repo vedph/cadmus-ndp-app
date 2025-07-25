@@ -8,4 +8,6 @@
   window.__env.version = "0.0.1";
   // enable thesaurus import in thesaurus list for admins
   window.__env.thesImportEnabled = true;
+  // MUFI
+  window.__env.mufiUrl = "http://localhost:5172/api/";
 })(this);
