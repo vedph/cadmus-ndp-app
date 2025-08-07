@@ -19,7 +19,7 @@
     "@angular/core": "^20.0.0",
     "@myrmidon/cadmus-mat-physical-size": "^9.0.8",
     "@myrmidon/cadmus-refs-decorated-counts": "^9.0.0",
-    "@myrmidon/cadmus-codicology-ui": "^13.0.0",
+    "@myrmidon/cadmus-codicology-ui": "^13.0.3",
     "@myrmidon/cadmus-core": "^12.0.1",
     "@myrmidon/cadmus-state": "^14.0.0",
     "@myrmidon/cadmus-ui": "^14.0.0"

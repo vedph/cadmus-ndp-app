@@ -22,6 +22,9 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2025-08-07:
+  - updated Angular and packages.
+  - updated Docker compose bibliography API version.
 - 2025-07-24:
   - updated Angular and packages.
   - added JWT URI exception for VIAF.
