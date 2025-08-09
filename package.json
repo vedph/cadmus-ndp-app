@@ -11,8 +11,9 @@
     "build-lay": "ng build @myrmidon/cadmus-part-ndpfrac-layout",
     "build-rul": "ng build @myrmidon/cadmus-part-ndpfrac-rulings",
     "build-sup": "ng build @myrmidon/cadmus-part-ndpfrac-support",
-    "build-pg": "ng build @myrmidon/cadmus-part-ndpfrac-pg",
-    "build-lib": "npm run build-lbl && npm run build-lay && npm run build-rul && npm run build-sup && npm run build-pg"
+    "build-fpg": "ng build @myrmidon/cadmus-part-ndpfrac-pg",
+    "build-fnt": "ng build @myrmidon/cadmus-part-ndpbooks-fonts",
+    "build-lib": "npm run build-lbl && npm run build-lay && npm run build-rul && npm run build-sup && npm run build-fpg && npm run build-fnt"
   },
   "private": true,
   "dependencies": {

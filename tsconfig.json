@@ -4,6 +4,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@myrmidon/cadmus-part-ndpbooks-fonts": [
+        "./dist/myrmidon/cadmus-part-ndpbooks-fonts"
+      ],
       "@myrmidon/cadmus-part-ndpfrac-layout": [
         "./dist/myrmidon/cadmus-part-ndpfrac-layout"
       ],
@@ -71,6 +74,12 @@
     },
     {
       "path": "./projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpbooks-fonts/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpbooks-fonts/tsconfig.spec.json"
     }
   ]
 }
