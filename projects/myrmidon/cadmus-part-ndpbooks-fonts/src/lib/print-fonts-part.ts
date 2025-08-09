@@ -10,6 +10,7 @@ export interface PrintFont {
   sections?: string[];
   features?: string[];
   ids?: AssertedCompositeId[];
+  note?: string;
 }
 
 /**
