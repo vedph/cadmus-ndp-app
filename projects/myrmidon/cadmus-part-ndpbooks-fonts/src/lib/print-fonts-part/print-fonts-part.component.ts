@@ -21,7 +21,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgxToolsValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
-import { ModelEditorComponentBase } from '@myrmidon/cadmus-ui';
+import { CloseSaveButtonsComponent, ModelEditorComponentBase } from '@myrmidon/cadmus-ui';
 import {
   EditedObject,
   ThesauriSet,
@@ -33,6 +33,7 @@ import {
   PrintFont,
   PrintFontsPart,
 } from '../print-fonts-part';
+import { PrintFontEditorComponent } from '../print-font-editor/print-font-editor.component';
 
 /**
  * PrintFontsPart editor component.
@@ -44,6 +45,7 @@ import {
   selector: 'cadmus-print-fonts-part',
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
@@ -52,6 +54,8 @@ import {
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
+    CloseSaveButtonsComponent,
+    PrintFontEditorComponent,
   ],
   templateUrl: './print-fonts-part.component.html',
   styleUrl: './print-fonts-part.component.css',
@@ -80,7 +84,7 @@ export class PrintFontsPartComponent
   // external-id-scopes
   public extIdScopeEntries?: ThesaurusEntry[];
 
-  public entries: FormControl<PrintFont[]>;
+  public fonts: FormControl<PrintFont[]>;
 
   constructor(
     authService: AuthJwtService,
@@ -90,7 +94,7 @@ export class PrintFontsPartComponent
     super(authService, formBuilder);
     this.editedIndex = -1;
     // form
-    this.entries = formBuilder.control([], {
+    this.fonts = formBuilder.control([], {
       // at least 1 entry
       validators: NgxToolsValidators.strictMinLengthValidator(1),
       nonNullable: true,
@@ -103,7 +107,7 @@ export class PrintFontsPartComponent
 
   protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
     return formBuilder.group({
-      entries: this.entries,
+      entries: this.fonts,
     });
   }
 
@@ -163,7 +167,7 @@ export class PrintFontsPartComponent
       this.form.reset();
       return;
     }
-    this.entries.setValue(part.fonts || []);
+    this.fonts.setValue(part.fonts || []);
     this.form.markAsPristine();
   }
 
@@ -179,80 +183,80 @@ export class PrintFontsPartComponent
 
   protected getValue(): PrintFontsPart {
     let part = this.getEditedPart(PRINT_FONTS_PART_TYPEID) as PrintFontsPart;
-    part.fonts = this.entries.value || [];
+    part.fonts = this.fonts.value || [];
     return part;
   }
 
-  public addPrintFont(): void {
-    const entry: PrintFont = {
-      // TODO: set your entry default properties...
+  public addFont(): void {
+    const font: PrintFont = {
+      family: '',
     };
-    this.editPrintFont(entry, -1);
+    this.editFont(font, -1);
   }
 
-  public editPrintFont(entry: PrintFont, index: number): void {
+  public editFont(entry: PrintFont, index: number): void {
     this.editedIndex = index;
     this.edited = entry;
   }
 
-  public closePrintFont(): void {
+  public closeFont(): void {
     this.editedIndex = -1;
     this.edited = undefined;
   }
 
-  public savePrintFont(entry: PrintFont): void {
-    const entries = [...this.entries.value];
+  public saveFont(entry: PrintFont): void {
+    const fonts = [...this.fonts.value];
     if (this.editedIndex === -1) {
-      entries.push(entry);
+      fonts.push(entry);
     } else {
-      entries.splice(this.editedIndex, 1, entry);
+      fonts.splice(this.editedIndex, 1, entry);
     }
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
-    this.closePrintFont();
+    this.fonts.setValue(fonts);
+    this.fonts.markAsDirty();
+    this.fonts.updateValueAndValidity();
+    this.closeFont();
   }
 
-  public deletePrintFont(index: number): void {
+  public deleteFont(index: number): void {
     this._dialogService
-      .confirm('Confirmation', 'Delete PrintFont?')
+      .confirm('Confirmation', 'Delete font?')
       .subscribe((yes: boolean | undefined) => {
         if (yes) {
           if (this.editedIndex === index) {
-            this.closePrintFont();
+            this.closeFont();
           }
-          const entries = [...this.entries.value];
+          const entries = [...this.fonts.value];
           entries.splice(index, 1);
-          this.entries.setValue(entries);
-          this.entries.markAsDirty();
-          this.entries.updateValueAndValidity();
+          this.fonts.setValue(entries);
+          this.fonts.markAsDirty();
+          this.fonts.updateValueAndValidity();
         }
       });
   }
 
-  public movePrintFontUp(index: number): void {
+  public moveFontUp(index: number): void {
     if (index < 1) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
-    entries.splice(index, 1);
-    entries.splice(index - 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    const font = this.fonts.value[index];
+    const fonts = [...this.fonts.value];
+    fonts.splice(index, 1);
+    fonts.splice(index - 1, 0, font);
+    this.fonts.setValue(fonts);
+    this.fonts.markAsDirty();
+    this.fonts.updateValueAndValidity();
   }
 
-  public movePrintFontDown(index: number): void {
-    if (index + 1 >= this.entries.value.length) {
+  public moveFontDown(index: number): void {
+    if (index + 1 >= this.fonts.value.length) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
-    entries.splice(index, 1);
-    entries.splice(index + 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    const font = this.fonts.value[index];
+    const fonts = [...this.fonts.value];
+    fonts.splice(index, 1);
+    fonts.splice(index + 1, 0, font);
+    this.fonts.setValue(fonts);
+    this.fonts.markAsDirty();
+    this.fonts.updateValueAndValidity();
   }
 }
