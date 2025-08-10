@@ -1,20 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, effect, model, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  model,
+  output,
+} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  takeUntil,
-} from 'rxjs/operators';
-import { Subscription } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // material
 import { MatButtonModule } from '@angular/material/button';
@@ -24,9 +22,27 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { PrintFont } from '../print-fonts-part';
-import { AssertedCompositeId } from '@myrmidon/cadmus-refs-asserted-ids';
 
+import {
+  AssertedCompositeId,
+  AssertedCompositeIdsComponent,
+} from '@myrmidon/cadmus-refs-asserted-ids';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+
+import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
+
+import { PrintFont } from '../print-fonts-part';
+
+function entryToFlag(entry: ThesaurusEntry): Flag {
+  return {
+    id: entry.id,
+    label: entry.value,
+  };
+}
+
+/**
+ * Editor for a single print font.
+ */
 @Component({
   selector: 'cadmus-print-font-editor',
   imports: [
@@ -39,6 +55,8 @@ import { AssertedCompositeId } from '@myrmidon/cadmus-refs-asserted-ids';
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
+    AssertedCompositeIdsComponent,
+    FlagSetComponent,
   ],
   templateUrl: './print-font-editor.component.html',
   styleUrl: './print-font-editor.component.css',
@@ -46,6 +64,32 @@ import { AssertedCompositeId } from '@myrmidon/cadmus-refs-asserted-ids';
 export class PrintFontEditorComponent {
   public readonly font = model<PrintFont | undefined>();
   public readonly cancelEdit = output();
+
+  // print-font-families
+  public readonly familyEntries = input<ThesaurusEntry[]>();
+  // print-layout-sections
+  public readonly sectionEntries = input<ThesaurusEntry[]>();
+  // print-font-features
+  public readonly featureEntries = input<ThesaurusEntry[]>();
+
+  // doc-reference-types
+  public readonly refTypeEntries = input<ThesaurusEntry[]>();
+  // doc-reference-tags
+  public readonly refTagEntries = input<ThesaurusEntry[]>();
+  // assertion-tags
+  public readonly assTagEntries = input<ThesaurusEntry[]>();
+  // external-id-tags
+  public readonly idTagEntries = input<ThesaurusEntry[]>();
+  // external-id-scopes
+  public readonly idScopeEntries = input<ThesaurusEntry[]>();
+
+  // flags mapped from thesaurus entries
+  public sectionFlags = computed<Flag[]>(
+    () => this.sectionEntries()?.map((e) => entryToFlag(e)) || []
+  );
+  public featureFlags = computed<Flag[]>(
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
+  );
 
   public eid: FormControl<string | null>;
   public family: FormControl<string>;
@@ -113,6 +157,24 @@ export class PrintFontEditorComponent {
       ids: this.ids.value?.length ? this.ids.value : undefined,
       note: this.note.value || undefined,
     };
+  }
+
+  public onSectionCheckedIdsChange(ids: string[]): void {
+    this.sections.setValue(ids);
+    this.sections.markAsDirty();
+    this.sections.updateValueAndValidity();
+  }
+
+  public onFeatureCheckedIdsChange(ids: string[]): void {
+    this.features.setValue(ids);
+    this.features.markAsDirty();
+    this.features.updateValueAndValidity();
+  }
+
+  public onIdsChange(ids: AssertedCompositeId[]): void {
+    this.ids.setValue(ids);
+    this.ids.markAsDirty();
+    this.ids.updateValueAndValidity();
   }
 
   public cancel(): void {

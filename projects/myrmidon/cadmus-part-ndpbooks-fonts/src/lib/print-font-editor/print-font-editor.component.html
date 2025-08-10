@@ -1,1 +1,114 @@
-<p>print-font-editor works!</p>
+<form [formGroup]="form" (submit)="save()">
+  <div class="form-row">
+    <!-- eid -->
+    <mat-form-field>
+      <mat-label>eid</mat-label>
+      <input matInput [formControl]="eid" />
+      @if ($any(eid).errors?.maxLength && (eid.dirty || eid.touched)) {
+      <mat-error>eid too long</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- family (bound) -->
+    @if (familyEntries()?.length) {
+    <mat-form-field>
+      <mat-label>family</mat-label>
+      <mat-select [formControl]="family">
+        @for (e of familyEntries(); track e.id) {
+        <mat-option [value]="e.id">{{ e.value }}</mat-option>
+        }
+      </mat-select>
+      @if ($any(family).errors?.required && (family.dirty || family.touched)) {
+      <mat-error>family required</mat-error>
+      }
+    </mat-form-field>
+    } @else {
+    <!-- family (free) -->
+    <mat-form-field>
+      <mat-label>family</mat-label>
+      <input matInput [formControl]="family" />
+      @if ($any(family).errors?.required && (family.dirty || family.touched)) {
+      <mat-error>family required</mat-error>
+      } @if ($any(family).errors?.maxLength && (family.dirty || family.touched))
+      {
+      <mat-error>family too long</mat-error>
+      }
+    </mat-form-field>
+    }
+  </div>
+
+  <!-- sections -->
+  <div>
+    @if (sectionFlags().length) {
+    <div>
+      <cadmus-ui-flag-set
+        [flags]="sectionFlags()"
+        [checkedIds]="sections.value"
+        (checkedIdsChange)="onSectionCheckedIdsChange($event)"
+      />
+    </div>
+    }
+  </div>
+
+  <!-- features -->
+  <div>
+    @if (featureFlags().length) {
+    <div>
+      <cadmus-ui-flag-set
+        [flags]="featureFlags()"
+        [checkedIds]="features.value"
+        (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
+      />
+    </div>
+    }
+  </div>
+
+  <div>
+    <!-- IDs -->
+    <fieldset>
+      <legend>IDs</legend>
+      <cadmus-refs-asserted-composite-ids
+        [idScopeEntries]="idScopeEntries()"
+        [idTagEntries]="idTagEntries()"
+        [assTagEntries]="assTagEntries()"
+        [refTypeEntries]="refTypeEntries()"
+        [refTagEntries]="refTagEntries()"
+        [ids]="ids.value || undefined"
+        [canSwitchMode]="true"
+        [canEditTarget]="true"
+        (idsChange)="onIdsChange($event!)"
+      />
+    </fieldset>
+  </div>
+
+  <!-- note -->
+  <div>
+    <mat-form-field>
+      <mat-label>note</mat-label>
+      <input matInput [formControl]="note" />
+      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+      <mat-error>note too long</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- buttons -->
+  <div>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Discard changes"
+      (click)="cancel()"
+    >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      mat-icon-button
+      matTooltip="Accept changes"
+      [disabled]="form.invalid || form.pristine"
+    >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+</form>
