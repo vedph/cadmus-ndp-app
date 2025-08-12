@@ -124,12 +124,21 @@ export const routes: Routes = [
       ),
     canActivate: [jwtGuard],
   },
-  // ndp- frac parts
+  // ndp-frac parts
   {
     path: 'items/:iid/ndp-frac',
     loadChildren: () =>
       import('@myrmidon/cadmus-part-ndpfrac-pg').then(
         (module) => module.CADMUS_PART_NDPFRAC_PG_ROUTES
+      ),
+    canActivate: [jwtGuard],
+  },
+  // ndp-books part
+  {
+    path: 'items/:iid/ndp-books',
+    loadChildren: () =>
+      import('@myrmidon/cadmus-part-ndpbooks-pg').then(
+        (module) => module.CADMUS_PART_NDPBOOKS_PG_ROUTES
       ),
     canActivate: [jwtGuard],
   },

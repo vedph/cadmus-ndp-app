@@ -44,12 +44,15 @@ import { COD_FR_QUIRE_LABELS_PART_TYPEID } from '../../projects/myrmidon/cadmus-
 import { COD_FR_RULINGS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-rulings/src/public-api';
 import { COD_FR_SUPPORT_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-support/src/public-api';
 
+import { PRINT_FONTS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fonts/src/public-api';
+
 // route constants
 const GENERAL = 'general';
 const PHILOLOGY = 'philology';
 const CODICOLOGY = 'codicology';
 const BIBLIO = 'biblio';
 const NDP_FRAC = 'ndp-frac';
+const NDP_BOOKS = 'ndp-books';
 
 /**
  * The parts and fragments editor keys for this UI.
@@ -163,5 +166,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   },
   [COD_FR_SUPPORT_PART_TYPEID]: {
     part: NDP_FRAC,
+  },
+  // ndp-books
+  [PRINT_FONTS_PART_TYPEID]: {
+    part: NDP_BOOKS,
   },
 };
