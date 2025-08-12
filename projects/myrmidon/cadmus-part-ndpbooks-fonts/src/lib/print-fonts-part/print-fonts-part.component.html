@@ -16,7 +16,7 @@
           color="primary"
           (click)="addFont()"
         >
-          <mat-icon>add_circle</mat-icon> Font
+          <mat-icon>add_circle</mat-icon> font
         </button>
       </div>
       @if (fonts.value.length) {
@@ -24,7 +24,9 @@
         <thead>
           <tr>
             <th></th>
-            TODO: add model properties
+            <th>eid</th>
+            <th>family</th>
+            <th>sections</th>
           </tr>
         </thead>
         <tbody>
@@ -37,7 +39,7 @@
                 mat-icon-button
                 color="primary"
                 matTooltip="Edit this Font"
-                (click)="editFont(entry, i)"
+                (click)="editFont(font, i)"
               >
                 <mat-icon class="mat-primary">edit</mat-icon>
               </button>
@@ -69,7 +71,16 @@
                 <mat-icon class="mat-warn">remove_circle</mat-icon>
               </button>
             </td>
-            TODO: td's for properties
+            <td>{{ font.eid }}</td>
+            <td>{{ font.family }}</td>
+            <td>
+              @if (font.sections?.length) {
+                @for (s of font.sections; track s; let last = $last) {
+                  {{ s | flatLookup : sectionEntries }}
+                  @if (!last) {, }
+                }
+              } @else { - }
+            </td>
           </tr>
           }
         </tbody>

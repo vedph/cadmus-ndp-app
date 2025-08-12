@@ -5,3 +5,4 @@
 export * from './lib/print-fonts-part';
 export * from './lib/print-font-editor/print-font-editor.component';
 export * from './lib/print-fonts-part/print-fonts-part.component';
+export * from './lib/print-fonts-part-feature/print-fonts-part-feature.component';

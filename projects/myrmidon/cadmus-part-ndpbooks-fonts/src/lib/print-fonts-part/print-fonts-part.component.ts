@@ -6,7 +6,6 @@ import {
   UntypedFormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { take } from 'rxjs/operators';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,7 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { NgxToolsValidators } from '@myrmidon/ngx-tools';
+import { FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import { CloseSaveButtonsComponent, ModelEditorComponentBase } from '@myrmidon/cadmus-ui';
@@ -56,6 +55,7 @@ import { PrintFontEditorComponent } from '../print-font-editor/print-font-editor
     MatTooltipModule,
     CloseSaveButtonsComponent,
     PrintFontEditorComponent,
+    FlatLookupPipe
   ],
   templateUrl: './print-fonts-part.component.html',
   styleUrl: './print-fonts-part.component.css',
