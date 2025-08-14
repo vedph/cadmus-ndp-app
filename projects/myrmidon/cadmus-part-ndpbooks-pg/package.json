@@ -1,6 +1,19 @@
 {
   "name": "@myrmidon/cadmus-part-ndpbooks-pg",
   "version": "0.0.1",
+  "description": "Cadmus - printed books editors wrappers.",
+  "keywords": [
+    "Cadmus",
+    "NDP"
+  ],
+  "homepage": "https://github.com/vedph/cadmus-ndp-app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vedph/cadmus-ndp-app"
+  },
+  "author": {
+    "name": "Daniele Fusi"
+  },
   "peerDependencies": {
     "@angular/common": "^20.1.0",
     "@angular/core": "^20.1.0"

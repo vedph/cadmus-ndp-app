@@ -1,7 +1,7 @@
 {
-  "name": "@myrmidon/cadmus-part-ndpbooks-fonts",
+  "name": "@myrmidon/cadmus-part-ndpbooks-fig-plan",
   "version": "0.0.1",
-  "description": "Cadmus - printed book fonts part.",
+  "description": "Cadmus - printed books figurative plan part.",
   "keywords": [
     "Cadmus",
     "NDP"

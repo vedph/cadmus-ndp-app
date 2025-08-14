@@ -307,6 +307,36 @@
           }
         }
       }
+    },
+    "@myrmidon/cadmus-part-ndpbooks-fig-plan": {
+      "projectType": "library",
+      "root": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/src",
+      "prefix": "cadmus",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {

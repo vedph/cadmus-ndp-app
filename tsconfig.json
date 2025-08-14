@@ -4,6 +4,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@myrmidon/cadmus-part-ndpbooks-fig-plan": [
+        "./dist/myrmidon/cadmus-part-ndpbooks-fig-plan"
+      ],
       "@myrmidon/cadmus-part-ndpbooks-fonts": [
         "./dist/myrmidon/cadmus-part-ndpbooks-fonts"
       ],
@@ -89,6 +92,12 @@
     },
     {
       "path": "./projects/myrmidon/cadmus-part-ndpbooks-pg/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.spec.json"
     }
   ]
 }

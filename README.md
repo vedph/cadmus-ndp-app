@@ -24,6 +24,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 - 2025-08-14:
   - added features to FRAC layout part and let it opt in for role-dependent thesauri. This allows using this part also for printed books.
+  - added books figurative plan library.
 - 2025-08-07:
   - updated Angular and packages.
   - updated Docker compose bibliography API version.
