@@ -32,7 +32,7 @@ export const PRINT_FONTS_PART_TYPEID = 'it.vedph.ndp.print-fonts';
 export const PRINT_FONTS_PART_SCHEMA = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id:
-    'www.vedph.it/cadmus/parts/__PRJ__/__LIB__/' +
+    'www.vedph.it/cadmus/parts/ndp/' +
     PRINT_FONTS_PART_TYPEID +
     '.json',
   type: 'object',
