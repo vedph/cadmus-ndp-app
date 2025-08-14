@@ -34,10 +34,12 @@ export class CodFrLayoutPartFeatureComponent
       thesaurusService,
       editorService
     );
+    this.roleIdInThesauri = true;
   }
 
   protected override getReqThesauriIds(): string[] {
     return [
+      'cod-fr-layout-features',
       'cod-fr-layout-prickings',
       'decorated-count-ids',
       'decorated-count-tags',

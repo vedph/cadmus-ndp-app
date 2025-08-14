@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -34,6 +34,7 @@ import {
   DecoratedCount,
   DecoratedCountsComponent,
 } from '@myrmidon/cadmus-refs-decorated-counts';
+import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 
 import {
   CodLayoutFormulaComponent,
@@ -50,10 +51,18 @@ const DEFAULT_UNITS = [
   { id: 'cm', value: 'cm' },
 ];
 
+function entryToFlag(entry: ThesaurusEntry): Flag {
+  return {
+    id: entry.id,
+    label: entry.value,
+  };
+}
+
 /**
  * CodFrLayout part editor component.
  * Thesauri: cod-fr-layout-prickings, decorated-count-ids,
- * decorated-count-tags, physical-size-units, physical-size-dim-tags.
+ * cod-fr-layout-features, decorated-count-tags, physical-size-units,
+ * physical-size-dim-tags.
  */
 @Component({
   selector: 'cadmus-cod-fr-layout-part',
@@ -69,6 +78,7 @@ const DEFAULT_UNITS = [
     MatSelectModule,
     MatTabsModule,
     MatTooltipModule,
+    FlagSetComponent,
     CodLayoutFormulaComponent,
     DecoratedCountsComponent,
     CloseSaveButtonsComponent,
@@ -84,6 +94,7 @@ export class CodFrLayoutPartComponent
   public dimensions: FormControl<PhysicalDimension[]>;
   public pricking: FormControl<string>;
   public columnCount: FormControl<number>;
+  public features: FormControl<string[]>;
   public counts: FormControl<DecoratedCount[]>;
   public note: FormControl<string | null>;
 
@@ -93,6 +104,8 @@ export class CodFrLayoutPartComponent
     dimensions: [],
   });
 
+  // cod-fr-layout-features
+  public featureEntries?: ThesaurusEntry[];
   // cod-fr-layout-prickings
   public prickingEntries?: ThesaurusEntry[];
   // decorated-count-ids
@@ -103,6 +116,11 @@ export class CodFrLayoutPartComponent
   public unitEntries: ThesaurusEntry[] = DEFAULT_UNITS;
   // physical-size-dim-tags
   public dimTagEntries?: ThesaurusEntry[];
+
+  // flags mapped from thesaurus entries
+  public featureFlags = computed<Flag[]>(
+    () => this.featureEntries?.map((e) => entryToFlag(e)) || []
+  );
 
   constructor(authService: AuthJwtService, formBuilder: FormBuilder) {
     super(authService, formBuilder);
@@ -121,6 +139,7 @@ export class CodFrLayoutPartComponent
         nonNullable: true,
       }
     );
+    this.features = formBuilder.control([], { nonNullable: true });
     this.columnCount = formBuilder.control<number>(0, {
       validators: Validators.min(1),
       nonNullable: true,
@@ -196,6 +215,7 @@ export class CodFrLayoutPartComponent
     this.dimensions.setValue(part.dimensions || []);
     this.pricking.setValue(part.pricking || '');
     this.columnCount.setValue(part.columnCount || 0);
+    this.features.setValue(part.features || []);
     this.counts.setValue(part.counts || []);
     this.note.setValue(part.note || null);
 
@@ -226,9 +246,18 @@ export class CodFrLayoutPartComponent
       : undefined;
     part.pricking = this.pricking.value?.trim() || undefined;
     part.columnCount = this.columnCount.value || 0;
+    part.features = this.features.value?.length
+      ? this.features.value
+      : undefined;
     part.counts = this.counts.value?.length ? this.counts.value : undefined;
     part.note = this.note.value?.trim() || undefined;
     return part;
+  }
+
+  public onFeatureCheckedIdsChange(ids: string[]): void {
+    this.features.setValue(ids);
+    this.features.markAsDirty();
+    this.features.updateValueAndValidity();
   }
 
   public onCountsChange(counts: DecoratedCount[]): void {

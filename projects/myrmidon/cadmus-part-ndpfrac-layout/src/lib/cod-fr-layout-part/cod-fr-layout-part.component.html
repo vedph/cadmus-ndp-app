@@ -61,6 +61,17 @@
             </mat-form-field>
           </div>
 
+          <!-- features -->
+          @if (featureFlags().length) {
+          <div>
+            <cadmus-ui-flag-set
+              [flags]="featureFlags()"
+              [checkedIds]="features.value"
+              (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
+            />
+          </div>
+          }
+
           <!-- counts -->
           <div>
             <cadmus-refs-decorated-counts
@@ -79,7 +90,8 @@
               @if ($any(note).errors?.required && (note.dirty || note.touched))
               {
               <mat-error>note required</mat-error>
-              } @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+              } @if ($any(note).errors?.maxLength && (note.dirty ||
+              note.touched)) {
               <mat-error>note too long</mat-error>
               }
             </mat-form-field>

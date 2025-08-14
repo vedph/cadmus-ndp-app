@@ -11,6 +11,7 @@ export interface CodFrLayoutPart extends Part {
   pricking?: string;
   columnCount: number;
   counts?: DecoratedCount[];
+  features?: string[];
   note?: string;
 }
 
@@ -103,6 +104,12 @@ export const COD_FR_LAYOUT_PART_SCHEMA = {
           note: { type: 'string' },
         },
         required: ['id', 'value'],
+      },
+    },
+    features: {
+      type: 'array',
+      items: {
+        type: 'string',
       },
     },
     note: {
