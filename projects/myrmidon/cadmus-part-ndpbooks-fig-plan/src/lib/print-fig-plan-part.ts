@@ -2,7 +2,7 @@ import { Part } from '@myrmidon/cadmus-core';
 import { AssertedCompositeId } from '@myrmidon/cadmus-refs-asserted-ids';
 
 /**
- * An item of a print figurative plan.
+ * An item of a printed book's figurative plan.
  */
 export interface FigPlanItem {
   eid: string;
@@ -11,7 +11,7 @@ export interface FigPlanItem {
 }
 
 /**
- * The printed book figurative plan part model.
+ * The printed book's figurative plan part model.
  */
 export interface PrintFigPlanPart extends Part {
   artistIds?: AssertedCompositeId[];
