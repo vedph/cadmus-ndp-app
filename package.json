@@ -77,6 +77,7 @@
     "@myrmidon/cadmus-refs-asserted-chronotope": "^10.0.2",
     "@myrmidon/cadmus-refs-asserted-ids": "^10.0.8",
     "@myrmidon/cadmus-refs-assertion": "^10.0.3",
+    "@myrmidon/cadmus-refs-citation": "^1.0.1",
     "@myrmidon/cadmus-refs-decorated-counts": "^9.0.0",
     "@myrmidon/cadmus-refs-decorated-ids": "^9.0.2",
     "@myrmidon/cadmus-refs-doc-references": "^10.0.1",
