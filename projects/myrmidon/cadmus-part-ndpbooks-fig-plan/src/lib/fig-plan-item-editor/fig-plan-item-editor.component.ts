@@ -1,4 +1,4 @@
-import { Component, effect, input, model, output } from '@angular/core';
+import { Component, effect, input, model, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -17,8 +17,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { FigPlanItem } from '../print-fig-plan-part';
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import {
+  Citation,
+  CitationSpan,
+  CitSchemeService,
+  CompactCitationComponent,
+} from '@myrmidon/cadmus-refs-citation';
+
+import { FigPlanItem } from '../print-fig-plan-part';
 
 /**
  * Editor for a figure plan item.
@@ -36,6 +43,7 @@ import { ThesaurusEntry } from '@myrmidon/cadmus-core';
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
+    CompactCitationComponent,
   ],
   templateUrl: './fig-plan-item-editor.component.html',
   styleUrl: './fig-plan-item-editor.component.css',
@@ -47,13 +55,16 @@ export class FigPlanItemEditorComponent {
   public readonly cancelEdit = output();
 
   public readonly typeEntries = input<ThesaurusEntry[]>();
+  public readonly editedCit = signal<Citation | CitationSpan | undefined>(
+    undefined
+  );
 
   public eid: FormControl<string>;
   public type: FormControl<string>;
   public citation?: FormControl<string | null>;
   public form: FormGroup;
 
-  constructor(formBuilder: FormBuilder) {
+  constructor(formBuilder: FormBuilder, private _citService: CitSchemeService) {
     this.eid = formBuilder.control<string>('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(100)],
@@ -81,17 +92,49 @@ export class FigPlanItemEditorComponent {
     this._updatingForm = true;
 
     if (!item) {
+      this.editedCit.set(undefined);
       this.form.reset();
     } else {
       this.eid.setValue(item.eid, { emitEvent: false });
       this.type.setValue(item.type, { emitEvent: false });
       this.citation?.setValue(item.citation || null, { emitEvent: false });
+      // parse citation, whether it's a span or a single one
+      if (item.citation) {
+        this.editedCit.set(
+          item.citation.includes(' - ')
+            ? this._citService.parseSpan(item.citation, 'dc')
+            : this._citService.parse(item.citation, 'dc')
+        );
+      } else {
+        this.editedCit.set(undefined);
+      }
     }
 
     this.form.markAsPristine();
 
     // reset guard only after marking controls
     this._updatingForm = false;
+  }
+
+  public onCitationChange(citation: Citation | CitationSpan | undefined): void {
+    if (!citation) {
+      this.citation?.setValue(null);
+    } else {
+      if ((citation as CitationSpan)?.a) {
+        const span = citation as CitationSpan;
+        this.citation?.setValue(
+          `${this._citService.toString(span.a)} - ${this._citService.toString(
+            span.b || span.a
+          )}`
+        );
+      } else {
+        this.citation?.setValue(
+          this._citService.toString(citation as Citation)
+        );
+      }
+    }
+    this.citation?.updateValueAndValidity();
+    this.citation?.markAsDirty();
   }
 
   private getItem(): FigPlanItem {

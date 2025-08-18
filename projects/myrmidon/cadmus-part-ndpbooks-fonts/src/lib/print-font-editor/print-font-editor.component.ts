@@ -102,7 +102,7 @@ export class PrintFontEditorComponent {
   // track if the form is currently being updated programmatically
   private _updatingForm = false;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(formBuilder: FormBuilder) {
     // form
     this.eid = formBuilder.control<string | null>(null);
     this.family = formBuilder.control<string>('', { nonNullable: true });

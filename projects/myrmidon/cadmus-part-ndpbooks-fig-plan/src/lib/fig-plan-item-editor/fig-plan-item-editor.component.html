@@ -37,7 +37,11 @@
     </mat-form-field>
     }
 
-    TODO citation
+    <!-- citation -->
+    <cadmus-refs-compact-citation
+      [citation]="editedCit()"
+      (citationChange)="onCitationChange($event)"
+    />
   </div>
   <!-- buttons -->
   <div>
