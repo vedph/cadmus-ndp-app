@@ -73,20 +73,22 @@
             <thead>
               <tr>
                 <th></th>
-                TODO: add model properties
+                <th>EID</th>
+                <th>type</th>
+                <th>citation</th>
               </tr>
             </thead>
             <tbody>
-              @for (entry of items.value; track entry; let i = $index; let
-              first = $first; let last = $last) {
-              <tr [class.selected]="entry === edited">
+              @for (item of items.value; track item; let i = $index; let first =
+              $first; let last = $last) {
+              <tr [class.selected]="item === edited">
                 <td class="fit-width">
                   <button
                     type="button"
                     mat-icon-button
                     color="primary"
                     matTooltip="Edit this Item"
-                    (click)="editItem(entry, i)"
+                    (click)="editItem(item, i)"
                   >
                     <mat-icon class="mat-primary">edit</mat-icon>
                   </button>
@@ -118,7 +120,13 @@
                     <mat-icon class="mat-warn">remove_circle</mat-icon>
                   </button>
                 </td>
-                TODO: td's for properties
+                <td>{{ item.eid }}</td>
+                <td>
+                  {{
+                    item.type | flatLookup : planTypeEntries() : "id" : "value"
+                  }}
+                </td>
+                <td>{{ item.citation }}</td>
               </tr>
               }
             </tbody>
@@ -127,11 +135,13 @@
           <fieldset>
             <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
               <mat-expansion-panel-header>
-                <mat-panel-title>Item #</mat-panel-title>
+                <mat-panel-title>item #</mat-panel-title>
               </mat-expansion-panel-header>
-              TODO: editor control with: [model]="edited"
-              (modelChange)="saveItem($event)"
-              (editorClose)="closeItem()"
+              <cadmus-fig-plan-item-editor
+                [item]="edited"
+                (itemChange)="saveItem($event!)"
+                (editorClose)="closeItem()"
+              />
             </mat-expansion-panel>
           </fieldset>
           }

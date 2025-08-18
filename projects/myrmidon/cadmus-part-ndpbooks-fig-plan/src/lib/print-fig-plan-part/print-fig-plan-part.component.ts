@@ -41,6 +41,8 @@ import {
   PRINT_FIG_PLAN_PART_TYPEID,
   PrintFigPlanPart,
 } from '../print-fig-plan-part';
+import { FigPlanItemEditorComponent } from '../fig-plan-item-editor/fig-plan-item-editor.component';
+import { FlatLookupPipe } from '@myrmidon/ngx-tools';
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {
@@ -67,13 +69,15 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatTabGroup,
+    MatTab,
     MatTooltipModule,
     // cadmus
+    FlatLookupPipe,
     CloseSaveButtonsComponent,
     AssertedCompositeIdsComponent,
     FlagSetComponent,
-    MatTabGroup,
-    MatTab,
+    FigPlanItemEditorComponent,
   ],
   templateUrl: './print-fig-plan-part.component.html',
   styleUrl: './print-fig-plan-part.component.css',
