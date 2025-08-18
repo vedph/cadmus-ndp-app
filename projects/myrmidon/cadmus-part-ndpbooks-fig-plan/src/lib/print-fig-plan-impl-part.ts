@@ -1,6 +1,7 @@
 import { PhysicalSize } from '@myrmidon/cadmus-mat-physical-size';
 import { AssertedCompositeId } from '@myrmidon/cadmus-refs-asserted-ids';
 
+import { Part } from '@myrmidon/cadmus-core';
 import { PrintFont } from '@myrmidon/cadmus-part-ndpbooks-fonts';
 
 import { FigPlanItem } from './print-fig-plan-part';
@@ -111,4 +112,15 @@ export interface FigPlanImplItem extends FigPlanItem {
    * The iconography of this item, if any.
    */
   iconographyId?: AssertedCompositeId;
+}
+
+/**
+ * The printed book's figurative plan part model.
+ */
+export interface PrintFigPlanPartImpl extends Part {
+  isComplete?: boolean;
+  techniques: string[];
+  items?: FigPlanImplItem[];
+  description?: string;
+  features?: string[];
 }
