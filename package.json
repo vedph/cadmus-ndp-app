@@ -14,6 +14,7 @@
     "build-fpg": "ng build @myrmidon/cadmus-part-ndpfrac-pg",
     "build-fnt": "ng build @myrmidon/cadmus-part-ndpbooks-fonts",
     "build-bpg": "ng build @myrmidon/cadmus-part-ndpbooks-pg",
+    "build-fip": "ng build @myrmidon/cadmus-part-ndpbooks-fig-plan",
     "build-lib": "npm run build-lbl && npm run build-lay && npm run build-rul && npm run build-sup && npm run build-fpg && npm run build-fnt && npm run build-bpg"
   },
   "private": true,

@@ -1,0 +1,71 @@
+<form [formGroup]="form" (submit)="save()">
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>picture_in_picture</mat-icon>
+      </div>
+      <mat-card-title>
+        {{ (modelName() | titlecase) || "Figurative Plan Part" }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab title="general">
+          <div>
+            <!-- assertedIds -->
+            <fieldset>
+              <legend>artists</legend>
+              <cadmus-refs-asserted-composite-ids
+                [idScopeEntries]="assIdScopeEntries()"
+                [idTagEntries]="assIdTagEntries()"
+                [assTagEntries]="assTagEntries()"
+                [refTypeEntries]="docRefTypeEntries()"
+                [refTagEntries]="docRefTagEntries()"
+                [ids]="artistIds.value || undefined"
+                [canSwitchMode]="true"
+                [canEditTarget]="true"
+                (idsChange)="onArtistIdsChange($event!)"
+              />
+            </fieldset>
+          </div>
+
+          <!-- techniques -->
+          @if (techFlags().length) {
+          <div>
+            <fieldset>
+              <legend>techniques</legend>
+              <cadmus-ui-flag-set
+                [flags]="techFlags()"
+                [checkedIds]="techniques.value"
+                (checkedIdsChange)="onTechniqueCheckedIdsChange($event)"
+              />
+            </fieldset>
+          </div>
+          }
+
+          <!-- features -->
+          @if (featureFlags().length) {
+          <div>
+            <fieldset>
+              <legend>features</legend>
+              <cadmus-ui-flag-set
+                [flags]="featureFlags()"
+                [checkedIds]="features.value"
+                (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
+              />
+            </fieldset>
+          </div>
+          }
+        </mat-tab>
+        <mat-tab title="items"> TODO </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+    <mat-card-actions>
+      <cadmus-close-save-buttons
+        [form]="form"
+        [noSave]="userLevel < 2"
+        (closeRequest)="close()"
+      />
+    </mat-card-actions>
+  </mat-card>
+</form>
