@@ -92,8 +92,8 @@ export class PrintFigPlanPartComponent
   public description: FormControl<string | null>;
   public items: FormControl<FigPlanItem[]>;
 
-  public edited?: FigPlanItem;
-  public editedIndex = -1;
+  public readonly edited = signal<FigPlanItem | undefined>(undefined);
+  public readonly editedIndex = signal<number>(-1);
 
   // fig-plan-techniques
   public readonly planTechEntries = signal<ThesaurusEntry[] | undefined>(
@@ -271,21 +271,21 @@ export class PrintFigPlanPartComponent
   }
 
   public editItem(item: FigPlanItem, index: number): void {
-    this.editedIndex = index;
-    this.edited = item;
+    this.editedIndex.set(index);
+    this.edited.set(item);
   }
 
   public closeItem(): void {
-    this.editedIndex = -1;
-    this.edited = undefined;
+    this.editedIndex.set(-1);
+    this.edited.set(undefined);
   }
 
   public saveItem(entry: FigPlanItem): void {
     const items = [...this.items.value];
-    if (this.editedIndex === -1) {
+    if (this.editedIndex() === -1) {
       items.push(entry);
     } else {
-      items.splice(this.editedIndex, 1, entry);
+      items.splice(this.editedIndex(), 1, entry);
     }
     this.items.setValue(items);
     this.items.markAsDirty();
@@ -298,7 +298,7 @@ export class PrintFigPlanPartComponent
       .confirm('Confirmation', 'Delete item?')
       .subscribe((yes: boolean | undefined) => {
         if (yes) {
-          if (this.editedIndex === index) {
+          if (this.editedIndex() === index) {
             this.closeItem();
           }
           const items = [...this.items.value];
