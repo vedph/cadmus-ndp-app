@@ -45,6 +45,7 @@ import { COD_FR_RULINGS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-
 import { COD_FR_SUPPORT_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-support/src/public-api';
 
 import { PRINT_FONTS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fonts/src/public-api';
+import { PRINT_FIG_PLAN_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fig-plan/src/public-api';
 
 // route constants
 const GENERAL = 'general';
@@ -169,6 +170,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   },
   // ndp-books
   [PRINT_FONTS_PART_TYPEID]: {
+    part: NDP_BOOKS,
+  },
+  [PRINT_FIG_PLAN_PART_TYPEID]: {
     part: NDP_BOOKS,
   },
 };
