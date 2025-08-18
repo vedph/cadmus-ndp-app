@@ -19,6 +19,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import {
   EditedObject,
@@ -36,6 +37,7 @@ import {
 } from '@myrmidon/cadmus-refs-asserted-ids';
 
 import {
+  FigPlanItem,
   PRINT_FIG_PLAN_PART_TYPEID,
   PrintFigPlanPart,
 } from '../print-fig-plan-part';
@@ -48,7 +50,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 }
 
 /**
- * PrintFigPlan part editor component.
+ * Printed book figurative part editor component.
  * Thesauri: fig-plan-techniques, fig-plan-types, fig-plan-features,
  * asserted-id-scopes, asserted-id-tags, assertion-tags, doc-reference-types,
  * doc-reference-tags.
@@ -84,7 +86,10 @@ export class PrintFigPlanPartComponent
   public techniques: FormControl<string[]>;
   public features: FormControl<string[]>;
   public description: FormControl<string | null>;
-  // TODO
+  public items: FormControl<FigPlanItem[]>;
+
+  public edited?: FigPlanItem;
+  public editedIndex = -1;
 
   // fig-plan-techniques
   public readonly planTechEntries = signal<ThesaurusEntry[] | undefined>(
@@ -127,7 +132,11 @@ export class PrintFigPlanPartComponent
     () => this.planFeatureEntries()?.map((e) => entryToFlag(e)) || []
   );
 
-  constructor(authService: AuthJwtService, formBuilder: FormBuilder) {
+  constructor(
+    authService: AuthJwtService,
+    formBuilder: FormBuilder,
+    private _dialogService: DialogService
+  ) {
     super(authService, formBuilder);
     // form
     this.artistIds = formBuilder.control<AssertedCompositeId[]>([], {
@@ -138,6 +147,7 @@ export class PrintFigPlanPartComponent
     this.description = formBuilder.control<string | null>(null, {
       validators: Validators.maxLength(1000),
     });
+    this.items = formBuilder.control<FigPlanItem[]>([], { nonNullable: true });
   }
 
   public override ngOnInit(): void {
@@ -146,14 +156,11 @@ export class PrintFigPlanPartComponent
 
   protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
     return formBuilder.group({
-      artistIds: this.artistIds.value?.length
-        ? this.artistIds.value
-        : undefined,
-      techniques: this.techniques.value?.length
-        ? this.techniques.value
-        : undefined,
-      features: this.features.value?.length ? this.features.value : undefined,
-      description: this.description.value?.trim() || undefined,
+      artistIds: this.artistIds,
+      techniques: this.techniques,
+      features: this.features,
+      description: this.description,
+      items: this.items,
     });
   }
 
@@ -218,6 +225,7 @@ export class PrintFigPlanPartComponent
     this.techniques.setValue(part.techniques ?? [], { emitEvent: false });
     this.features.setValue(part.features ?? [], { emitEvent: false });
     this.description.setValue(part.description ?? null, { emitEvent: false });
+    this.items.setValue(part.items || []);
 
     this.form.markAsPristine();
   }
@@ -250,6 +258,80 @@ export class PrintFigPlanPartComponent
     this.artistIds.updateValueAndValidity();
   }
 
+  public addItem(): void {
+    const item: FigPlanItem = {
+      eid: '',
+      type: this.planTypeEntries()?.length ? this.planTypeEntries()![0].id : '',
+    };
+    this.editItem(item, -1);
+  }
+
+  public editItem(item: FigPlanItem, index: number): void {
+    this.editedIndex = index;
+    this.edited = item;
+  }
+
+  public closeItem(): void {
+    this.editedIndex = -1;
+    this.edited = undefined;
+  }
+
+  public saveItem(entry: FigPlanItem): void {
+    const items = [...this.items.value];
+    if (this.editedIndex === -1) {
+      items.push(entry);
+    } else {
+      items.splice(this.editedIndex, 1, entry);
+    }
+    this.items.setValue(items);
+    this.items.markAsDirty();
+    this.items.updateValueAndValidity();
+    this.closeItem();
+  }
+
+  public deleteItem(index: number): void {
+    this._dialogService
+      .confirm('Confirmation', 'Delete item?')
+      .subscribe((yes: boolean | undefined) => {
+        if (yes) {
+          if (this.editedIndex === index) {
+            this.closeItem();
+          }
+          const items = [...this.items.value];
+          items.splice(index, 1);
+          this.items.setValue(items);
+          this.items.markAsDirty();
+          this.items.updateValueAndValidity();
+        }
+      });
+  }
+
+  public moveItemUp(index: number): void {
+    if (index < 1) {
+      return;
+    }
+    const item = this.items.value[index];
+    const items = [...this.items.value];
+    items.splice(index, 1);
+    items.splice(index - 1, 0, item);
+    this.items.setValue(items);
+    this.items.markAsDirty();
+    this.items.updateValueAndValidity();
+  }
+
+  public moveItemDown(index: number): void {
+    if (index + 1 >= this.items.value.length) {
+      return;
+    }
+    const item = this.items.value[index];
+    const items = [...this.items.value];
+    items.splice(index, 1);
+    items.splice(index + 1, 0, item);
+    this.items.setValue(items);
+    this.items.markAsDirty();
+    this.items.updateValueAndValidity();
+  }
+
   protected getValue(): PrintFigPlanPart {
     let part = this.getEditedPart(
       PRINT_FIG_PLAN_PART_TYPEID
@@ -263,6 +345,8 @@ export class PrintFigPlanPartComponent
       ? this.features.value
       : undefined;
     part.description = this.description.value?.trim() || undefined;
+    part.items = this.items.value?.length ? this.items.value : undefined;
+
     return part;
   }
 }

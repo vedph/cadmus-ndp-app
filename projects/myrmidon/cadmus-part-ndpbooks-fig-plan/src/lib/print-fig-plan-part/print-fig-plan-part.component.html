@@ -57,7 +57,85 @@
           </div>
           }
         </mat-tab>
-        <mat-tab title="items"> TODO </mat-tab>
+        <mat-tab title="items">
+          <div>
+            <button
+              type="button"
+              mat-flat-button
+              color="primary"
+              (click)="addItem()"
+            >
+              <mat-icon>add_circle</mat-icon> item
+            </button>
+          </div>
+          @if (items.value.length) {
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                TODO: add model properties
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of items.value; track entry; let i = $index; let
+              first = $first; let last = $last) {
+              <tr [class.selected]="entry === edited">
+                <td class="fit-width">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Edit this Item"
+                    (click)="editItem(entry, i)"
+                  >
+                    <mat-icon class="mat-primary">edit</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this Item up"
+                    [disabled]="first"
+                    (click)="moveItemUp(i)"
+                  >
+                    <mat-icon>arrow_upward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this Item down"
+                    [disabled]="last"
+                    (click)="moveItemDown(i)"
+                  >
+                    <mat-icon>arrow_downward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="warn"
+                    matTooltip="Delete this Item"
+                    (click)="deleteItem(i)"
+                  >
+                    <mat-icon class="mat-warn">remove_circle</mat-icon>
+                  </button>
+                </td>
+                TODO: td's for properties
+              </tr>
+              }
+            </tbody>
+          </table>
+          } @if (edited) {
+          <fieldset>
+            <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
+              <mat-expansion-panel-header>
+                <mat-panel-title>Item #</mat-panel-title>
+              </mat-expansion-panel-header>
+              TODO: editor control with: [model]="edited"
+              (modelChange)="saveItem($event)"
+              (editorClose)="closeItem()"
+            </mat-expansion-panel>
+          </fieldset>
+          }
+        </mat-tab>
       </mat-tab-group>
     </mat-card-content>
     <mat-card-actions>
