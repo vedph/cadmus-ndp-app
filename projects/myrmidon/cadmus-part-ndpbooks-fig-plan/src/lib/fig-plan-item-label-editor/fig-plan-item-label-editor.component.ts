@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, input, model, output, signal } from '@angular/core';
+import { Component, computed, effect, input, model, output, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -20,8 +20,17 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { PrintFont } from '@myrmidon/cadmus-part-ndpbooks-fonts';
+import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { FigPlanItemLabel } from '../print-fig-plan-impl-part';
+
+function entryToFlag(entry: ThesaurusEntry): Flag {
+  return {
+    id: entry.id,
+    label: entry.value,
+  };
+}
 
 /**
  * Editor for a figurative plan item's label.
@@ -33,11 +42,13 @@ import { FigPlanItemLabel } from '../print-fig-plan-impl-part';
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
+    MatExpansionModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
+    FlagSetComponent,
   ],
   templateUrl: './fig-plan-item-label-editor.component.html',
   styleUrl: './fig-plan-item-label-editor.component.css',
@@ -61,6 +72,10 @@ export class FigPlanItemLabelEditorComponent {
   public readonly docRefTypeEntries = input<ThesaurusEntry[]>();
   // doc-reference-tags
   public readonly docRefTagEntries = input<ThesaurusEntry[]>();
+
+  public readonly languageFlags = computed<Flag[]>(
+    () => this.languageEntries()?.map((e) => entryToFlag(e)) || []
+  );
 
   public type: FormControl<string>;
   public languages: FormControl<string[]>;
@@ -202,6 +217,12 @@ export class FigPlanItemLabelEditorComponent {
     this.fonts.setValue(fonts);
     this.fonts.markAsDirty();
     this.fonts.updateValueAndValidity();
+  }
+
+  public onLanguageIdsChange(ids: string[]): void {
+    this.languages.setValue(ids);
+    this.languages.markAsDirty();
+    this.languages.updateValueAndValidity();
   }
 
   public cancel(): void {

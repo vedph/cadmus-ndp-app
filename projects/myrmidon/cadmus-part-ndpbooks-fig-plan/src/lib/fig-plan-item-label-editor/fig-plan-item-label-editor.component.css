@@ -22,3 +22,16 @@ fieldset {
   border-radius: 6px;
   padding: 6px;
 }
+.long-text {
+  width: 100%;
+  max-width: 800px;
+}
+.form-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.form-row * {
+  flex: 0 0 auto;
+}
