@@ -209,7 +209,7 @@ export class FigPlanItemLabelEditorComponent {
   }
 
   /**
-   * Saves the current form data by updating the `data` model signal.
+   * Saves the current form data by updating the `label` model signal.
    * This method can be called manually (e.g., by a Save button) or
    * automatically (via auto-save).
    * @param pristine If true (default), the form is marked as pristine
