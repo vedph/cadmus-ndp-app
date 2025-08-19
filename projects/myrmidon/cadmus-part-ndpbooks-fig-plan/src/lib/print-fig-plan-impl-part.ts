@@ -37,13 +37,6 @@ export interface FigPlanItemLabel {
    * The fonts used in the label.
    */
   fonts?: PrintFont[];
-
-  /**
-   * The label types found in the item: e.g. a legend for
-   * the whole image, or a character name on a character
-   * in the image, etc.
-   */
-  labels?: FigPlanItemLabel[];
 }
 
 /**
