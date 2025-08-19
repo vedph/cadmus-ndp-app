@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, effect, input, model, output } from '@angular/core';
+import { Component, effect, input, model, output, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -18,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { PrintFont } from '@myrmidon/cadmus-part-ndpbooks-fonts';
 
 import { FigPlanItemLabel } from '../print-fig-plan-impl-part';
@@ -68,7 +69,10 @@ export class FigPlanItemLabelEditorComponent {
   public fonts: FormControl<PrintFont[]>;
   public form: FormGroup;
 
-  constructor(formBuilder: FormBuilder) {
+  public readonly edited = signal<PrintFont | undefined>(undefined);
+  public readonly editedIndex = signal<number>(-1);
+
+  constructor(formBuilder: FormBuilder, private _dialogService: DialogService) {
     // form
     this.type = formBuilder.control('', {
       nonNullable: true,
@@ -125,6 +129,79 @@ export class FigPlanItemLabelEditorComponent {
       note: this.note.value || undefined,
       fonts: this.fonts.value?.length ? this.fonts.value : undefined,
     };
+  }
+
+  public addFont(): void {
+    const font: PrintFont = {
+      family: '',
+    };
+    this.editFont(font, -1);
+  }
+
+  public editFont(font: PrintFont, index: number): void {
+    this.editedIndex.set(index);
+    this.edited.set(font);
+  }
+
+  public closeFont(): void {
+    this.editedIndex.set(-1);
+    this.edited.set(undefined);
+  }
+
+  public saveFont(entry: PrintFont): void {
+    const fonts = [...this.fonts.value];
+    if (this.editedIndex() === -1) {
+      fonts.push(entry);
+    } else {
+      fonts.splice(this.editedIndex(), 1, entry);
+    }
+    this.fonts.setValue(fonts);
+    this.fonts.markAsDirty();
+    this.fonts.updateValueAndValidity();
+    this.closeFont();
+  }
+
+  public deleteFont(index: number): void {
+    this._dialogService
+      .confirm('Confirmation', 'Delete Font?')
+      .subscribe((yes: boolean | undefined) => {
+        if (yes) {
+          if (this.editedIndex() === index) {
+            this.closeFont();
+          }
+          const fonts = [...this.fonts.value];
+          fonts.splice(index, 1);
+          this.fonts.setValue(fonts);
+          this.fonts.markAsDirty();
+          this.fonts.updateValueAndValidity();
+        }
+      });
+  }
+
+  public moveFontUp(index: number): void {
+    if (index < 1) {
+      return;
+    }
+    const font = this.fonts.value[index];
+    const fonts = [...this.fonts.value];
+    fonts.splice(index, 1);
+    fonts.splice(index - 1, 0, font);
+    this.fonts.setValue(fonts);
+    this.fonts.markAsDirty();
+    this.fonts.updateValueAndValidity();
+  }
+
+  public moveFontDown(index: number): void {
+    if (index + 1 >= this.fonts.value.length) {
+      return;
+    }
+    const font = this.fonts.value[index];
+    const fonts = [...this.fonts.value];
+    fonts.splice(index, 1);
+    fonts.splice(index + 1, 0, font);
+    this.fonts.setValue(fonts);
+    this.fonts.markAsDirty();
+    this.fonts.updateValueAndValidity();
   }
 
   public cancel(): void {
