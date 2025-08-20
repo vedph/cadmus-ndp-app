@@ -62,15 +62,112 @@
   </div>
 
   <!-- fonts -->
-   <mat-expansion-panel>
+  <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>fonts</mat-panel-title>
       <mat-panel-description>
         {{ fonts.value.length }}
       </mat-panel-description>
     </mat-expansion-panel-header>
-    TODO
-   </mat-expansion-panel>
+    <div>
+      <button type="button" mat-flat-button color="primary" (click)="addFont()">
+        <mat-icon>add_circle</mat-icon> font
+      </button>
+    </div>
+    @if (fonts.value.length) {
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>EID</th>
+          <th>family</th>
+          <th>sections</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (font of fonts.value; track font; let i = $index; let first =
+        $first; let last = $last) {
+        <tr [class.selected]="font === edited()">
+          <td class="fit-width">
+            <button
+              type="button"
+              mat-icon-button
+              color="primary"
+              matTooltip="Edit this font"
+              (click)="editFont(font, i)"
+            >
+              <mat-icon class="mat-primary">edit</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Move this font up"
+              [disabled]="first"
+              (click)="moveFontUp(i)"
+            >
+              <mat-icon>arrow_upward</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Move this font down"
+              [disabled]="last"
+              (click)="moveFontDown(i)"
+            >
+              <mat-icon>arrow_downward</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              matTooltip="Delete this font"
+              (click)="deleteFont(i)"
+            >
+              <mat-icon class="mat-warn">remove_circle</mat-icon>
+            </button>
+          </td>
+          <td>{{ font.eid }}</td>
+          <td>{{ font.family }}</td>
+          <td>
+            @if (font.sections?.length) {
+            <ng-container>
+              @for (section of font.sections; track section; let last = $last) {
+              <ng-container>
+                {{
+                  section
+                    | flatLookup : layoutSectionEntries() : "id" : "value"
+                }}<span *ngIf="!last">, </span>
+              </ng-container>
+              }
+            </ng-container>
+            }
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    } @if (edited()) {
+    <fieldset>
+      <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Font #{{ editedIndex() + 1 }}</mat-panel-title>
+        </mat-expansion-panel-header>
+        <cadmus-print-font-editor
+          [idTagEntries]="assIdTagEntries()"
+          [familyEntries]="fontFamilyEntries()"
+          [refTagEntries]="docRefTagEntries()"
+          [featureEntries]="fontFeatureEntries()"
+          [idScopeEntries]="assIdScopeEntries()"
+          [refTypeEntries]="docRefTypeEntries()"
+          [sectionEntries]="layoutSectionEntries()"
+          [font]="edited()"
+          (fontChange)="saveFont($event!)"
+          (editorClose)="closeFont()"
+        />
+      </mat-expansion-panel>
+    </fieldset>
+    }
+  </mat-expansion-panel>
 
   <!-- buttons -->
   <div>

@@ -18,8 +18,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import { FlatLookupPipe } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { PrintFont } from '@myrmidon/cadmus-part-ndpbooks-fonts';
+import { PrintFont, PrintFontEditorComponent } from '@myrmidon/cadmus-part-ndpbooks-fonts';
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import { MatExpansionModule } from '@angular/material/expansion';
 
@@ -49,6 +50,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatSelectModule,
     MatTooltipModule,
     FlagSetComponent,
+    PrintFontEditorComponent,
+    FlatLookupPipe
   ],
   templateUrl: './fig-plan-item-label-editor.component.html',
   styleUrl: './fig-plan-item-label-editor.component.css',
@@ -72,6 +75,13 @@ export class FigPlanItemLabelEditorComponent {
   public readonly docRefTypeEntries = input<ThesaurusEntry[]>();
   // doc-reference-tags
   public readonly docRefTagEntries = input<ThesaurusEntry[]>();
+
+  // print-font-families
+  public readonly fontFamilyEntries = input<ThesaurusEntry[]>();
+  // print-layout-sections
+  public readonly layoutSectionEntries = input<ThesaurusEntry[]>();
+  // print-font-features
+  public readonly fontFeatureEntries = input<ThesaurusEntry[]>();
 
   public readonly languageFlags = computed<Flag[]>(
     () => this.languageEntries()?.map((e) => entryToFlag(e)) || []
