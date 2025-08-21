@@ -24,14 +24,13 @@ import {
   CitSchemeService,
   CompactCitationComponent,
 } from '@myrmidon/cadmus-refs-citation';
-
-import { FigPlanItem } from '../print-fig-plan-part';
+import { FigPlanImplItem } from '../print-fig-plan-impl-part';
 
 /**
- * Editor for a figure plan item.
+ * Editor for a figurative plan's implementation item.
  */
 @Component({
-  selector: 'cadmus-fig-plan-item-editor',
+  selector: 'cadmus-fig-plan-impl-item-editor',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -45,11 +44,11 @@ import { FigPlanItem } from '../print-fig-plan-part';
     MatTooltipModule,
     CompactCitationComponent,
   ],
-  templateUrl: './fig-plan-item-editor.component.html',
-  styleUrl: './fig-plan-item-editor.component.css',
+  templateUrl: './fig-plan-impl-item-editor.component.html',
+  styleUrl: './fig-plan-impl-item-editor.component.css',
 })
-export class FigPlanItemEditorComponent {
-  public readonly item = model<FigPlanItem | undefined>();
+export class FigPlanImplItemEditorComponent {
+  public readonly item = model<FigPlanImplItem | undefined>();
   public readonly cancelEdit = output();
 
   public readonly typeEntries = input<ThesaurusEntry[]>();
@@ -87,7 +86,7 @@ export class FigPlanItemEditorComponent {
     });
   }
 
-  private updateForm(item: FigPlanItem | undefined | null): void {
+  private updateForm(item: FigPlanImplItem | undefined | null): void {
     if (!item) {
       this.editedCit.set(undefined);
       this.form.reset();
@@ -131,7 +130,7 @@ export class FigPlanItemEditorComponent {
     this.citation?.markAsDirty();
   }
 
-  private getItem(): FigPlanItem {
+  private getItem(): FigPlanImplItem {
     return {
       eid: this.eid.value,
       type: this.type.value,
