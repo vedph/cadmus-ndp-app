@@ -1,0 +1,118 @@
+<form [formGroup]="form" (submit)="save()">
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>picture_in_picture</mat-icon>
+      </div>
+      <mat-card-title>
+        {{
+          (modelName() | titlecase) ||
+            "Book Figurative Plan Implementation Part"
+        }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-tab-group>
+        <!-- GENERAL -->
+        <mat-tab label="general">
+
+        </mat-tab>
+
+        <!-- ITEMS -->
+        <mat-tab label="items">
+          <div>
+            <button
+              type="button"
+              mat-flat-button
+              color="primary"
+              (click)="addItem()"
+            >
+              <mat-icon>add_circle</mat-icon> item
+            </button>
+          </div>
+          @if (items.value.length) {
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>EID</th>
+                <th>type</th>
+                <th>citation</th>
+                <th>location</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of items.value; track item; let i = $index; let first =
+              $first; let last = $last) {
+              <tr [class.selected]="item === edited()">
+                <td class="fit-width">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Edit this item"
+                    (click)="editItem(item, i)"
+                  >
+                    <mat-icon class="mat-primary">edit</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this item up"
+                    [disabled]="first"
+                    (click)="moveItemUp(i)"
+                  >
+                    <mat-icon>arrow_upward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this item down"
+                    [disabled]="last"
+                    (click)="moveItemDown(i)"
+                  >
+                    <mat-icon>arrow_downward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="warn"
+                    matTooltip="Delete this item"
+                    (click)="deleteItem(i)"
+                  >
+                    <mat-icon class="mat-warn">remove_circle</mat-icon>
+                  </button>
+                </td>
+                <td>{{ item.eid }}</td>
+                <td>
+                  {{ item.type | flatLookup : typeEntries() : "id" : "value" }}
+                </td>
+                <td>{{ item.citation }}</td>
+                <td>{{ item.location }}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+          } @if (edited()) {
+          <fieldset>
+            <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
+              <mat-expansion-panel-header>
+                <mat-panel-title>item #{{ editedIndex() + 1 }}</mat-panel-title>
+              </mat-expansion-panel-header>
+              TODO: editor control with: [model]="edited()"
+              (modelChange)="saveItem($event)" (editorClose)="closeItem()"
+            </mat-expansion-panel>
+          </fieldset>
+          }
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+    <mat-card-actions>
+      <cadmus-close-save-buttons
+        [form]="form"
+        [noSave]="userLevel < 2"
+        (closeRequest)="close()"
+      />
+    </mat-card-actions>
+  </mat-card>
+</form>

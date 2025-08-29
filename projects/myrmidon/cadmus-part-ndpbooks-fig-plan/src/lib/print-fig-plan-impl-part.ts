@@ -110,10 +110,224 @@ export interface FigPlanImplItem extends FigPlanItem {
 /**
  * The printed book's figurative plan part model.
  */
-export interface PrintFigPlanPartImpl extends Part {
+export interface PrintFigPlanImplPart extends Part {
   isComplete?: boolean;
   techniques: string[];
   items?: FigPlanImplItem[];
   description?: string;
   features?: string[];
 }
+
+/**
+ * The type ID used to identify the PrintFigPlanImplPart type.
+ */
+export const PRINT_FIG_PLAN_IMPL_PART_TYPEID =
+  'it.vedph.ndp.print-fig-plan-impl';
+
+/**
+ * JSON schema for the PrintFigPlanImpl part.
+ * You can use the JSON schema tool at https://jsonschema.net/.
+ */
+export const PRINT_FIG_PLAN_IMPL_PART_SCHEMA = {
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  $id:
+    'www.vedph.it/cadmus/parts/ndp/' +
+    PRINT_FIG_PLAN_IMPL_PART_TYPEID +
+    '.json',
+  type: 'object',
+  title: 'PrintFigPlanImplPart',
+  required: [
+    'id',
+    'itemId',
+    'typeId',
+    'timeCreated',
+    'creatorId',
+    'timeModified',
+    'userId',
+    'techniques',
+  ],
+  properties: {
+    timeCreated: {
+      type: 'string',
+      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$',
+    },
+    creatorId: {
+      type: 'string',
+    },
+    timeModified: {
+      type: 'string',
+      pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d+Z$',
+    },
+    userId: {
+      type: 'string',
+    },
+    id: {
+      type: 'string',
+      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    },
+    itemId: {
+      type: 'string',
+      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    },
+    typeId: {
+      type: 'string',
+      pattern: '^[a-z][-0-9a-z._]*$',
+    },
+    roleId: {
+      type: ['string', 'null'],
+      pattern: '^([a-z][-0-9a-z._]*)?$',
+    },
+    isComplete: {
+      type: 'boolean',
+    },
+    techniques: {
+      type: 'array',
+      items: { type: 'string' },
+      minItems: 1,
+    },
+    items: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['eid', 'type'],
+        properties: {
+          eid: { type: 'string' },
+          type: { type: 'string' },
+          citation: { type: 'string' },
+          location: { type: 'string' },
+          changeType: { type: 'string' },
+          features: {
+            type: 'array',
+            items: { type: 'string' },
+          },
+          matrixType: { type: 'string' },
+          matrixState: { type: 'string' },
+          matrixStateDsc: { type: 'string' },
+          position: { type: 'string' },
+          size: {
+            type: 'object',
+            properties: {
+              w: { type: 'number' },
+              h: { type: 'number' },
+              unit: { type: 'string' },
+              tag: { type: 'string' },
+            },
+            required: [],
+            additionalProperties: false,
+          },
+          labels: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['type'],
+              properties: {
+                type: { type: 'string' },
+                languages: {
+                  type: 'array',
+                  items: { type: 'string' },
+                },
+                value: { type: 'string' },
+                note: { type: 'string' },
+                fonts: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    required: ['family'],
+                    properties: {
+                      eid: { type: 'string' },
+                      family: { type: 'string' },
+                      sections: {
+                        type: 'array',
+                        items: { type: 'string' },
+                      },
+                      features: {
+                        type: 'array',
+                        items: { type: 'string' },
+                      },
+                      ids: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          required: ['tag', 'scope', 'gid', 'assertion'],
+                          properties: {
+                            tag: { type: 'string' },
+                            scope: { type: 'string' },
+                            gid: { type: 'string' },
+                            assertion: {
+                              type: 'object',
+                              required: ['rank'],
+                              properties: {
+                                rank: { type: 'integer' },
+                                note: { type: 'string' },
+                                sources: {
+                                  type: 'array',
+                                  items: {
+                                    type: 'object',
+                                    required: ['citation'],
+                                    properties: {
+                                      citation: { type: 'string' },
+                                      tag: { type: 'string' },
+                                    },
+                                    additionalProperties: false,
+                                  },
+                                },
+                              },
+                              additionalProperties: false,
+                            },
+                          },
+                          additionalProperties: false,
+                        },
+                      },
+                      note: { type: 'string' },
+                    },
+                    additionalProperties: false,
+                  },
+                },
+              },
+              additionalProperties: false,
+            },
+          },
+          labelDsc: { type: 'string' },
+          iconographyId: {
+            type: 'object',
+            required: ['tag', 'scope', 'gid', 'assertion'],
+            properties: {
+              tag: { type: 'string' },
+              scope: { type: 'string' },
+              gid: { type: 'string' },
+              assertion: {
+                type: 'object',
+                required: ['rank'],
+                properties: {
+                  rank: { type: 'integer' },
+                  note: { type: 'string' },
+                  sources: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      required: ['citation'],
+                      properties: {
+                        citation: { type: 'string' },
+                        tag: { type: 'string' },
+                      },
+                      additionalProperties: false,
+                    },
+                  },
+                },
+                additionalProperties: false,
+              },
+            },
+            additionalProperties: false,
+          },
+        },
+        additionalProperties: false,
+      },
+    },
+    description: { type: 'string' },
+    features: {
+      type: 'array',
+      items: { type: 'string' },
+    },
+  },
+  additionalProperties: false,
+};

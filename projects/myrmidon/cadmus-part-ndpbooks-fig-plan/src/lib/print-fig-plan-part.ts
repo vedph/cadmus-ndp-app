@@ -6,7 +6,7 @@ import { AssertedCompositeId } from '@myrmidon/cadmus-refs-asserted-ids';
  */
 export interface FigPlanItem {
   eid: string;
-  type: string;
+  type: string; // fig-plan-types
   citation?: string;
 }
 
