@@ -37,7 +37,7 @@ import {
   FigPlanImplItem,
   PrintFigPlanImplPart,
 } from '../print-fig-plan-impl-part';
-import { PRINT_FIG_PLAN_PART_TYPEID } from '../print-fig-plan-part';
+import { PRINT_FIG_PLAN_IMPL_PART_TYPEID } from '../print-fig-plan-impl-part';
 import { FigPlanImplItemEditorComponent } from '../fig-plan-impl-item-editor/fig-plan-impl-item-editor.component';
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
@@ -404,7 +404,7 @@ export class PrintFigPlanImplPartComponent
 
   protected getValue(): PrintFigPlanImplPart {
     let part = this.getEditedPart(
-      PRINT_FIG_PLAN_PART_TYPEID
+      PRINT_FIG_PLAN_IMPL_PART_TYPEID
     ) as PrintFigPlanImplPart;
     part.isComplete = this.complete.value;
     part.techniques = this.techniques.value || [];
