@@ -1,5 +1,6 @@
 <form [formGroup]="form" (submit)="save()">
   <mat-tab-group>
+    <!-- GENERAL -->
     <mat-tab label="general">
       <div>
         <!-- eid -->
@@ -46,6 +47,8 @@
         />
       </div>
     </mat-tab>
+
+    <!-- IMPLEMENTATION-->
     <mat-tab label="implementation">
       <div class="form-row">
         <!-- location -->
@@ -105,6 +108,11 @@
         <fieldset>
           <legend>iconography</legend>
           <cadmus-refs-asserted-composite-id
+            [assTagEntries]="assTagEntries()"
+            [idScopeEntries]="idScopeEntries()"
+            [idTagEntries]="idTagEntries()"
+            [refTagEntries]="refTagEntries()"
+            [refTypeEntries]="refTypeEntries()"
             [canSwitchMode]="true"
             [canEditTarget]="true"
             [id]="iconographyId.value || undefined"
@@ -112,8 +120,61 @@
           />
         </fieldset>
       </div>
+
+      <!-- features -->
+      @if (featureFlags().length) {
+      <div>
+        <cadmus-ui-flag-set
+          [flags]="featureFlags()"
+          [checkedIds]="features.value"
+          (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
+        />
+      </div>
+      }
+
+      <!-- size -->
+      <div>
+        <cadmus-mat-physical-size
+          [tagEntries]="szTagEntries()"
+          [unitEntries]="szUnitEntries()"
+          [dimTagEntries]="szDimTagEntries()"
+          [size]="size.value || undefined"
+          (sizeChange)="onSizeChange($event!)"
+        />
+      </div>
+
+      <!-- matrix -->
+      <div>
+        <fieldset>
+          <legend>matrix</legend>
+          <div>
+            <!-- matrixType (bound) -->
+            @if (matrixTypeEntries()?.length) {
+            <mat-form-field>
+              <mat-label>matrixType</mat-label>
+              <mat-select [formControl]="matrixType">
+                @for (e of matrixTypeEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            } @else {
+            <!-- matrixType (free) -->
+            <mat-form-field>
+              <mat-label>matrixType</mat-label>
+              <input matInput [formControl]="matrixType" maxlength="100" />
+              @if ($any(matrixType).errors?.maxLength && (matrixType.dirty ||
+              matrixType.touched)) {
+              <mat-error>matrix type too long</mat-error>
+              }
+            </mat-form-field>
+            }
+          </div>
+        </fieldset>
+      </div>
     </mat-tab>
   </mat-tab-group>
+
   <!-- buttons -->
   <div>
     <button

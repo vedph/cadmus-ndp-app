@@ -1,4 +1,12 @@
-import { Component, effect, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -18,7 +26,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { AssertedCompositeId, AssertedCompositeIdComponent } from '@myrmidon/cadmus-refs-asserted-ids';
+import {
+  AssertedCompositeId,
+  AssertedCompositeIdComponent,
+} from '@myrmidon/cadmus-refs-asserted-ids';
 import {
   CodLocationComponent,
   CodLocationParser,
@@ -30,10 +41,22 @@ import {
   CitSchemeService,
   CompactCitationComponent,
 } from '@myrmidon/cadmus-refs-citation';
+import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
+import {
+  PhysicalSize,
+  PhysicalSizeComponent,
+} from '@myrmidon/cadmus-mat-physical-size';
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { FigPlanImplItem } from '../print-fig-plan-impl-part';
+
+function entryToFlag(entry: ThesaurusEntry): Flag {
+  return {
+    id: entry.id,
+    label: entry.value,
+  };
+}
 
 /**
  * Editor for a figurative plan's implementation item.
@@ -54,7 +77,9 @@ import { FigPlanImplItem } from '../print-fig-plan-impl-part';
     MatTooltipModule,
     CodLocationComponent,
     CompactCitationComponent,
-    AssertedCompositeIdComponent
+    AssertedCompositeIdComponent,
+    FlagSetComponent,
+    PhysicalSizeComponent,
   ],
   templateUrl: './fig-plan-impl-item-editor.component.html',
   styleUrl: './fig-plan-impl-item-editor.component.css',
@@ -63,7 +88,40 @@ export class FigPlanImplItemEditorComponent {
   public readonly item = model<FigPlanImplItem | undefined>();
   public readonly cancelEdit = output();
 
+  // fig-plan-types
   public readonly typeEntries = input<ThesaurusEntry[]>();
+  // fig-plan-impl-positions
+  public readonly positionEntries = input<ThesaurusEntry[]>();
+  // fig-plan-impl-change-types
+  public readonly changeTypeEntries = input<ThesaurusEntry[]>();
+  // fig-plan-impl-item-features
+  public readonly featureEntries = input<ThesaurusEntry[]>();
+  // fig-plan-impl-matrix-types
+  public readonly matrixTypeEntries = input<ThesaurusEntry[]>();
+
+  // asserted-id-scopes
+  public readonly idScopeEntries = input<ThesaurusEntry[]>();
+  // asserted-id-tags
+  public readonly idTagEntries = input<ThesaurusEntry[]>();
+  // assertion-tags
+  public readonly assTagEntries = input<ThesaurusEntry[]>();
+  // doc-reference-types
+  public readonly refTypeEntries = input<ThesaurusEntry[]>();
+  // doc-reference-tags
+  public readonly refTagEntries = input<ThesaurusEntry[]>();
+
+  // physical-size-units
+  public readonly szUnitEntries = input<ThesaurusEntry[]>();
+  // physical-size-tags
+  public readonly szTagEntries = input<ThesaurusEntry[]>();
+  // physical-size-dim-tags
+  public readonly szDimTagEntries = input<ThesaurusEntry[]>();
+
+  // flags mapped from thesaurus entries
+  public featureFlags = computed<Flag[]>(
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
+  );
+
   public readonly editedCit = signal<Citation | CitationSpan | undefined>(
     undefined
   );
@@ -75,12 +133,10 @@ export class FigPlanImplItemEditorComponent {
   public position: FormControl<string | null>;
   public changeType: FormControl<string | null>;
   public iconographyId: FormControl<AssertedCompositeId | null>;
+  public features: FormControl<string[]>;
+  public size: FormControl<PhysicalSize | null>;
+  public matrixType: FormControl<string | null>;
   public form: FormGroup;
-
-  // fig-plan-impl-positions
-  public readonly positionEntries = input<ThesaurusEntry[]>();
-  // fig-plan-impl-change-types
-  public readonly changeTypeEntries = input<ThesaurusEntry[]>();
 
   constructor(formBuilder: FormBuilder, private _citService: CitSchemeService) {
     this.eid = formBuilder.control<string>('', {
@@ -98,6 +154,9 @@ export class FigPlanImplItemEditorComponent {
     this.position = formBuilder.control<string | null>(null);
     this.changeType = formBuilder.control<string | null>(null);
     this.iconographyId = formBuilder.control<AssertedCompositeId | null>(null);
+    this.features = formBuilder.control([], { nonNullable: true });
+    this.size = formBuilder.control<PhysicalSize | null>(null);
+    this.matrixType = formBuilder.control<string | null>(null);
 
     this.form = formBuilder.group({
       eid: this.eid,
@@ -107,6 +166,9 @@ export class FigPlanImplItemEditorComponent {
       position: this.position,
       changeType: this.changeType,
       iconographyId: this.iconographyId,
+      features: this.features,
+      size: this.size,
+      matrixType: this.matrixType,
     });
 
     // when model changes, update form
@@ -143,7 +205,11 @@ export class FigPlanImplItemEditorComponent {
       }
       this.position.setValue(item.position || null, { emitEvent: false });
       this.changeType.setValue(item.changeType || null, { emitEvent: false });
-      this.iconographyId.setValue(item.iconographyId || null, { emitEvent: false });
+      this.iconographyId.setValue(item.iconographyId || null, {
+        emitEvent: false,
+      });
+      this.size.setValue(item.size || null, { emitEvent: false });
+      this.matrixType.setValue(item.matrixType || null, { emitEvent: false });
     }
 
     this.form.markAsPristine();
@@ -182,6 +248,18 @@ export class FigPlanImplItemEditorComponent {
     this.iconographyId.updateValueAndValidity();
   }
 
+  public onFeatureCheckedIdsChange(ids: string[]): void {
+    this.features.setValue(ids);
+    this.features.markAsDirty();
+    this.features.updateValueAndValidity();
+  }
+
+  public onSizeChange(size: PhysicalSize): void {
+    this.size.setValue(size);
+    this.size.markAsDirty();
+    this.size.updateValueAndValidity();
+  }
+
   private getItem(): FigPlanImplItem {
     return {
       eid: this.eid.value,
@@ -193,6 +271,9 @@ export class FigPlanImplItemEditorComponent {
       position: this.position.value || undefined,
       changeType: this.changeType.value || undefined,
       iconographyId: this.iconographyId.value || undefined,
+      features: this.features.value.length ? this.features.value : undefined,
+      size: this.size.value || undefined,
+      matrixType: this.matrixType.value || undefined,
     };
   }
 
