@@ -1,0 +1,8 @@
+<cadmus-current-item-bar />
+<cadmus-print-fig-plan-impl-part
+  [identity]="identity"
+  [data]="$any(data)"
+  (dataChange)="save($event!.value!)"
+  (editorClose)="close()"
+  (dirtyChange)="onDirtyChange($event)"
+/>
