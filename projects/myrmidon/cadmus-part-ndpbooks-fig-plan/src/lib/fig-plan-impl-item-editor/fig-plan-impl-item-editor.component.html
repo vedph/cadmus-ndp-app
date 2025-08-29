@@ -147,7 +147,7 @@
       <div>
         <fieldset>
           <legend>matrix</legend>
-          <div>
+          <div class="form-row">
             <!-- matrixType (bound) -->
             @if (matrixTypeEntries()?.length) {
             <mat-form-field>
@@ -169,6 +169,43 @@
               }
             </mat-form-field>
             }
+            <!-- matrixState (bound) -->
+            @if (matrixStateEntries()?.length) {
+            <mat-form-field>
+              <mat-label>state</mat-label>
+              <mat-select [formControl]="matrixState">
+                @for (e of matrixStateEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            } @else {
+            <!-- matrixState (free) -->
+            <mat-form-field>
+              <mat-label>state</mat-label>
+              <input matInput [formControl]="matrixState" maxlength="100" />
+              @if ($any(matrixState).errors?.maxLength && (matrixState.dirty ||
+              matrixState.touched)) {
+              <mat-error>matrixState too long</mat-error>
+              }
+            </mat-form-field>
+            }
+          </div>
+          <!-- matrixStateDsc -->
+          <div>
+            <mat-form-field class="long-text">
+              <mat-label>state description</mat-label>
+              <textarea
+                matInput
+                [formControl]="matrixStateDsc"
+                maxlength="1000"
+                rows="3"
+              ></textarea>
+              @if ($any(matrixStateDsc).errors?.maxLength &&
+              (matrixStateDsc.dirty || matrixStateDsc.touched)) {
+              <mat-error>state description too long</mat-error>
+              }
+            </mat-form-field>
           </div>
         </fieldset>
       </div>

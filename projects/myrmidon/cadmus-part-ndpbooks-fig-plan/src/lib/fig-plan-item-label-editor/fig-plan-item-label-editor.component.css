@@ -22,6 +22,9 @@ fieldset {
   border-radius: 6px;
   padding: 6px;
 }
+legend {
+  color: silver;
+}
 .long-text {
   width: 100%;
   max-width: 800px;

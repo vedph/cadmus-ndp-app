@@ -98,6 +98,8 @@ export class FigPlanImplItemEditorComponent {
   public readonly featureEntries = input<ThesaurusEntry[]>();
   // fig-plan-impl-matrix-types
   public readonly matrixTypeEntries = input<ThesaurusEntry[]>();
+  // fig-plan-impl-matrix-states
+  public readonly matrixStateEntries = input<ThesaurusEntry[]>();
 
   // asserted-id-scopes
   public readonly idScopeEntries = input<ThesaurusEntry[]>();
@@ -136,6 +138,8 @@ export class FigPlanImplItemEditorComponent {
   public features: FormControl<string[]>;
   public size: FormControl<PhysicalSize | null>;
   public matrixType: FormControl<string | null>;
+  public matrixState: FormControl<string | null>;
+  public matrixStateDsc: FormControl<string | null>;
   public form: FormGroup;
 
   constructor(formBuilder: FormBuilder, private _citService: CitSchemeService) {
@@ -157,6 +161,8 @@ export class FigPlanImplItemEditorComponent {
     this.features = formBuilder.control([], { nonNullable: true });
     this.size = formBuilder.control<PhysicalSize | null>(null);
     this.matrixType = formBuilder.control<string | null>(null);
+    this.matrixState = formBuilder.control<string | null>(null);
+    this.matrixStateDsc = formBuilder.control<string | null>(null);
 
     this.form = formBuilder.group({
       eid: this.eid,
@@ -169,6 +175,8 @@ export class FigPlanImplItemEditorComponent {
       features: this.features,
       size: this.size,
       matrixType: this.matrixType,
+      matrixState: this.matrixState,
+      matrixStateDsc: this.matrixStateDsc,
     });
 
     // when model changes, update form
@@ -210,6 +218,8 @@ export class FigPlanImplItemEditorComponent {
       });
       this.size.setValue(item.size || null, { emitEvent: false });
       this.matrixType.setValue(item.matrixType || null, { emitEvent: false });
+      this.matrixState.setValue(item.matrixState || null, { emitEvent: false });
+      this.matrixStateDsc.setValue(item.matrixStateDsc || null, { emitEvent: false });
     }
 
     this.form.markAsPristine();
@@ -274,6 +284,8 @@ export class FigPlanImplItemEditorComponent {
       features: this.features.value.length ? this.features.value : undefined,
       size: this.size.value || undefined,
       matrixType: this.matrixType.value || undefined,
+      matrixState: this.matrixState.value || undefined,
+      matrixStateDsc: this.matrixStateDsc.value?.trim() || undefined,
     };
   }
 
