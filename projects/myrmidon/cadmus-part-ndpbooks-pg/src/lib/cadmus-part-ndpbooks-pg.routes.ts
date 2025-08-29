@@ -10,6 +10,8 @@ import {
 
 import {
   PRINT_FIG_PLAN_PART_TYPEID,
+  PRINT_FIG_PLAN_IMPL_PART_TYPEID,
+  PrintFigPlanImplPartFeatureComponent,
   PrintFigPlanPartFeatureComponent,
 } from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
 
@@ -24,6 +26,12 @@ export const CADMUS_PART_NDPBOOKS_PG_ROUTES: Routes = [
     path: `${PRINT_FIG_PLAN_PART_TYPEID}/:pid`,
     pathMatch: 'full',
     component: PrintFigPlanPartFeatureComponent,
+    canDeactivate: [PendingChangesGuard],
+  },
+  {
+    path: `${PRINT_FIG_PLAN_IMPL_PART_TYPEID}/:pid`,
+    pathMatch: 'full',
+    component: PrintFigPlanImplPartFeatureComponent,
     canDeactivate: [PendingChangesGuard],
   },
 ];
