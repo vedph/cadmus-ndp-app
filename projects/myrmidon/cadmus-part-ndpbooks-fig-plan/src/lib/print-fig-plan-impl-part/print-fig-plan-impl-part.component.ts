@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +19,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
+import { FlatLookupPipe } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
@@ -62,6 +63,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatExpansionModule,
     MatFormFieldModule,
     MatIconModule,
@@ -72,7 +74,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     FlatLookupPipe,
     FlagSetComponent,
     CloseSaveButtonsComponent,
-    FigPlanImplItemEditorComponent
+    FigPlanImplItemEditorComponent,
   ],
   templateUrl: './print-fig-plan-impl-part.component.html',
   styleUrl: './print-fig-plan-impl-part.component.css',
@@ -198,8 +200,6 @@ export class PrintFigPlanImplPartComponent
     this.features = formBuilder.control<string[]>([], { nonNullable: true });
     this.description = formBuilder.control<string | null>(null);
     this.items = formBuilder.control([], {
-      // at least 1 entry
-      validators: NgxToolsValidators.strictMinLengthValidator(1),
       nonNullable: true,
     });
   }
