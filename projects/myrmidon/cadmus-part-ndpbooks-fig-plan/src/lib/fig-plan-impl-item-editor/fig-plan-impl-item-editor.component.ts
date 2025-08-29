@@ -18,7 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import { AssertedCompositeId, AssertedCompositeIdComponent } from '@myrmidon/cadmus-refs-asserted-ids';
 import {
   CodLocationComponent,
   CodLocationParser,
@@ -30,6 +30,8 @@ import {
   CitSchemeService,
   CompactCitationComponent,
 } from '@myrmidon/cadmus-refs-citation';
+
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { FigPlanImplItem } from '../print-fig-plan-impl-part';
 
@@ -52,6 +54,7 @@ import { FigPlanImplItem } from '../print-fig-plan-impl-part';
     MatTooltipModule,
     CodLocationComponent,
     CompactCitationComponent,
+    AssertedCompositeIdComponent
   ],
   templateUrl: './fig-plan-impl-item-editor.component.html',
   styleUrl: './fig-plan-impl-item-editor.component.css',
@@ -69,16 +72,17 @@ export class FigPlanImplItemEditorComponent {
   public type: FormControl<string>;
   public citation: FormControl<string | null>;
   public location: FormControl<CodLocationRange[] | null>;
+  public position: FormControl<string | null>;
+  public changeType: FormControl<string | null>;
+  public iconographyId: FormControl<AssertedCompositeId | null>;
   public form: FormGroup;
 
   // fig-plan-impl-positions
   public readonly positionEntries = input<ThesaurusEntry[]>();
+  // fig-plan-impl-change-types
+  public readonly changeTypeEntries = input<ThesaurusEntry[]>();
 
-  constructor(
-    formBuilder: FormBuilder,
-    private _citService: CitSchemeService,
-    private _locParser: CodLocationParser
-  ) {
+  constructor(formBuilder: FormBuilder, private _citService: CitSchemeService) {
     this.eid = formBuilder.control<string>('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(100)],
@@ -91,11 +95,18 @@ export class FigPlanImplItemEditorComponent {
       validators: [Validators.maxLength(1000)],
     });
     this.location = formBuilder.control<CodLocationRange[]>([]);
+    this.position = formBuilder.control<string | null>(null);
+    this.changeType = formBuilder.control<string | null>(null);
+    this.iconographyId = formBuilder.control<AssertedCompositeId | null>(null);
+
     this.form = formBuilder.group({
       eid: this.eid,
       type: this.type,
       citation: this.citation,
       location: this.location,
+      position: this.position,
+      changeType: this.changeType,
+      iconographyId: this.iconographyId,
     });
 
     // when model changes, update form
@@ -126,9 +137,13 @@ export class FigPlanImplItemEditorComponent {
       if (item.location) {
         const location = CodLocationParser.parseLocation(item.location);
         this.location.setValue(
-          location ? [{ start: location, end: location }] : []
+          location ? [{ start: location, end: location }] : [],
+          { emitEvent: false }
         );
       }
+      this.position.setValue(item.position || null, { emitEvent: false });
+      this.changeType.setValue(item.changeType || null, { emitEvent: false });
+      this.iconographyId.setValue(item.iconographyId || null, { emitEvent: false });
     }
 
     this.form.markAsPristine();
@@ -157,6 +172,14 @@ export class FigPlanImplItemEditorComponent {
 
   public onLocationChange(location: CodLocationRange[]): void {
     this.location.setValue(location);
+    this.location.markAsDirty();
+    this.location.updateValueAndValidity();
+  }
+
+  public onIdChange(id: AssertedCompositeId | null): void {
+    this.iconographyId.setValue(id);
+    this.iconographyId.markAsDirty();
+    this.iconographyId.updateValueAndValidity();
   }
 
   private getItem(): FigPlanImplItem {
@@ -167,6 +190,9 @@ export class FigPlanImplItemEditorComponent {
       location: this.location.value?.length
         ? CodLocationParser.locationToString(this.location.value[0].start)!
         : undefined,
+      position: this.position.value || undefined,
+      changeType: this.changeType.value || undefined,
+      iconographyId: this.iconographyId.value || undefined,
     };
   }
 
