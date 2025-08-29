@@ -109,8 +109,8 @@
           <legend>iconography</legend>
           <cadmus-refs-asserted-composite-id
             [assTagEntries]="assTagEntries()"
-            [idScopeEntries]="idScopeEntries()"
-            [idTagEntries]="idTagEntries()"
+            [idScopeEntries]="assIdScopeEntries()"
+            [idTagEntries]="assIdTagEntries()"
             [refTagEntries]="refTagEntries()"
             [refTypeEntries]="refTypeEntries()"
             [canSwitchMode]="true"
@@ -208,6 +208,107 @@
             </mat-form-field>
           </div>
         </fieldset>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="labels">
+      <div>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          (click)="addLabel()"
+        >
+          <mat-icon>add_circle</mat-icon> label
+        </button>
+      </div>
+      <div>
+        @if (labels.value.length) {
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>type</th>
+              <th>value</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of labels.value; track entry; let i = $index; let first
+            = $first; let last = $last) {
+            <tr [class.selected]="entry === editedLabel()">
+              <td class="fit-width">
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="primary"
+                  matTooltip="Edit this label"
+                  (click)="editLabel(entry, i)"
+                >
+                  <mat-icon class="mat-primary">edit</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matTooltip="Move this label up"
+                  [disabled]="first"
+                  (click)="moveLabelUp(i)"
+                >
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matTooltip="Move this label down"
+                  [disabled]="last"
+                  (click)="moveLabelDown(i)"
+                >
+                  <mat-icon>arrow_downward</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="warn"
+                  matTooltip="Delete this label"
+                  (click)="deleteLabel(i)"
+                >
+                  <mat-icon class="mat-warn">remove_circle</mat-icon>
+                </button>
+              </td>
+              <td>{{ entry.type }}</td>
+              <td>{{ entry.value }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+        } @if (editedLabel()) {
+        <fieldset>
+          <mat-expansion-panel
+            [expanded]="editedLabel()"
+            [disabled]="!editedLabel()"
+          >
+            <mat-expansion-panel-header>
+              <mat-panel-title
+                >Label #{{ editedLabelIndex() + 1 }}</mat-panel-title
+              >
+            </mat-expansion-panel-header>
+            <cadmus-fig-plan-item-label-editor
+              [typeEntries]="labelTypeEntries()"
+              [assTagEntries]="assTagEntries()"
+              [assIdTagEntries]="assIdTagEntries()"
+              [languageEntries]="labelLangEntries()"
+              [docRefTagEntries]="refTagEntries()"
+              [assIdScopeEntries]="assIdScopeEntries()"
+              [docRefTypeEntries]="refTypeEntries()"
+              [fontFamilyEntries]="fontFamilyEntries()"
+              [fontFeatureEntries]="fontFeatureEntries()"
+              [layoutSectionEntries]="layoutSectionEntries()"
+              [label]="editedLabel()"
+              (labelChange)="saveLabel($event!)"
+              (editorClose)="closeLabel()"
+            />
+          </mat-expansion-panel>
+        </fieldset>
+        }
       </div>
     </mat-tab>
   </mat-tab-group>

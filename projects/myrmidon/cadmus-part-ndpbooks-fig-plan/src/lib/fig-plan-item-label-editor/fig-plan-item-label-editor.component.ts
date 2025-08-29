@@ -63,8 +63,6 @@ export class FigPlanItemLabelEditorComponent {
   public readonly typeEntries = input<ThesaurusEntry[]>();
   // fig-plan-item-label-languages
   public readonly languageEntries = input<ThesaurusEntry[]>();
-  // fig-plan-impl-features
-  public readonly featureEntries = input<ThesaurusEntry[]>();
   // asserted-id-scopes
   public readonly assIdScopeEntries = input<ThesaurusEntry[]>();
   // asserted-id-tags

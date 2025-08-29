@@ -26,6 +26,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { DialogService } from '@myrmidon/ngx-mat-tools';
 import {
   AssertedCompositeId,
   AssertedCompositeIdComponent,
@@ -49,7 +50,8 @@ import {
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
-import { FigPlanImplItem } from '../print-fig-plan-impl-part';
+import { FigPlanImplItem, FigPlanItemLabel } from '../print-fig-plan-impl-part';
+import { FigPlanItemLabelEditorComponent } from '../fig-plan-item-label-editor/fig-plan-item-label-editor.component';
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {
@@ -80,6 +82,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     AssertedCompositeIdComponent,
     FlagSetComponent,
     PhysicalSizeComponent,
+    FigPlanItemLabelEditorComponent,
   ],
   templateUrl: './fig-plan-impl-item-editor.component.html',
   styleUrl: './fig-plan-impl-item-editor.component.css',
@@ -102,9 +105,9 @@ export class FigPlanImplItemEditorComponent {
   public readonly matrixStateEntries = input<ThesaurusEntry[]>();
 
   // asserted-id-scopes
-  public readonly idScopeEntries = input<ThesaurusEntry[]>();
+  public readonly assIdScopeEntries = input<ThesaurusEntry[]>();
   // asserted-id-tags
-  public readonly idTagEntries = input<ThesaurusEntry[]>();
+  public readonly assIdTagEntries = input<ThesaurusEntry[]>();
   // assertion-tags
   public readonly assTagEntries = input<ThesaurusEntry[]>();
   // doc-reference-types
@@ -119,14 +122,31 @@ export class FigPlanImplItemEditorComponent {
   // physical-size-dim-tags
   public readonly szDimTagEntries = input<ThesaurusEntry[]>();
 
+  // fig-plan-item-label-types
+  public readonly labelTypeEntries = input<ThesaurusEntry[]>();
+  // fig-plan-item-label-languages
+  public readonly labelLangEntries = input<ThesaurusEntry[]>();
+
+  // print-font-families
+  public readonly fontFamilyEntries = input<ThesaurusEntry[]>();
+  // print-layout-sections
+  public readonly layoutSectionEntries = input<ThesaurusEntry[]>();
+  // print-font-features
+  public readonly fontFeatureEntries = input<ThesaurusEntry[]>();
+
   // flags mapped from thesaurus entries
   public featureFlags = computed<Flag[]>(
     () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
   );
 
+  // the edited citation
   public readonly editedCit = signal<Citation | CitationSpan | undefined>(
     undefined
   );
+  // the edited label
+  public readonly editedLabel = signal<FigPlanItemLabel | undefined>(undefined);
+  // the edited label index
+  public readonly editedLabelIndex = signal<number>(-1);
 
   public eid: FormControl<string>;
   public type: FormControl<string>;
@@ -140,9 +160,14 @@ export class FigPlanImplItemEditorComponent {
   public matrixType: FormControl<string | null>;
   public matrixState: FormControl<string | null>;
   public matrixStateDsc: FormControl<string | null>;
+  public labels: FormControl<FigPlanItemLabel[]>;
   public form: FormGroup;
 
-  constructor(formBuilder: FormBuilder, private _citService: CitSchemeService) {
+  constructor(
+    formBuilder: FormBuilder,
+    private _citService: CitSchemeService,
+    private _dialogService: DialogService
+  ) {
     this.eid = formBuilder.control<string>('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(100)],
@@ -163,6 +188,9 @@ export class FigPlanImplItemEditorComponent {
     this.matrixType = formBuilder.control<string | null>(null);
     this.matrixState = formBuilder.control<string | null>(null);
     this.matrixStateDsc = formBuilder.control<string | null>(null);
+    this.labels = formBuilder.control<FigPlanItemLabel[]>([], {
+      nonNullable: true,
+    });
 
     this.form = formBuilder.group({
       eid: this.eid,
@@ -177,6 +205,7 @@ export class FigPlanImplItemEditorComponent {
       matrixType: this.matrixType,
       matrixState: this.matrixState,
       matrixStateDsc: this.matrixStateDsc,
+      labels: this.labels,
     });
 
     // when model changes, update form
@@ -219,7 +248,10 @@ export class FigPlanImplItemEditorComponent {
       this.size.setValue(item.size || null, { emitEvent: false });
       this.matrixType.setValue(item.matrixType || null, { emitEvent: false });
       this.matrixState.setValue(item.matrixState || null, { emitEvent: false });
-      this.matrixStateDsc.setValue(item.matrixStateDsc || null, { emitEvent: false });
+      this.matrixStateDsc.setValue(item.matrixStateDsc || null, {
+        emitEvent: false,
+      });
+      this.labels.setValue(item.labels || [], { emitEvent: false });
     }
 
     this.form.markAsPristine();
@@ -270,6 +302,81 @@ export class FigPlanImplItemEditorComponent {
     this.size.updateValueAndValidity();
   }
 
+  //#region labels
+  public addLabel(): void {
+    const label: FigPlanItemLabel = {
+      type: this.labelTypeEntries()?.[0].id || '',
+    };
+    this.editLabel(label, -1);
+  }
+
+  public editLabel(label: FigPlanItemLabel, index: number): void {
+    this.editedLabelIndex.set(index);
+    this.editedLabel.set(label);
+  }
+
+  public closeLabel(): void {
+    this.editedLabelIndex.set(-1);
+    this.editedLabel.set(undefined);
+  }
+
+  public saveLabel(label: FigPlanItemLabel): void {
+    const entries = [...this.labels.value];
+    if (this.editedLabelIndex() === -1) {
+      entries.push(label);
+    } else {
+      entries.splice(this.editedLabelIndex(), 1, label);
+    }
+    this.labels.setValue(entries);
+    this.labels.markAsDirty();
+    this.labels.updateValueAndValidity();
+    this.closeLabel();
+  }
+
+  public deleteLabel(index: number): void {
+    this._dialogService
+      .confirm('Confirmation', 'Delete Label?')
+      .subscribe((yes: boolean | undefined) => {
+        if (yes) {
+          if (this.editedLabelIndex() === index) {
+            this.closeLabel();
+          }
+          const entries = [...this.labels.value];
+          entries.splice(index, 1);
+          this.labels.setValue(entries);
+          this.labels.markAsDirty();
+          this.labels.updateValueAndValidity();
+        }
+      });
+  }
+
+  public moveLabelUp(index: number): void {
+    if (index < 1) {
+      return;
+    }
+    const entry = this.labels.value[index];
+    const entries = [...this.labels.value];
+    entries.splice(index, 1);
+    entries.splice(index - 1, 0, entry);
+    this.labels.setValue(entries);
+    this.labels.markAsDirty();
+    this.labels.updateValueAndValidity();
+  }
+
+  public moveLabelDown(index: number): void {
+    if (index + 1 >= this.labels.value.length) {
+      return;
+    }
+    const entry = this.labels.value[index];
+    const entries = [...this.labels.value];
+    entries.splice(index, 1);
+    entries.splice(index + 1, 0, entry);
+    this.labels.setValue(entries);
+    this.labels.markAsDirty();
+    this.labels.updateValueAndValidity();
+  }
+  //#endregion
+
   private getItem(): FigPlanImplItem {
     return {
       eid: this.eid.value,
@@ -286,6 +393,7 @@ export class FigPlanImplItemEditorComponent {
       matrixType: this.matrixType.value || undefined,
       matrixState: this.matrixState.value || undefined,
       matrixStateDsc: this.matrixStateDsc.value?.trim() || undefined,
+      labels: this.labels.value.length ? this.labels.value : undefined,
     };
   }
 
