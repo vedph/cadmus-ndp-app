@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -6,7 +6,6 @@ import {
   UntypedFormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { take } from 'rxjs/operators';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,6 +21,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
+import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
@@ -37,6 +37,14 @@ import {
   PrintFigPlanImplPart,
 } from '../print-fig-plan-impl-part';
 import { PRINT_FIG_PLAN_PART_TYPEID } from '../print-fig-plan-part';
+import { FigPlanImplItemEditorComponent } from '../fig-plan-impl-item-editor/fig-plan-impl-item-editor.component';
+
+function entryToFlag(entry: ThesaurusEntry): Flag {
+  return {
+    id: entry.id,
+    label: entry.value,
+  };
+}
 
 /**
  * PrintFigPlanImplPart editor component.
@@ -61,10 +69,10 @@ import { PRINT_FIG_PLAN_PART_TYPEID } from '../print-fig-plan-part';
     MatSelectModule,
     MatTabsModule,
     MatTooltipModule,
-    // ngx-tools
     FlatLookupPipe,
-    // cadmus
+    FlagSetComponent,
     CloseSaveButtonsComponent,
+    FigPlanImplItemEditorComponent
   ],
   templateUrl: './print-fig-plan-impl-part.component.html',
   styleUrl: './print-fig-plan-impl-part.component.css',
@@ -75,6 +83,15 @@ export class PrintFigPlanImplPartComponent
 {
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<FigPlanImplItem | undefined>(undefined);
+
+  // fig-plan-techniques
+  public readonly techniqueEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
+  // fig-plan-impl-features
+  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
 
   // fig-plan-types
   public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
@@ -87,7 +104,7 @@ export class PrintFigPlanImplPartComponent
     undefined
   );
   // fig-plan-impl-item-features
-  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(
+  public readonly itemFeatureEntries = signal<ThesaurusEntry[] | undefined>(
     undefined
   );
   // fig-plan-impl-matrix-types
@@ -155,6 +172,18 @@ export class PrintFigPlanImplPartComponent
     undefined
   );
 
+  // flags mapped from thesaurus entries
+  public techniqueFlags = computed<Flag[]>(
+    () => this.techniqueEntries()?.map((e) => entryToFlag(e)) || []
+  );
+  public featureFlags = computed<Flag[]>(
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
+  );
+
+  public complete: FormControl<boolean>;
+  public techniques: FormControl<string[]>;
+  public features: FormControl<string[]>;
+  public description: FormControl<string | null>;
   public items: FormControl<FigPlanImplItem[]>;
 
   constructor(
@@ -164,6 +193,10 @@ export class PrintFigPlanImplPartComponent
   ) {
     super(authService, formBuilder);
     // form
+    this.complete = formBuilder.control<boolean>(false, { nonNullable: true });
+    this.techniques = formBuilder.control<string[]>([], { nonNullable: true });
+    this.features = formBuilder.control<string[]>([], { nonNullable: true });
+    this.description = formBuilder.control<string | null>(null);
     this.items = formBuilder.control([], {
       // at least 1 entry
       validators: NgxToolsValidators.strictMinLengthValidator(1),
@@ -177,12 +210,29 @@ export class PrintFigPlanImplPartComponent
 
   protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
     return formBuilder.group({
+      complete: this.complete,
+      techniques: this.techniques,
+      features: this.features,
+      description: this.description,
       items: this.items,
     });
   }
 
   private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'fig-plan-types';
+    let key = 'fig-plan-techniques';
+    if (this.hasThesaurus(key)) {
+      this.techniqueEntries.set(thesauri[key].entries);
+    } else {
+      this.techniqueEntries.set(undefined);
+    }
+    key = 'fig-plan-impl-features';
+    if (this.hasThesaurus(key)) {
+      this.featureEntries.set(thesauri[key].entries);
+    } else {
+      this.featureEntries.set(undefined);
+    }
+
+    key = 'fig-plan-types';
     if (this.hasThesaurus(key)) {
       this.typeEntries.set(thesauri[key].entries);
     } else {
@@ -320,6 +370,10 @@ export class PrintFigPlanImplPartComponent
       this.form.reset();
       return;
     }
+    this.complete.setValue(part.isComplete ? true : false);
+    this.techniques.setValue(part.techniques || []);
+    this.features.setValue(part.features || []);
+    this.description.setValue(part.description || null);
     this.items.setValue(part.items || []);
     this.form.markAsPristine();
   }
@@ -336,10 +390,26 @@ export class PrintFigPlanImplPartComponent
     this.updateForm(data?.value);
   }
 
+  public onTechniqueCheckedIdsChange(ids: string[]): void {
+    this.techniques.setValue(ids);
+    this.techniques.markAsDirty();
+    this.techniques.updateValueAndValidity();
+  }
+
+  public onFeatureCheckedIdsChange(ids: string[]): void {
+    this.features.setValue(ids);
+    this.features.markAsDirty();
+    this.features.updateValueAndValidity();
+  }
+
   protected getValue(): PrintFigPlanImplPart {
     let part = this.getEditedPart(
       PRINT_FIG_PLAN_PART_TYPEID
     ) as PrintFigPlanImplPart;
+    part.isComplete = this.complete.value;
+    part.techniques = this.techniques.value || [];
+    part.features = this.features.value || [];
+    part.description = this.description.value?.trim() || undefined;
     part.items = this.items.value || [];
     return part;
   }

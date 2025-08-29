@@ -15,7 +15,46 @@
       <mat-tab-group>
         <!-- GENERAL -->
         <mat-tab label="general">
-
+          <!-- complete -->
+          <div>
+            <mat-checkbox [formControl]="complete">complete</mat-checkbox>
+          </div>
+          <!-- techniques -->
+          @if (techniqueFlags().length) {
+          <div>
+            <cadmus-ui-flag-set
+              [flags]="techniqueFlags()"
+              [checkedIds]="techniques.value"
+              (checkedIdsChange)="onTechniqueCheckedIdsChange($event)"
+            />
+          </div>
+          }
+          <!-- features -->
+          @if (featureFlags().length) {
+          <div>
+            <cadmus-ui-flag-set
+              [flags]="featureFlags()"
+              [checkedIds]="features.value"
+              (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
+            />
+          </div>
+          }
+          <!-- description -->
+          <div>
+            <mat-form-field class="long-text">
+              <mat-label>description</mat-label>
+              <textarea
+                matInput
+                [formControl]="description"
+                maxlength="5000"
+                rows="3"
+              ></textarea>
+              @if ($any(description).errors?.maxLength && (description.dirty ||
+              description.touched)) {
+              <mat-error>description too long</mat-error>
+              }
+            </mat-form-field>
+          </div>
         </mat-tab>
 
         <!-- ITEMS -->
@@ -99,8 +138,22 @@
               <mat-expansion-panel-header>
                 <mat-panel-title>item #{{ editedIndex() + 1 }}</mat-panel-title>
               </mat-expansion-panel-header>
-              TODO: editor control with: [model]="edited()"
-              (modelChange)="saveItem($event)" (editorClose)="closeItem()"
+              <cadmus-fig-plan-impl-item-editor
+                [typeEntries]="typeEntries()"
+                [szTagEntries]="szTagEntries()"
+                [assTagEntries]="assTagEntries()"
+                [refTagEntries]="refTagEntries()"
+                [szUnitEntries]="szUnitEntries()"
+                [featureEntries]="itemFeatureEntries()"
+                [refTypeEntries]="refTypeEntries()"
+                [assIdTagEntries]="assIdTagEntries()"
+                [positionEntries]="positionEntries()"
+                [szDimTagEntries]="szDimTagEntries()"
+                [labelLangEntries]="labelLangEntries()"
+                [item]="edited()"
+                (itemChange)="saveItem($event!)"
+                (editorClose)="closeItem()"
+              />
             </mat-expansion-panel>
           </fieldset>
           }
