@@ -51,7 +51,7 @@
     "@myrmidon/cadmus-mat-physical-size": "^9.0.8",
     "@myrmidon/cadmus-mat-physical-state": "^9.0.0",
     "@myrmidon/cadmus-part-biblio-ui": "^12.0.0",
-    "@myrmidon/cadmus-part-codicology-bindings": "^13.0.0",
+    "@myrmidon/cadmus-part-codicology-bindings": "^13.0.1",
     "@myrmidon/cadmus-part-codicology-contents": "^13.0.2",
     "@myrmidon/cadmus-part-codicology-decorations": "^13.0.0",
     "@myrmidon/cadmus-part-codicology-edits": "^13.0.0",

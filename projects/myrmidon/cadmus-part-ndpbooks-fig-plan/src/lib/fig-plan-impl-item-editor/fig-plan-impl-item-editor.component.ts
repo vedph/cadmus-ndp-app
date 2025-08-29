@@ -15,15 +15,22 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import {
+  CodLocationComponent,
+  CodLocationParser,
+  CodLocationRange,
+} from '@myrmidon/cadmus-cod-location';
 import {
   Citation,
   CitationSpan,
   CitSchemeService,
   CompactCitationComponent,
 } from '@myrmidon/cadmus-refs-citation';
+
 import { FigPlanImplItem } from '../print-fig-plan-impl-part';
 
 /**
@@ -41,7 +48,9 @@ import { FigPlanImplItem } from '../print-fig-plan-impl-part';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatTabsModule,
     MatTooltipModule,
+    CodLocationComponent,
     CompactCitationComponent,
   ],
   templateUrl: './fig-plan-impl-item-editor.component.html',
@@ -58,10 +67,18 @@ export class FigPlanImplItemEditorComponent {
 
   public eid: FormControl<string>;
   public type: FormControl<string>;
-  public citation?: FormControl<string | null>;
+  public citation: FormControl<string | null>;
+  public location: FormControl<CodLocationRange[] | null>;
   public form: FormGroup;
 
-  constructor(formBuilder: FormBuilder, private _citService: CitSchemeService) {
+  // fig-plan-impl-positions
+  public readonly positionEntries = input<ThesaurusEntry[]>();
+
+  constructor(
+    formBuilder: FormBuilder,
+    private _citService: CitSchemeService,
+    private _locParser: CodLocationParser
+  ) {
     this.eid = formBuilder.control<string>('', {
       nonNullable: true,
       validators: [Validators.required, Validators.maxLength(100)],
@@ -73,10 +90,12 @@ export class FigPlanImplItemEditorComponent {
     this.citation = formBuilder.control<string | null>(null, {
       validators: [Validators.maxLength(1000)],
     });
+    this.location = formBuilder.control<CodLocationRange[]>([]);
     this.form = formBuilder.group({
       eid: this.eid,
       type: this.type,
       citation: this.citation,
+      location: this.location,
     });
 
     // when model changes, update form
@@ -104,6 +123,12 @@ export class FigPlanImplItemEditorComponent {
       } else {
         this.editedCit.set(undefined);
       }
+      if (item.location) {
+        const location = CodLocationParser.parseLocation(item.location);
+        this.location.setValue(
+          location ? [{ start: location, end: location }] : []
+        );
+      }
     }
 
     this.form.markAsPristine();
@@ -130,11 +155,18 @@ export class FigPlanImplItemEditorComponent {
     this.citation?.markAsDirty();
   }
 
+  public onLocationChange(location: CodLocationRange[]): void {
+    this.location.setValue(location);
+  }
+
   private getItem(): FigPlanImplItem {
     return {
       eid: this.eid.value,
       type: this.type.value,
       citation: this.citation?.value ?? undefined,
+      location: this.location.value?.length
+        ? CodLocationParser.locationToString(this.location.value[0].start)!
+        : undefined,
     };
   }
 

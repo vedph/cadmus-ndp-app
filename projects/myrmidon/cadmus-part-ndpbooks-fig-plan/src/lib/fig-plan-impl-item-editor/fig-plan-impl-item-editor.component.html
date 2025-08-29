@@ -1,1 +1,79 @@
-<p>fig-plan-impl-item-editor works!</p>
+<form [formGroup]="form" (submit)="save()">
+  <mat-tab-group>
+    <mat-tab label="general">
+      <div>
+        <!-- eid -->
+        <mat-form-field>
+          <mat-label>EID</mat-label>
+          <input matInput [formControl]="eid" />
+          @if ($any(eid).errors?.required && (eid.dirty || eid.touched)) {
+          <mat-error>EID required</mat-error>
+          } @if ($any(eid).errors?.maxLength && (eid.dirty || eid.touched)) {
+          <mat-error>EID too long</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- type (bound) -->
+        @if (typeEntries()?.length) {
+        <mat-form-field>
+          <mat-label>type</mat-label>
+          <mat-select [formControl]="type">
+            <mat-option *ngFor="let e of typeEntries()" [value]="e.id">{{
+              e.value
+            }}</mat-option>
+          </mat-select>
+          @if ($any(type).errors?.required && (type.dirty || type.touched)) {
+          <mat-error>type required</mat-error>
+          }
+        </mat-form-field>
+        } @else {
+        <!-- type (free) -->
+        <mat-form-field>
+          <mat-label>type</mat-label>
+          <input matInput [formControl]="type" />
+          @if ($any(type).errors?.required && (type.dirty || type.touched)) {
+          <mat-error>type required</mat-error>
+          } @if ($any(type).errors?.maxLength && (type.dirty || type.touched)) {
+          <mat-error>type too long</mat-error>
+          }
+        </mat-form-field>
+        }
+
+        <!-- citation -->
+        <cadmus-refs-compact-citation
+          [citation]="editedCit()"
+          (citationChange)="onCitationChange($event)"
+        />
+      </div>
+    </mat-tab>
+    <mat-tab label="implementation">
+      <!-- location -->
+      <div>
+        <cadmus-cod-location
+          [single]="true"
+          [location]="location.value"
+          (locationChange)="onLocationChange($event!)"
+        />
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+  <!-- buttons -->
+  <div>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Discard changes"
+      (click)="cancel()"
+    >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      mat-icon-button
+      matTooltip="Accept changes"
+      [disabled]="form.invalid || form.pristine"
+    >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+</form>
