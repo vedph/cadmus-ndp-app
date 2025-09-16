@@ -34,7 +34,7 @@
         <tbody>
           @for (entry of entries.value; track entry; let i = $index; let first =
           $first; let last = $last) {
-          <tr [class.selected]="entry === edited">
+          <tr [class.selected]="i === editedIndex()">
             <td class="fit-width">
               <button
                 type="button"
@@ -76,31 +76,31 @@
             <td>
               @for (f of entry.features; track f) {
               <span class="feature">{{
-                f | flatLookup : featureEntries : "id" : "value"
+                f | flatLookup : featureEntries() : "id" : "value"
               }}</span>
               }
             </td>
             <td>
-              {{ entry.system | flatLookup : systemEntries : "id" : "value" }}
+              {{ entry.system | flatLookup : systemEntries() : "id" : "value" }}
             </td>
             <td>
-              {{ entry.type | flatLookup : typeEntries : "id" : "value" }}
+              {{ entry.type | flatLookup : typeEntries() : "id" : "value" }}
             </td>
           </tr>
           }
         </tbody>
       </table>
-      } @if (edited) {
+      } @if (edited()) {
       <fieldset>
-        <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
+        <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
           <mat-expansion-panel-header>
-            <mat-panel-title>Ruling #{{ editedIndex + 1 }}</mat-panel-title>
+            <mat-panel-title>Ruling #{{ editedIndex() + 1 }}</mat-panel-title>
           </mat-expansion-panel-header>
           <cadmus-cod-fr-ruling-editor
-            [featureEntries]="featureEntries"
-            [systemEntries]="systemEntries"
-            [typeEntries]="typeEntries"
-            [ruling]="edited"
+            [featureEntries]="featureEntries()"
+            [systemEntries]="systemEntries()"
+            [typeEntries]="typeEntries()"
+            [ruling]="edited()"
             (rulingChange)="saveRuling($event!)"
             (editorClose)="closeRuling()"
           />

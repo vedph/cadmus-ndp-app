@@ -99,9 +99,6 @@ export class PrintFontEditorComponent {
   public note: FormControl<string | null>;
   public form: FormGroup;
 
-  // track if the form is currently being updated programmatically
-  private _updatingForm = false;
-
   constructor(formBuilder: FormBuilder) {
     // form
     this.eid = formBuilder.control<string | null>(null);
@@ -129,8 +126,6 @@ export class PrintFontEditorComponent {
   }
 
   private updateForm(font: PrintFont | undefined | null): void {
-    this._updatingForm = true;
-
     if (!font) {
       this.form.reset();
     } else {
@@ -143,9 +138,6 @@ export class PrintFontEditorComponent {
     }
 
     this.form.markAsPristine();
-
-    // reset guard only after marking controls
-    this._updatingForm = false;
   }
 
   private getFont(): PrintFont {

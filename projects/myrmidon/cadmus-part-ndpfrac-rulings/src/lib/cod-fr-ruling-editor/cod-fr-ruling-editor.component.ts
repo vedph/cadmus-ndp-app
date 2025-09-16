@@ -77,9 +77,6 @@ export class CodFrRulingEditorComponent {
   public note: FormControl<string | null>;
   public form: FormGroup;
 
-  // track if the form is currently being updated programmatically
-  private _updatingForm = false;
-
   constructor(private formBuilder: FormBuilder) {
     // form
     this.system = this.formBuilder.control<string | null>(null, [
@@ -110,8 +107,6 @@ export class CodFrRulingEditorComponent {
   }
 
   private updateForm(ruling: CodFrRuling | undefined | null): void {
-    this._updatingForm = true;
-
     if (!ruling) {
       this.form.reset();
     } else {
@@ -122,9 +117,6 @@ export class CodFrRulingEditorComponent {
     }
 
     this.form.markAsPristine();
-
-    // reset guard only after marking controls
-    this._updatingForm = false;
   }
 
   private getRuling(): CodFrRuling {

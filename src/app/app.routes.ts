@@ -111,7 +111,7 @@ export const routes: Routes = [
     path: 'items/:iid/geography',
     loadChildren: () =>
       import('@myrmidon/cadmus-part-geo-pg').then(
-        (module) => module.CadmusPartGeoPgModule
+        (module) => module.CADMUS_PART_GEO_PG_ROUTES
       ),
     canActivate: [jwtGuard],
   },
@@ -120,7 +120,7 @@ export const routes: Routes = [
     path: 'items/:iid/epigraphy',
     loadChildren: () =>
       import('@myrmidon/cadmus-part-epigraphy-pg').then(
-        (module) => module.CadmusPartEpigraphyPgModule
+        (module) => module.CADMUS_PART_EPIGRAPHY_PG_ROUTES
       ),
     canActivate: [jwtGuard],
   },

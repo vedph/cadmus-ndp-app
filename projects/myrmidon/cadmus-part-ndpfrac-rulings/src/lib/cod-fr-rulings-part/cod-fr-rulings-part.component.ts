@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -17,7 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
+import { deepCopy, FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 
@@ -68,15 +68,15 @@ export class CodFrRulingsPartComponent
   extends ModelEditorComponentBase<CodFrRulingsPart>
   implements OnInit
 {
-  public editedIndex: number;
-  public edited: CodFrRuling | undefined;
+  public readonly editedIndex = signal<number>(-1);
+  public readonly edited = signal<CodFrRuling | undefined>(undefined);
 
   // cod-fr-ruling-systems
-  public systemEntries?: ThesaurusEntry[];
+  public readonly systemEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // cod-fr-ruling-types
-  public typeEntries?: ThesaurusEntry[];
+  public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // cod-fr-ruling-features
-  public featureEntries?: ThesaurusEntry[];
+  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
 
   public entries: FormControl<CodFrRuling[]>;
 
@@ -86,7 +86,6 @@ export class CodFrRulingsPartComponent
     private _dialogService: DialogService
   ) {
     super(authService, formBuilder);
-    this.editedIndex = -1;
     // form
     this.entries = formBuilder.control([], {
       // at least 1 entry
@@ -108,21 +107,21 @@ export class CodFrRulingsPartComponent
   private updateThesauri(thesauri: ThesauriSet): void {
     let key = 'cod-fr-ruling-systems';
     if (this.hasThesaurus(key)) {
-      this.systemEntries = thesauri[key].entries;
+      this.systemEntries.set(thesauri[key].entries);
     } else {
-      this.systemEntries = undefined;
+      this.systemEntries.set(undefined);
     }
     key = 'cod-fr-ruling-types';
     if (this.hasThesaurus(key)) {
-      this.typeEntries = thesauri[key].entries;
+      this.typeEntries.set(thesauri[key].entries);
     } else {
-      this.typeEntries = undefined;
+      this.typeEntries.set(undefined);
     }
     key = 'cod-fr-ruling-features';
     if (this.hasThesaurus(key)) {
-      this.featureEntries = thesauri[key].entries;
+      this.featureEntries.set(thesauri[key].entries);
     } else {
-      this.featureEntries = undefined;
+      this.featureEntries.set(undefined);
     }
   }
 
@@ -161,21 +160,21 @@ export class CodFrRulingsPartComponent
   }
 
   public editRuling(ruling: CodFrRuling, index: number): void {
-    this.editedIndex = index;
-    this.edited = ruling;
+    this.editedIndex.set(index);
+    this.edited.set(deepCopy(ruling));
   }
 
   public closeRuling(): void {
-    this.editedIndex = -1;
-    this.edited = undefined;
+    this.editedIndex.set(-1);
+    this.edited.set(undefined);
   }
 
   public saveRuling(entry: CodFrRuling): void {
     const entries = [...this.entries.value];
-    if (this.editedIndex === -1) {
+    if (this.editedIndex() === -1) {
       entries.push(entry);
     } else {
-      entries.splice(this.editedIndex, 1, entry);
+      entries.splice(this.editedIndex(), 1, entry);
     }
     this.entries.setValue(entries);
     this.entries.markAsDirty();
@@ -188,7 +187,7 @@ export class CodFrRulingsPartComponent
       .confirm('Confirmation', 'Delete ruling?')
       .subscribe((yes: boolean | undefined) => {
         if (yes) {
-          if (this.editedIndex === index) {
+          if (this.editedIndex() === index) {
             this.closeRuling();
           }
           const entries = [...this.entries.value];

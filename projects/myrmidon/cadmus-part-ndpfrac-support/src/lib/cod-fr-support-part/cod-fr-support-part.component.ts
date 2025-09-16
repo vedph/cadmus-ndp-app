@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   FormControl,
@@ -27,7 +27,11 @@ import {
   PhysicalGridLocationComponent,
 } from '@myrmidon/cadmus-mat-physical-grid';
 
-import { ThesauriSet, ThesaurusEntry, EditedObject } from '@myrmidon/cadmus-core';
+import {
+  ThesauriSet,
+  ThesaurusEntry,
+  EditedObject,
+} from '@myrmidon/cadmus-core';
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
@@ -80,11 +84,17 @@ export class CodFrSupportPartComponent
   public supposedReuse: FormControl<string | null>;
 
   // cod-fr-support-materials
-  public materialEntries?: ThesaurusEntry[];
+  public readonly materialEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
   // cod-fr-support-reuse-types
-  public reuseEntries?: ThesaurusEntry[];
+  public readonly reuseEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
   // cod-fr-support-containers
-  public containerEntries?: ThesaurusEntry[];
+  public readonly containerEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
 
   constructor(
     authService: AuthJwtService,
@@ -123,21 +133,21 @@ export class CodFrSupportPartComponent
   private updateThesauri(thesauri: ThesauriSet): void {
     let key = 'cod-fr-support-materials';
     if (this.hasThesaurus(key)) {
-      this.materialEntries = thesauri[key].entries;
+      this.materialEntries.set(thesauri[key].entries);
     } else {
-      this.materialEntries = undefined;
+      this.materialEntries.set(undefined);
     }
     key = 'cod-fr-support-reuse-types';
     if (this.hasThesaurus(key)) {
-      this.reuseEntries = thesauri[key].entries;
+      this.reuseEntries.set(thesauri[key].entries);
     } else {
-      this.reuseEntries = undefined;
+      this.reuseEntries.set(undefined);
     }
     key = 'cod-fr-support-containers';
     if (this.hasThesaurus(key)) {
-      this.containerEntries = thesauri[key].entries;
+      this.containerEntries.set(thesauri[key].entries);
     } else {
-      this.containerEntries = undefined;
+      this.containerEntries.set(undefined);
     }
   }
 
@@ -147,7 +157,7 @@ export class CodFrSupportPartComponent
       return;
     }
     this.material.setValue(
-      part.material || this.materialEntries?.[0]?.id || ''
+      part.material || this.materialEntries()?.[0]?.id || ''
     );
     // if the location is not valid, it will be set to null
     this.location.setValue(

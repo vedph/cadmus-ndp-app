@@ -13,13 +13,13 @@
         <div id="pane-general">
           <div class="form-row">
             <!-- material (bound) -->
-            @if (materialEntries?.length) {
+            @if (materialEntries()?.length) {
             <mat-form-field>
               <mat-label>material</mat-label>
               <mat-select [formControl]="material">
-                <mat-option *ngFor="let e of materialEntries" [value]="e.id">{{
-                  e.value
-                }}</mat-option>
+                @for (e of materialEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+                }
               </mat-select>
               @if ($any(material).errors?.required && (material.dirty ||
               material.touched)) {
@@ -44,13 +44,13 @@
 
           <div>
             <!-- container (bound) -->
-            @if (containerEntries?.length) {
+            @if (containerEntries()?.length) {
             <mat-form-field>
               <mat-label>container</mat-label>
               <mat-select [formControl]="container">
-                <mat-option *ngFor="let e of containerEntries" [value]="e.id">{{
-                  e.value
-                }}</mat-option>
+                @for (e of containerEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+                }
               </mat-select>
               @if ($any(container).errors?.required && (container.dirty ||
               container.touched)) {
@@ -75,13 +75,13 @@
 
           <div class="form-row">
             <!-- reuse (bound) -->
-            @if (reuseEntries?.length) {
+            @if (reuseEntries()?.length) {
             <mat-form-field>
               <mat-label>reuse</mat-label>
               <mat-select [formControl]="reuse">
-                <mat-option *ngFor="let e of reuseEntries" [value]="e.id">{{
-                  e.value
-                }}</mat-option>
+                @for (e of reuseEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+                }
               </mat-select>
             </mat-form-field>
             } @else {
@@ -97,13 +97,13 @@
             }
 
             <!-- supposedReuse (bound) -->
-            @if (reuseEntries?.length) {
+            @if (reuseEntries()?.length) {
             <mat-form-field>
               <mat-label>supposed reuse</mat-label>
               <mat-select [formControl]="supposedReuse">
-                <mat-option *ngFor="let e of reuseEntries" [value]="e.id">{{
-                  e.value
-                }}</mat-option>
+                @for (e of reuseEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+                }
               </mat-select>
             </mat-form-field>
             } @else {

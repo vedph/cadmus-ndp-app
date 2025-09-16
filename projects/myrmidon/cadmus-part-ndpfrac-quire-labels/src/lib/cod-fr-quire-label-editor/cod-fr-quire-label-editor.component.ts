@@ -31,11 +31,12 @@ import { NgxToolsValidators } from '@myrmidon/ngx-tools';
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
-import { CodFrQuireLabel } from '../cod-fr-quire-labels-part';
 import {
   AssertedCompositeId,
   AssertedCompositeIdComponent,
 } from '@myrmidon/cadmus-refs-asserted-ids';
+
+import { CodFrQuireLabel } from '../cod-fr-quire-labels-part';
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {
@@ -100,9 +101,6 @@ export class CodFrQuireLabelEditorComponent {
   public note: FormControl<string | null>;
   public form: FormGroup;
 
-  // track if the form is currently being updated programmatically
-  private _updatingForm = false;
-
   constructor(private formBuilder: FormBuilder) {
     // form
     this.types = this.formBuilder.control<string[]>([], {
@@ -140,8 +138,6 @@ export class CodFrQuireLabelEditorComponent {
   }
 
   private updateForm(data: CodFrQuireLabel | undefined | null): void {
-    this._updatingForm = true;
-
     if (!data) {
       this.form.reset();
     } else {
@@ -154,9 +150,6 @@ export class CodFrQuireLabelEditorComponent {
     }
 
     this.form.markAsPristine();
-
-    // reset guard only after marking controls
-    this._updatingForm = false;
   }
 
   private getData(): CodFrQuireLabel {

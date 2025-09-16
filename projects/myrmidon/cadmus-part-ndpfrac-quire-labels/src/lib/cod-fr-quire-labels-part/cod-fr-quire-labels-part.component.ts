@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -17,7 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
+import { deepCopy, FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 
@@ -70,23 +70,23 @@ export class CodFrQuireLabelsPartComponent
   extends ModelEditorComponentBase<CodFrQuireLabelsPart>
   implements OnInit
 {
-  public editedIndex: number;
-  public edited: CodFrQuireLabel | undefined;
+  public readonly editedIndex = signal<number>(-1);
+  public readonly edited = signal<CodFrQuireLabel | undefined>(undefined);
 
   // doc-reference-types
-  public refTypeEntries?: ThesaurusEntry[];
+  public readonly refTypeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // doc-reference-tags
-  public refTagEntries?: ThesaurusEntry[];
+  public readonly refTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // assertion-tags
-  public assTagEntries?: ThesaurusEntry[];
+  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // external-id-tags
-  public idTagEntries?: ThesaurusEntry[];
+  public readonly idTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // external-id-scopes
-  public idScopeEntries?: ThesaurusEntry[];
+  public readonly idScopeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // cod-fr-quire-label-types
-  public typeEntries?: ThesaurusEntry[];
+  public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // cod-fr-quire-label-positions
-  public positionEntries?: ThesaurusEntry[];
+  public readonly positionEntries = signal<ThesaurusEntry[] | undefined>(undefined);
 
   public labels: FormControl<CodFrQuireLabel[]>;
 
@@ -96,7 +96,6 @@ export class CodFrQuireLabelsPartComponent
     private _dialogService: DialogService
   ) {
     super(authService, formBuilder);
-    this.editedIndex = -1;
     // form
     this.labels = formBuilder.control([], {
       // at least 1 entry
@@ -118,45 +117,45 @@ export class CodFrQuireLabelsPartComponent
   private updateThesauri(thesauri: ThesauriSet): void {
     let key = 'doc-reference-types';
     if (this.hasThesaurus(key)) {
-      this.refTypeEntries = thesauri[key].entries;
+      this.refTypeEntries.set(thesauri[key].entries);
     } else {
-      this.refTypeEntries = undefined;
+      this.refTypeEntries.set(undefined);
     }
     key = 'doc-reference-tags';
     if (this.hasThesaurus(key)) {
-      this.refTagEntries = thesauri[key].entries;
+      this.refTagEntries.set(thesauri[key].entries);
     } else {
-      this.refTagEntries = undefined;
+      this.refTagEntries.set(undefined);
     }
     key = 'assertion-tags';
     if (this.hasThesaurus(key)) {
-      this.assTagEntries = thesauri[key].entries;
+      this.assTagEntries.set(thesauri[key].entries);
     } else {
-      this.assTagEntries = undefined;
+      this.assTagEntries.set(undefined);
     }
     key = 'external-id-tags';
     if (this.hasThesaurus(key)) {
-      this.idTagEntries = thesauri[key].entries;
+      this.idTagEntries.set(thesauri[key].entries);
     } else {
-      this.idTagEntries = undefined;
+      this.idTagEntries.set(undefined);
     }
     key = 'external-id-scopes';
     if (this.hasThesaurus(key)) {
-      this.idScopeEntries = thesauri[key].entries;
+      this.idScopeEntries.set(thesauri[key].entries);
     } else {
-      this.idScopeEntries = undefined;
+      this.idScopeEntries.set(undefined);
     }
     key = 'cod-fr-quire-label-types';
     if (this.hasThesaurus(key)) {
-      this.typeEntries = thesauri[key].entries;
+      this.typeEntries.set(thesauri[key].entries);
     } else {
-      this.typeEntries = undefined;
+      this.typeEntries.set(undefined);
     }
     key = 'cod-fr-quire-label-positions';
     if (this.hasThesaurus(key)) {
-      this.positionEntries = thesauri[key].entries;
+      this.positionEntries.set(thesauri[key].entries);
     } else {
-      this.positionEntries = undefined;
+      this.positionEntries.set(undefined);
     }
   }
 
@@ -198,21 +197,21 @@ export class CodFrQuireLabelsPartComponent
   }
 
   public editLabel(entry: CodFrQuireLabel, index: number): void {
-    this.editedIndex = index;
-    this.edited = entry;
+    this.editedIndex.set(index);
+    this.edited.set(deepCopy(entry));
   }
 
   public closeLabel(): void {
-    this.editedIndex = -1;
-    this.edited = undefined;
+    this.editedIndex.set(-1);
+    this.edited.set(undefined);
   }
 
   public saveLabel(entry: CodFrQuireLabel): void {
     const entries = [...this.labels.value];
-    if (this.editedIndex === -1) {
+    if (this.editedIndex() === -1) {
       entries.push(entry);
     } else {
-      entries.splice(this.editedIndex, 1, entry);
+      entries.splice(this.editedIndex(), 1, entry);
     }
     this.labels.setValue(entries);
     this.labels.markAsDirty();
@@ -225,7 +224,7 @@ export class CodFrQuireLabelsPartComponent
       .confirm('Confirmation', 'Delete label?')
       .subscribe((yes: boolean | undefined) => {
         if (yes) {
-          if (this.editedIndex === index) {
+          if (this.editedIndex() === index) {
             this.closeLabel();
           }
           const entries = [...this.labels.value];

@@ -42,7 +42,7 @@ import {
   PrintFigPlanPart,
 } from '../print-fig-plan-part';
 import { FigPlanItemEditorComponent } from '../fig-plan-item-editor/fig-plan-item-editor.component';
-import { FlatLookupPipe } from '@myrmidon/ngx-tools';
+import { deepCopy, FlatLookupPipe } from '@myrmidon/ngx-tools';
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {
@@ -272,7 +272,7 @@ export class PrintFigPlanPartComponent
 
   public editItem(item: FigPlanItem, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(item);
+    this.edited.set(deepCopy(item));
   }
 
   public closeItem(): void {

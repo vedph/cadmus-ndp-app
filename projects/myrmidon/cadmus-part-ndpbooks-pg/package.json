@@ -17,8 +17,9 @@
   "peerDependencies": {
     "@angular/common": "^20.1.0",
     "@angular/core": "^20.1.0",
-    "@myrmidon/cadmus-part-ndpbooks-fig-plan": "^0.0.1",
-    "@myrmidon/cadmus-part-ndpbooks-fonts": "^0.0.1"
+    "@angular/material": "^20.1.0",
+    "@myrmidon/cadmus-part-ndpbooks-fig-plan": "^0.0.2",
+    "@myrmidon/cadmus-part-ndpbooks-fonts": "^0.0.2"
   },
   "dependencies": {
     "tslib": "^2.3.0"

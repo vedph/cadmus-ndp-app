@@ -32,7 +32,7 @@
         <tbody>
           @for (entry of labels.value; track entry; let i = $index; let first =
           $first; let last = $last) {
-          <tr [class.selected]="entry === edited">
+          <tr [class.selected]="i === editedIndex()">
             <td class="fit-width">
               <button
                 type="button"
@@ -74,14 +74,14 @@
             <td>
               @for (type of entry.types; track type) {
               <span class="entry">{{
-                type | flatLookup : typeEntries : "id" : "value"
+                type | flatLookup : typeEntries() : "id" : "value"
               }}</span>
               }
             </td>
             <td>
               @for (position of entry.positions; track position) {
               <span class="entry">{{
-                position | flatLookup : positionEntries : "id" : "value"
+                position | flatLookup : positionEntries() : "id" : "value"
               }}</span>
               }
             </td>
@@ -92,21 +92,21 @@
           }
         </tbody>
       </table>
-      } @if (edited) {
+      } @if (edited()) {
       <fieldset>
-        <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
+        <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
           <mat-expansion-panel-header>
-            <mat-panel-title>label #{{ editedIndex + 1 }}</mat-panel-title>
+            <mat-panel-title>label #{{ editedIndex() + 1 }}</mat-panel-title>
           </mat-expansion-panel-header>
           <cadmus-cod-fr-quire-label-editor
-            [typeEntries]="typeEntries"
-            [idTagEntries]="idTagEntries"
-            [assTagEntries]="assTagEntries"
-            [refTagEntries]="refTagEntries"
-            [idScopeEntries]="idScopeEntries"
-            [refTypeEntries]="refTypeEntries"
-            [positionEntries]="positionEntries"
-            [label]="edited"
+            [typeEntries]="typeEntries()"
+            [idTagEntries]="idTagEntries()"
+            [assTagEntries]="assTagEntries()"
+            [refTagEntries]="refTagEntries()"
+            [idScopeEntries]="idScopeEntries()"
+            [refTypeEntries]="refTypeEntries()"
+            [positionEntries]="positionEntries()"
+            [label]="edited()"
             (labelChange)="saveLabel($event!)"
             (editorClose)="closeLabel()"
           />

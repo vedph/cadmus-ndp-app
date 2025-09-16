@@ -32,7 +32,7 @@
         <tbody>
           @for (font of fonts.value; track font; let i = $index; let first =
           $first; let last = $last) {
-          <tr [class.selected]="font === edited">
+          <tr [class.selected]="i === editedIndex()">
             <td class="fit-width">
               <button
                 type="button"
@@ -74,25 +74,23 @@
             <td>{{ font.eid }}</td>
             <td>{{ font.family }}</td>
             <td>
-              @if (font.sections?.length) {
-                @for (s of font.sections; track s; let last = $last) {
-                  {{ s | flatLookup : sectionEntries }}
-                  @if (!last) {, }
-                }
-              } @else { - }
+              @if (font.sections?.length) { @for (s of font.sections; track s;
+              let last = $last) {
+              {{ s | flatLookup : sectionEntries() : "id" : "value" }}
+              @if (!last) {, } } } @else { - }
             </td>
           </tr>
           }
         </tbody>
       </table>
-      } @if (edited) {
+      } @if (edited()) {
       <fieldset>
-        <mat-expansion-panel [expanded]="edited" [disabled]="!edited">
+        <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
           <mat-expansion-panel-header>
             <mat-panel-title>Font #</mat-panel-title>
           </mat-expansion-panel-header>
           <cadmus-print-font-editor
-            [font]="edited"
+            [font]="edited()"
             (fontChange)="saveFont($event!)"
             (editorClose)="closeFont()"
           />

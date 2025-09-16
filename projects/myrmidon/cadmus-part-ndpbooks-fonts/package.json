@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpbooks-fonts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Cadmus - printed book fonts part.",
   "keywords": [
     "Cadmus",
@@ -16,7 +16,8 @@
   },
   "peerDependencies": {
     "@angular/common": "^20.1.0",
-    "@angular/core": "^20.1.0"
+    "@angular/core": "^20.1.0",
+    "@angular/material": "^20.1.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

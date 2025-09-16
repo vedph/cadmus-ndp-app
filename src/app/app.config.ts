@@ -9,7 +9,6 @@ import {
   withJsonpSupport,
 } from '@angular/common/http';
 import { provideRouter, withViewTransitions } from '@angular/router';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 // material
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -45,7 +44,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withViewTransitions()),
-    provideAnimationsAsync(),
     provideNativeDateAdapter(),
     provideHttpClient(withInterceptors([jwtInterceptor]), withJsonpSupport()),
     // vendor

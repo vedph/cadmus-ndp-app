@@ -13,8 +13,8 @@
         <mat-tab label="layout">
           <cadmus-cod-layout-formula
             [data]="formulaData()"
-            [tagEntries]="dimTagEntries"
-            [unitEntries]="unitEntries"
+            [tagEntries]="dimTagEntries()"
+            [unitEntries]="unitEntries()"
             (dataChange)="onFormulaDataChange($event!)"
           />
         </mat-tab>
@@ -22,13 +22,13 @@
           <div class="form-row">
             <!-- pricking -->
             <!-- pricking (bound) -->
-            @if (prickingEntries?.length) {
+            @if (prickingEntries()?.length) {
             <mat-form-field>
               <mat-label>pricking</mat-label>
               <mat-select [formControl]="pricking">
-                <mat-option *ngFor="let e of prickingEntries" [value]="e.id">{{
-                  e.value
-                }}</mat-option>
+                @for (e of prickingEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+                }
               </mat-select>
               @if ($any(pricking).errors?.required && (pricking.dirty ||
               pricking.touched)) {
@@ -76,8 +76,8 @@
           <div>
             <cadmus-refs-decorated-counts
               [counts]="counts.value"
-              [tagEntries]="countTagEntries"
-              [idEntries]="countIdEntries"
+              [tagEntries]="countTagEntries()"
+              [idEntries]="countIdEntries()"
               (countsChange)="onCountsChange($event!)"
             />
           </div>

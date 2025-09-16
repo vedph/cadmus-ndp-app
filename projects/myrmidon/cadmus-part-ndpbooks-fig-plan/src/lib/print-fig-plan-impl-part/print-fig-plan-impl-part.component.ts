@@ -19,7 +19,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { FlatLookupPipe } from '@myrmidon/ngx-tools';
+import { deepCopy, FlatLookupPipe } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
@@ -425,7 +425,7 @@ export class PrintFigPlanImplPartComponent
 
   public editItem(item: FigPlanImplItem, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(item);
+    this.edited.set(deepCopy(item));
   }
 
   public closeItem(): void {

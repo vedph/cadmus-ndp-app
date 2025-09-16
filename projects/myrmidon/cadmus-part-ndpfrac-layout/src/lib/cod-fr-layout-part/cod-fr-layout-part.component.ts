@@ -105,21 +105,21 @@ export class CodFrLayoutPartComponent
   });
 
   // cod-fr-layout-features
-  public featureEntries?: ThesaurusEntry[];
+  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // cod-fr-layout-prickings
-  public prickingEntries?: ThesaurusEntry[];
+  public readonly prickingEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // decorated-count-ids
-  public countIdEntries?: ThesaurusEntry[];
+  public readonly countIdEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // decorated-count-tags
-  public countTagEntries?: ThesaurusEntry[];
+  public readonly countTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // physical-size-units
-  public unitEntries: ThesaurusEntry[] = DEFAULT_UNITS;
+  public readonly unitEntries = signal<ThesaurusEntry[]>(DEFAULT_UNITS);
   // physical-size-dim-tags
-  public dimTagEntries?: ThesaurusEntry[];
+  public dimTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
 
   // flags mapped from thesaurus entries
   public featureFlags = computed<Flag[]>(
-    () => this.featureEntries?.map((e) => entryToFlag(e)) || []
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
   );
 
   constructor(authService: AuthJwtService, formBuilder: FormBuilder) {
@@ -133,7 +133,7 @@ export class CodFrLayoutPartComponent
       nonNullable: true,
     });
     this.pricking = formBuilder.control<string>(
-      this.prickingEntries?.[0]?.id || '',
+      this.prickingEntries()?.[0]?.id || '',
       {
         validators: Validators.maxLength(100),
         nonNullable: true,
@@ -170,33 +170,33 @@ export class CodFrLayoutPartComponent
   private updateThesauri(thesauri: ThesauriSet): void {
     let key = 'cod-fr-layout-prickings';
     if (this.hasThesaurus(key)) {
-      this.prickingEntries = thesauri[key].entries;
+      this.prickingEntries.set(thesauri[key].entries);
     } else {
-      this.prickingEntries = undefined;
+      this.prickingEntries.set(undefined);
     }
     key = 'decorated-count-ids';
     if (this.hasThesaurus(key)) {
-      this.countIdEntries = thesauri[key].entries;
+      this.countIdEntries.set(thesauri[key].entries);
     } else {
-      this.countIdEntries = undefined;
+      this.countIdEntries.set(undefined);
     }
     key = 'decorated-count-tags';
     if (this.hasThesaurus(key)) {
-      this.countTagEntries = thesauri[key].entries;
+      this.countTagEntries.set(thesauri[key].entries);
     } else {
-      this.countTagEntries = undefined;
+      this.countTagEntries.set(undefined);
     }
     key = 'physical-size-units';
     if (this.hasThesaurus(key)) {
-      this.unitEntries = thesauri[key].entries || DEFAULT_UNITS;
+      this.unitEntries.set(thesauri[key].entries || DEFAULT_UNITS);
     } else {
-      this.unitEntries = DEFAULT_UNITS;
+      this.unitEntries.set(DEFAULT_UNITS);
     }
     key = 'physical-size-dim-tags';
     if (this.hasThesaurus(key)) {
-      this.dimTagEntries = thesauri[key].entries;
+      this.dimTagEntries.set(thesauri[key].entries);
     } else {
-      this.dimTagEntries = undefined;
+      this.dimTagEntries.set(undefined);
     }
   }
 
