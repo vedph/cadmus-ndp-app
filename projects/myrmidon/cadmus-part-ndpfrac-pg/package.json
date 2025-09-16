@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpfrac-pg",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Cadmus - NDP Fragments editor wrappers.",
   "keywords": [
     "Cadmus",
@@ -17,7 +17,11 @@
   "peerDependencies": {
     "@angular/common": "^20.0.0",
     "@angular/core": "^20.0.0",
-    "@angular/material": "^20.0.0"
+    "@angular/material": "^20.0.0",
+    "@myrmidon/cadmus-part-ndpfrac-layout": "^0.0.2",
+    "@myrmidon/cadmus-part-ndpfrac-quire-labels": "^0.0.2",
+    "@myrmidon/cadmus-part-ndpfrac-rulings": "^0.0.2",
+    "@myrmidon/cadmus-part-ndpfrac-supports": "^0.0.2"
   },
   "dependencies": {
     "tslib": "^2.3.0"

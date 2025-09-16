@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
@@ -11,9 +11,9 @@ import { AuthJwtService } from '@myrmidon/auth-jwt-login';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  public logged: boolean;
+  public readonly logged = signal<boolean>(false);;
 
   constructor(authService: AuthJwtService) {
-    this.logged = authService.currentUserValue !== null;
+    this.logged.set(authService.currentUserValue !== null);
   }
 }

@@ -3,6 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@myrmidon/cadmus-part-ndpbooks-fig-plan": [
         "./dist/myrmidon/cadmus-part-ndpbooks-fig-plan"
