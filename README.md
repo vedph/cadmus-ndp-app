@@ -22,6 +22,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2025-09-19: updated packages.
 - 2025-09-16:
   - refactored for full reactivity.
   - updated Angular and packages.
