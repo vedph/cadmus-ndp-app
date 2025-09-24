@@ -69,7 +69,6 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     FlagSetComponent,
     CloseSaveButtonsComponent,
     PhysicalMeasurementSetComponent,
-    MatDialogClose
 ],
   templateUrl: './drawing-tech-part.component.html',
   styleUrl: './drawing-tech-part.component.css',

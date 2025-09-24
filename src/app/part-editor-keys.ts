@@ -47,6 +47,8 @@ import { COD_FR_SUPPORT_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-
 import { PRINT_FONTS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fonts/src/public-api';
 import { PRINT_FIG_PLAN_IMPL_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fig-plan/src/lib/print-fig-plan-impl-part';
 import { PRINT_FIG_PLAN_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fig-plan/src/public-api';
+import { DRAWING_TECH_PART_SCHEMA } from '../../projects/myrmidon/cadmus-part-ndpdrw-tech/src/public-api';
+import { DRAWING_TECH_PART_TYPEID } from '@myrmidon/cadmus-part-ndpdrw-tech';
 
 // route constants
 const GENERAL = 'general';
@@ -55,6 +57,7 @@ const CODICOLOGY = 'codicology';
 const BIBLIO = 'biblio';
 const NDP_FRAC = 'ndp-frac';
 const NDP_BOOKS = 'ndp-books';
+const NDP_DRAWINGS = 'ndp-drawings';
 
 /**
  * The parts and fragments editor keys for this UI.
@@ -178,5 +181,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   },
   [PRINT_FIG_PLAN_IMPL_PART_TYPEID]: {
     part: NDP_BOOKS,
-  }
+  },
+  // ndp-drawings
+  [DRAWING_TECH_PART_TYPEID]: {
+    part: NDP_DRAWINGS,
+  },
 };
