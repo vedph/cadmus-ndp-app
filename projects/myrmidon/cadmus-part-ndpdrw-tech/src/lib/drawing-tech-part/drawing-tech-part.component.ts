@@ -36,6 +36,7 @@ import {
   DRAWING_TECH_PART_TYPEID,
   DrawingTechPart,
 } from '../drawing-tech-part';
+import { MatDialogClose } from "@angular/material/dialog";
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {
@@ -67,7 +68,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     // cadmus
     FlagSetComponent,
     CloseSaveButtonsComponent,
-    PhysicalMeasurementSetComponent
+    PhysicalMeasurementSetComponent,
+    MatDialogClose
 ],
   templateUrl: './drawing-tech-part.component.html',
   styleUrl: './drawing-tech-part.component.css',
