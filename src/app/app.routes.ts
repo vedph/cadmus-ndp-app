@@ -4,8 +4,8 @@ import { Routes } from '@angular/router';
 import { jwtAdminGuard, jwtGuard } from '@myrmidon/auth-jwt-login';
 
 // libraries in this workspace
-import { EditorGuardService } from '@myrmidon/cadmus-api';
-import { PendingChangesGuard } from '@myrmidon/cadmus-core';
+import { editorGuard } from '@myrmidon/cadmus-api';
+import { pendingChangesGuard } from '@myrmidon/cadmus-core';
 
 // locals
 import { HomeComponent } from './home/home.component';
@@ -46,7 +46,7 @@ export const routes: Routes = [
         (module) => module.ItemEditorComponent
       ),
     canActivate: [jwtGuard],
-    canDeactivate: [PendingChangesGuard],
+    canDeactivate: [pendingChangesGuard],
   },
   {
     path: 'items',
@@ -71,7 +71,7 @@ export const routes: Routes = [
       import('@myrmidon/cadmus-thesaurus-editor').then(
         (module) => module.ThesaurusEditorFeatureComponent
       ),
-    canActivate: [EditorGuardService],
+    canActivate: [editorGuard],
   },
   {
     path: 'thesauri',
@@ -79,7 +79,7 @@ export const routes: Routes = [
       import('@myrmidon/cadmus-thesaurus-list').then(
         (module) => module.ThesaurusListComponent
       ),
-    canActivate: [EditorGuardService],
+    canActivate: [editorGuard],
   },
   // cadmus - parts
   {
@@ -140,6 +140,15 @@ export const routes: Routes = [
     loadChildren: () =>
       import('@myrmidon/cadmus-part-ndpbooks-pg').then(
         (module) => module.CADMUS_PART_NDPBOOKS_PG_ROUTES
+      ),
+    canActivate: [jwtGuard],
+  },
+  // ndp-drawings part
+  {
+    path: 'items/:iid/ndp-drawings',
+    loadChildren: () =>
+      import('@myrmidon/cadmus-part-ndpdrw-pg').then(
+        (module) => module.CADMUS_PART_NDPDRAWING_PG_ROUTES
       ),
     canActivate: [jwtGuard],
   },

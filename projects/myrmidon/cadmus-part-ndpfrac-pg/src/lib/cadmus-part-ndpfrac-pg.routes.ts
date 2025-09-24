@@ -21,31 +21,31 @@ import {
 } from '@myrmidon/cadmus-part-ndpfrac-support';
 
 // cadmus
-import { PendingChangesGuard } from '@myrmidon/cadmus-core';
+import { pendingChangesGuard } from '@myrmidon/cadmus-core';
 
 export const CADMUS_PART_NDPFRAC_PG_ROUTES: Routes = [
   {
     path: `${COD_FR_LAYOUT_PART_TYPEID}/:pid`,
     pathMatch: 'full',
     component: CodFrLayoutPartFeatureComponent,
-    canDeactivate: [PendingChangesGuard],
+    canDeactivate: [pendingChangesGuard],
   },
   {
     path: `${COD_FR_QUIRE_LABELS_PART_TYPEID}/:pid`,
     pathMatch: 'full',
     component: CodFrQuireLabelsPartFeatureComponent,
-    canDeactivate: [PendingChangesGuard],
+    canDeactivate: [pendingChangesGuard],
   },
   {
     path: `${COD_FR_RULINGS_PART_TYPEID}/:pid`,
     pathMatch: 'full',
     component: CodFrRulingsPartFeatureComponent,
-    canDeactivate: [PendingChangesGuard],
+    canDeactivate: [pendingChangesGuard],
   },
   {
     path: `${COD_FR_SUPPORT_PART_TYPEID}/:pid`,
     pathMatch: 'full',
     component: CodFrSupportPartFeatureComponent,
-    canDeactivate: [PendingChangesGuard],
+    canDeactivate: [pendingChangesGuard],
   },
 ];
