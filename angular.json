@@ -337,6 +337,36 @@
           }
         }
       }
+    },
+    "@myrmidon/cadmus-part-ndpdrw-tech": {
+      "projectType": "library",
+      "root": "projects/myrmidon/cadmus-part-ndpdrw-tech",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpdrw-tech/src",
+      "prefix": "cadmus",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {

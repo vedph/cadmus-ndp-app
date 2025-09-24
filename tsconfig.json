@@ -14,6 +14,9 @@
       "@myrmidon/cadmus-part-ndpbooks-pg": [
         "./dist/myrmidon/cadmus-part-ndpbooks-pg"
       ],
+      "@myrmidon/cadmus-part-ndpdrw-tech": [
+        "./dist/myrmidon/cadmus-part-ndpdrw-tech"
+      ],
       "@myrmidon/cadmus-part-ndpfrac-layout": [
         "./dist/myrmidon/cadmus-part-ndpfrac-layout"
       ],
@@ -99,6 +102,12 @@
     },
     {
       "path": "./projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.spec.json"
     }
   ]
 }
