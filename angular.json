@@ -35,7 +35,6 @@
               "leaflet",
               "webcola",
               "dagre",
-              "diff-match-patch",
               "ngraph.graph",
               "ngraph.forcelayout"
             ]
@@ -150,10 +149,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-pg/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -180,10 +176,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-rulings/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -210,10 +203,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -240,10 +230,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -270,10 +257,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fonts/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -300,10 +284,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-pg/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -330,10 +311,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -360,10 +338,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
@@ -390,10 +365,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-pg/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }
