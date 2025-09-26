@@ -3,43 +3,6 @@ import {
   CitScheme,
 } from '@myrmidon/cadmus-refs-citation';
 
-export const OD_SCHEME: CitScheme = {
-  id: 'od',
-  name: 'Odyssey',
-  path: ['book', 'verse'],
-  optionalFrom: 'verse',
-  textOptions: {
-    pathPattern: '^\\s*([αβγδεζηθικλμνξοπρστυφχψω])\\s+(\\d+(?:[a-z])?)\\s*$',
-    template: '{book} {verse}',
-    hint: 'book (α-ω) verse (1-N[a-z])',
-  },
-  color: '#4287f5',
-  steps: {
-    book: {
-      type: 'numeric',
-      color: '#4287f5',
-      format: 'agl',
-      domain: {
-        range: {
-          min: 1,
-          max: 24,
-        },
-      },
-    },
-    verse: {
-      type: 'numeric',
-      color: '#1ECBE1',
-      suffixPattern: '([a-z])$',
-      suffixValidPattern: '^[a-z]$',
-      domain: {
-        range: {
-          min: 1,
-        },
-      },
-    },
-  },
-};
-
 export const DC_SCHEME: CitScheme = {
   id: 'dc',
   name: 'Commedia',

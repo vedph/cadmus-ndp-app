@@ -23,7 +23,7 @@ export const INDEX_LOOKUP_DEFINITIONS: IndexLookupDefinitions = {
     name: 'eid',
   },
   // codicology parts
-  cod_matdsc_eid: {
+  cod_unit_eid: {
     typeId: COD_MATERIAL_DSC_PART_TYPEID,
     name: 'unit-eid',
   },

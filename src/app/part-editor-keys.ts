@@ -35,26 +35,21 @@ import { COD_SHEET_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-s
 import { COD_SHELFMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-shelfmarks';
 import { COD_WATERMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-watermarks';
 
-// bibliography
-import { EXT_BIBLIOGRAPHY_PART_TYPEID } from '@myrmidon/cadmus-part-biblio-ui';
+import { COD_FR_LAYOUT_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-layout';
+import { COD_FR_QUIRE_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-quire-labels';
+import { COD_FR_RULINGS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-rulings';
+import { COD_FR_SUPPORT_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-support';
 
-// local
-import { COD_FR_LAYOUT_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-layout/src/public-api';
-import { COD_FR_QUIRE_LABELS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-quire-labels/src/public-api';
-import { COD_FR_RULINGS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-rulings/src/public-api';
-import { COD_FR_SUPPORT_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpfrac-support/src/public-api';
+import { PRINT_FONTS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fonts';
+import { PRINT_FIG_PLAN_IMPL_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
+import { PRINT_FIG_PLAN_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
 
-import { PRINT_FONTS_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fonts/src/public-api';
-import { PRINT_FIG_PLAN_IMPL_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fig-plan/src/lib/print-fig-plan-impl-part';
-import { PRINT_FIG_PLAN_PART_TYPEID } from '../../projects/myrmidon/cadmus-part-ndpbooks-fig-plan/src/public-api';
-import { DRAWING_TECH_PART_SCHEMA } from '../../projects/myrmidon/cadmus-part-ndpdrw-tech/src/public-api';
 import { DRAWING_TECH_PART_TYPEID } from '@myrmidon/cadmus-part-ndpdrw-tech';
 
 // route constants
 const GENERAL = 'general';
 const PHILOLOGY = 'philology';
 const CODICOLOGY = 'codicology';
-const BIBLIO = 'biblio';
 const NDP_FRAC = 'ndp-frac';
 const NDP_BOOKS = 'ndp-books';
 const NDP_DRAWINGS = 'ndp-drawings';
@@ -154,10 +149,6 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   },
   [COD_WATERMARKS_PART_TYPEID]: {
     part: CODICOLOGY,
-  },
-  // bibliography
-  [EXT_BIBLIOGRAPHY_PART_TYPEID]: {
-    part: BIBLIO,
   },
   // ndp-frac
   [COD_FR_LAYOUT_PART_TYPEID]: {

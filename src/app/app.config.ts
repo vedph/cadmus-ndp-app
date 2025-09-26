@@ -39,6 +39,12 @@ import { routes } from './app.routes';
 import { PART_EDITOR_KEYS } from './part-editor-keys';
 import { INDEX_LOOKUP_DEFINITIONS } from './index-lookup-definitions';
 import { ITEM_BROWSER_KEYS } from './item-browser-keys';
+import {
+  ZOTERO_API_KEY_TOKEN,
+  ZOTERO_LIBRARY_ID_TOKEN,
+  ZOTERO_USER_ID_TOKEN,
+} from '@myrmidon/cadmus-refs-zotero-lookup';
+import { EnvService } from '@myrmidon/ngx-tools';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -76,6 +82,22 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AUTH_JWT_EXCLUDED_URLS,
       useValue: ['https://viaf.org/viaf/'],
+    },
+    // Zotero
+    {
+      provide: ZOTERO_API_KEY_TOKEN,
+      useFactory: (env: EnvService) => env.get('zoteroApiKey'),
+      deps: [EnvService],
+    },
+    {
+      provide: ZOTERO_USER_ID_TOKEN,
+      useFactory: (env: EnvService) => env.get('zoteroUserId'),
+      deps: [EnvService],
+    },
+    {
+      provide: ZOTERO_LIBRARY_ID_TOKEN,
+      useFactory: (env: EnvService) => env.get('zoteroLibraryId'),
+      deps: [EnvService],
     },
     // text editor plugins
     // https://github.com/vedph/cadmus-bricks-shell-v2/blob/master/projects/myrmidon/cadmus-text-ed/README.md

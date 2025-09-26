@@ -27,11 +27,17 @@ import {
   RefLookupConfig,
 } from '@myrmidon/cadmus-refs-lookup';
 import { ViafRefLookupService } from '@myrmidon/cadmus-refs-viaf-lookup';
+import {
+  ZOTERO_API_KEY_TOKEN,
+  ZOTERO_USER_ID_TOKEN,
+  ZOTERO_LIBRARY_ID_TOKEN,
+  ZoteroRefLookupService,
+} from '@myrmidon/cadmus-refs-zotero-lookup';
 
 // cadmus
 import { AppRepository } from '@myrmidon/cadmus-state';
 
-import { DC_SCHEME, OD_SCHEME } from './cit-schemes';
+import { DC_SCHEME } from './cit-schemes';
 
 @Component({
   selector: 'app-root',
@@ -63,7 +69,8 @@ export class App implements OnInit, OnDestroy {
     private _router: Router,
     env: EnvService,
     storage: RamStorageService,
-    viaf: ViafRefLookupService
+    viaf: ViafRefLookupService,
+    zotero: ZoteroRefLookupService
   ) {
     this.version = env.get('version') || '';
 
@@ -72,6 +79,45 @@ export class App implements OnInit, OnDestroy {
 
     // configure external lookup for asserted composite IDs
     storage.store(LOOKUP_CONFIGS_KEY, [
+      // Zotero
+      {
+        name: 'Zotero',
+        iconUrl: '/img/zotero128.png',
+        description: 'Zotero bibliography',
+        label: 'ID',
+        service: zotero,
+        itemIdGetter: (item: any) =>
+          item ? `${item.library?.id}/${item.key}` : '',
+        itemLabelGetter: (item: any) => {
+          if (!item) {
+            return '';
+          }
+          const sb: string[] = [];
+          if (item.data?.creators && Array.isArray(item.data.creators)) {
+            const creators = item.data.creators;
+            for (let i = 0; i < creators.length; i++) {
+              const c = creators[i];
+              if (i > 0) {
+                sb.push('; ');
+              }
+              if (c.lastName) {
+                sb.push(c.lastName);
+              }
+              if (c.firstName) {
+                sb.push(' ' + c.firstName.charAt(0) + '.');
+              }
+            }
+          }
+          sb.push(': ');
+          if (item.title) {
+            sb.push(item.title);
+          } else if (item.data?.title) {
+            sb.push(item.data?.title);
+          }
+          return sb.join('');
+        },
+      },
+      // VIAF
       {
         name: 'VIAF',
         iconUrl: '/img/viaf128.png',
@@ -85,27 +131,11 @@ export class App implements OnInit, OnDestroy {
   }
 
   private configureCitationService(storage: RamStorageService): void {
-    // custom formatters: agl formatter for Odyssey
-    const aglFormatter = new MapFormatter();
-    const aglMap: CitMappedValues = {};
-    for (let n = 0x3b1; n <= 0x3c9; n++) {
-      // skip final sigma
-      if (n === 0x3c2) {
-        continue;
-      }
-      aglMap[String.fromCharCode(n)] = n - 0x3b0;
-    }
-    aglFormatter.configure(aglMap);
-
     // store settings via service
     storage.store(CIT_SCHEME_SERVICE_SETTINGS_KEY, {
       formats: {},
       schemes: {
         dc: DC_SCHEME,
-        od: OD_SCHEME,
-      },
-      formatters: {
-        agl: aglFormatter,
       },
     } as CitSchemeSettings);
   }
