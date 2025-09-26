@@ -23,7 +23,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 ## History
 
 - 2025-09-26:
-  - updated philology packages.
+  - updated philology and bricks packages.
   - removed `diff-match-patch` package.
   - ⚠️ refactored to remove bibliography and use Zotero via references.
 
