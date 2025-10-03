@@ -18,10 +18,16 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 1. `npm run build-lib`
 2. update version in `env.js` and `ng build --configuration=production`
-3. `docker build . -t vedph2020/cadmus-ndp-app:0.0.3 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
+3. `docker build . -t vedph2020/cadmus-ndp-app:0.0.4 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
 
+### 0.0.4
+
+- 2025-10-03:
+  - updated Angular and packages.
+  - removed biblio packages and config (going to use Zotero).
+  - generated Docker image.
 - 2025-10-02: updated Angular and packages.
 - 2025-09-26:
   - updated philology and bricks packages.

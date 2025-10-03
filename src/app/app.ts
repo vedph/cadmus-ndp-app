@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { Thesaurus, ThesaurusEntry } from '@myrmidon/cadmus-core';
-import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -18,21 +18,14 @@ import { AuthJwtService, GravatarPipe, User } from '@myrmidon/auth-jwt-login';
 // bricks
 import {
   CIT_SCHEME_SERVICE_SETTINGS_KEY,
-  CitMappedValues,
   CitSchemeSettings,
-  MapFormatter,
 } from '@myrmidon/cadmus-refs-citation';
 import {
   LOOKUP_CONFIGS_KEY,
   RefLookupConfig,
 } from '@myrmidon/cadmus-refs-lookup';
 import { ViafRefLookupService } from '@myrmidon/cadmus-refs-viaf-lookup';
-import {
-  ZOTERO_API_KEY_TOKEN,
-  ZOTERO_USER_ID_TOKEN,
-  ZOTERO_LIBRARY_ID_TOKEN,
-  ZoteroRefLookupService,
-} from '@myrmidon/cadmus-refs-zotero-lookup';
+import { ZoteroRefLookupService } from '@myrmidon/cadmus-refs-zotero-lookup';
 
 // cadmus
 import { AppRepository } from '@myrmidon/cadmus-state';
