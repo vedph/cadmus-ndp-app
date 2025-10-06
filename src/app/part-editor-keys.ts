@@ -35,14 +35,19 @@ import { COD_SHEET_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-s
 import { COD_SHELFMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-shelfmarks';
 import { COD_WATERMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-watermarks';
 
+// ndp-frac
 import { COD_FR_LAYOUT_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-layout';
 import { COD_FR_QUIRE_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-quire-labels';
 import { COD_FR_RULINGS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-rulings';
 import { COD_FR_SUPPORT_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-support';
 
+// ndp-books
 import { PRINT_FONTS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fonts';
 import { PRINT_FIG_PLAN_IMPL_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
 import { PRINT_FIG_PLAN_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
+
+// iconography
+import { ICO_INSTRUCTIONS_PART_TYPEID } from '@myrmidon/cadmus-part-iconography-instructions';
 
 import { DRAWING_TECH_PART_TYPEID } from '@myrmidon/cadmus-part-ndpdrw-tech';
 
@@ -50,6 +55,7 @@ import { DRAWING_TECH_PART_TYPEID } from '@myrmidon/cadmus-part-ndpdrw-tech';
 const GENERAL = 'general';
 const PHILOLOGY = 'philology';
 const CODICOLOGY = 'codicology';
+const ICONOGRAPHY = 'iconography';
 const NDP_FRAC = 'ndp-frac';
 const NDP_BOOKS = 'ndp-books';
 const NDP_DRAWINGS = 'ndp-drawings';
@@ -176,5 +182,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   // ndp-drawings
   [DRAWING_TECH_PART_TYPEID]: {
     part: NDP_DRAWINGS,
+  },
+  // iconography
+  [ICO_INSTRUCTIONS_PART_TYPEID]: {
+    part: ICONOGRAPHY,
   },
 };

@@ -152,6 +152,15 @@ export const routes: Routes = [
       ),
     canActivate: [jwtGuard],
   },
+  // iconography
+  {
+    path: 'items/:iid/iconography',
+    loadChildren: () =>
+      import('@myrmidon/cadmus-part-iconography-pg').then(
+        (module) => module.CADMUS_PART_ICONOGRAPHY_PG_ROUTES
+      ),
+    canActivate: [jwtGuard],
+  },
   // cadmus - graph
   {
     path: 'graph',
