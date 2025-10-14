@@ -22,6 +22,8 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2025-10-14: updated `@myrmidon/cod-layout-view` after fix.
+
 ### 0.0.6
 
 - 2025-10-14: updated packages.
