@@ -152,7 +152,7 @@
                 [labelLangEntries]="labelLangEntries()"
                 [item]="edited()"
                 (itemChange)="saveItem($event!)"
-                (editorClose)="closeItem()"
+                (cancelEdit)="closeItem()"
               />
             </mat-expansion-panel>
           </fieldset>

@@ -2,7 +2,7 @@
   <mat-tab-group>
     <!-- GENERAL -->
     <mat-tab label="general">
-      <div>
+      <div class="form-row">
         <!-- eid -->
         <mat-form-field>
           <mat-label>EID</mat-label>
@@ -83,7 +83,7 @@
         <!-- changeType (bound) -->
         @if (changeTypeEntries()?.length) {
         <mat-form-field>
-          <mat-label>changeType</mat-label>
+          <mat-label>change type</mat-label>
           <mat-select [formControl]="changeType">
             @for (e of changeTypeEntries(); track e.id) {
             <mat-option [value]="e.id">{{ e.value }}</mat-option>
@@ -93,11 +93,11 @@
         } @else {
         <!-- changeType (free) -->
         <mat-form-field>
-          <mat-label>changeType</mat-label>
+          <mat-label>change type</mat-label>
           <input matInput [formControl]="changeType" maxlength="100" />
           @if ($any(changeType).errors?.maxLength && (changeType.dirty ||
           changeType.touched)) {
-          <mat-error>changeType too long</mat-error>
+          <mat-error>change type too long</mat-error>
           }
         </mat-form-field>
         }
@@ -151,7 +151,7 @@
             <!-- matrixType (bound) -->
             @if (matrixTypeEntries()?.length) {
             <mat-form-field>
-              <mat-label>matrixType</mat-label>
+              <mat-label>matrix type</mat-label>
               <mat-select [formControl]="matrixType">
                 @for (e of matrixTypeEntries(); track e.id) {
                 <mat-option [value]="e.id">{{ e.value }}</mat-option>
@@ -161,7 +161,7 @@
             } @else {
             <!-- matrixType (free) -->
             <mat-form-field>
-              <mat-label>matrixType</mat-label>
+              <mat-label>matrix type</mat-label>
               <input matInput [formControl]="matrixType" maxlength="100" />
               @if ($any(matrixType).errors?.maxLength && (matrixType.dirty ||
               matrixType.touched)) {
@@ -186,7 +186,7 @@
               <input matInput [formControl]="matrixState" maxlength="100" />
               @if ($any(matrixState).errors?.maxLength && (matrixState.dirty ||
               matrixState.touched)) {
-              <mat-error>matrixState too long</mat-error>
+              <mat-error>state too long</mat-error>
               }
             </mat-form-field>
             }

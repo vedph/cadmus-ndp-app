@@ -21,6 +21,7 @@ import {
   PHYSICAL_MEASUREMENTS_PART_TYPEID,
   PHYSICAL_STATES_PART_TYPEID,
   PIN_LINKS_PART_TYPEID,
+  FLAGS_PART_TYPEID,
 } from '@myrmidon/cadmus-part-general-ui';
 
 // codicology
@@ -96,6 +97,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
     part: GENERAL,
   },
   [EXTERNAL_IDS_PART_TYPEID]: {
+    part: GENERAL,
+  },
+  [FLAGS_PART_TYPEID]: {
     part: GENERAL,
   },
   [HISTORICAL_EVENTS_PART_TYPEID]: {
