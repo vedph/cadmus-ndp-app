@@ -53,7 +53,7 @@
       </div>
       }
       <!-- measurements -->
-      <div>
+      <div class="mt">
         <cadmus-mat-physical-measurement-set
           [nameEntries]="measureNameEntries()"
           [unitEntries]="sizeUnitEntries() || []"
@@ -64,7 +64,7 @@
       </div>
       <!-- techniques-->
       @if (techniqueEntries()?.length) {
-      <div>
+      <div class="mt">
         <fieldset>
           <legend>techniques</legend>
           <cadmus-ui-flag-set
@@ -77,7 +77,7 @@
       }
       <!-- colors -->
       @if (colorEntries()?.length) {
-      <div>
+      <div class="mt">
         <fieldset>
           <legend>colors</legend>
           <cadmus-ui-flag-set
@@ -89,7 +89,7 @@
       </div>
       }
       <!-- note -->
-      <mat-form-field class="long-text">
+      <mat-form-field class="long-text mt">
         <mat-label>note</mat-label>
         <textarea matInput [formControl]="note" rows="3"></textarea>
         @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {

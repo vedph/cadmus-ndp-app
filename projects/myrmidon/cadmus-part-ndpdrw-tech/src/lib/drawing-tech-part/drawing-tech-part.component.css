@@ -10,3 +10,6 @@ fieldset {
 legend {
   color: silver;
 }
+.mt {
+  margin-top: 16px;
+}

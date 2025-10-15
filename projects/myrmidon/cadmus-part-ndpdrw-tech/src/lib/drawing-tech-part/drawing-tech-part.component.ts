@@ -36,7 +36,6 @@ import {
   DRAWING_TECH_PART_TYPEID,
   DrawingTechPart,
 } from '../drawing-tech-part';
-import { MatDialogClose } from "@angular/material/dialog";
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {

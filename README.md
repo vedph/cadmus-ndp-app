@@ -22,7 +22,9 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
-- 2025-10-15: updated packages.
+- 2025-10-15:
+  - updated packages.
+  - better UI for drawing techniques.
 - 2025-10-14:
   - updated `@myrmidon/cod-layout-view` after fix.
   - added missing flags part in part editor keys.
