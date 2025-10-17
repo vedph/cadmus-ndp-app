@@ -2,22 +2,28 @@
   <!-- types -->
   @if (typeFlags().length) {
   <div>
-    <cadmus-ui-flag-set
-      [flags]="typeFlags()"
-      [checkedIds]="types.value"
-      (checkedIdsChange)="onTypeCheckedIdsChange($event)"
-    />
+    <fieldset>
+      <legend>types</legend>
+      <cadmus-ui-flag-set
+        [flags]="typeFlags()"
+        [checkedIds]="types.value"
+        (checkedIdsChange)="onTypeCheckedIdsChange($event)"
+      />
+    </fieldset>
   </div>
   }
 
   <!-- positions -->
   @if (positionFlags().length) {
   <div>
-    <cadmus-ui-flag-set
-      [flags]="positionFlags()"
-      [checkedIds]="positions.value"
-      (checkedIdsChange)="onPositionCheckedIdsChange($event)"
-    />
+    <fieldset>
+      <legend>positions</legend>
+      <cadmus-ui-flag-set
+        [flags]="positionFlags()"
+        [checkedIds]="positions.value"
+        (checkedIdsChange)="onPositionCheckedIdsChange($event)"
+      />
+    </fieldset>
   </div>
   }
 

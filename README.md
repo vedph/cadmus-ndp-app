@@ -22,7 +22,9 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
-- 2025-10-17: updated Angular and packages.
+- 2025-10-17:
+  - updated Angular and packages.
+  - minor UI improvements.
 - 2025-10-15:
   - updated packages.
   - better UI for drawing techniques.

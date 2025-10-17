@@ -98,7 +98,7 @@
     "@myrmidon/cadmus-thesaurus-editor": "^16.0.0",
     "@myrmidon/cadmus-thesaurus-list": "^16.0.0",
     "@myrmidon/cadmus-thesaurus-ui": "^15.0.0",
-    "@myrmidon/cadmus-ui": "^15.1.1",
+    "@myrmidon/cadmus-ui": "^15.1.2",
     "@myrmidon/cadmus-ui-flag-set": "^9.0.2",
     "@myrmidon/cadmus-ui-object-view": "^0.0.2",
     "@myrmidon/cadmus-ui-pg": "^16.0.0",
