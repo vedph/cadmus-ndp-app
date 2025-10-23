@@ -18,10 +18,15 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 1. `npm run build-lib`
 2. update version in `env.js` and `ng build --configuration=production`
-3. `docker build . -t vedph2020/cadmus-ndp-app:0.0.6 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
+3. `docker build . -t vedph2020/cadmus-ndp-app:0.0.7 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
 
+### 0.0.7
+
+- 2025-10-23:
+  - updated Angular and packages.
+  - generated Docker image and updated Docker script.
 - 2025-10-17:
   - updated Angular and packages.
   - minor UI improvements.
