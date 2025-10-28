@@ -51,12 +51,14 @@ import { PRINT_FIG_PLAN_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fig-p
 import { ICO_INSTRUCTIONS_PART_TYPEID } from '@myrmidon/cadmus-part-iconography-instructions';
 
 import { DRAWING_TECH_PART_TYPEID } from '@myrmidon/cadmus-part-ndpdrw-tech';
+import { NOTABLE_WORD_FORMS_PART_TYPEID } from '@myrmidon/cadmus-part-ndp-notable-word-forms';
 
 // route constants
 const GENERAL = 'general';
 const PHILOLOGY = 'philology';
 const CODICOLOGY = 'codicology';
 const ICONOGRAPHY = 'iconography';
+const NDP = 'ndp';
 const NDP_FRAC = 'ndp-frac';
 const NDP_BOOKS = 'ndp-books';
 const NDP_DRAWINGS = 'ndp-drawings';
@@ -159,6 +161,10 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   },
   [COD_WATERMARKS_PART_TYPEID]: {
     part: CODICOLOGY,
+  },
+  // ndp
+  [NOTABLE_WORD_FORMS_PART_TYPEID]: {
+    part: NDP,
   },
   // ndp-frac
   [COD_FR_LAYOUT_PART_TYPEID]: {

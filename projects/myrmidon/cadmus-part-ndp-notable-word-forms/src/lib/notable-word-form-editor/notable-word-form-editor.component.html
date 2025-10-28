@@ -36,6 +36,12 @@
           }
         </mat-form-field>
         }
+
+        <!-- rank -->
+        <mat-form-field class="nr">
+          <mat-label>rank</mat-label>
+          <input matInput type="number" [formControl]="rank" min="0" />
+        </mat-form-field>
       </div>
 
       <!-- tags -->
@@ -68,8 +74,8 @@
 
     <!-- TRANSFORMATIONS -->
     <mat-tab label="Transformations">
-      <!-- referenceForm -->
-      <div>
+      <div class="form-row">
+        <!-- referenceForm -->
         <mat-form-field>
           <mat-label>ref. form</mat-label>
           <input matInput [formControl]="referenceForm" />
@@ -78,6 +84,9 @@
           <mat-error>reference form too long</mat-error>
           }
         </mat-form-field>
+
+        <!-- isValueTarget -->
+        <mat-checkbox [formControl]="isValueTarget"> ref → value </mat-checkbox>
       </div>
 
       <!-- operations -->
