@@ -72,23 +72,22 @@ export class NotableWordFormEditorComponent {
 
   /**
    * The source text for transformation via operations.
-   * This is referenceForm or value when isValueTarget is true, or
-   * undefined any of them is undefined.
+   * This is referenceForm when isValueTarget is true (ref → value), or
+   * value when isValueTarget is false (value → ref).
    */
   public readonly sourceText = computed<string | undefined>(() => {
     if (!this.referenceForm.value || !this.value.value) return undefined;
     const result = this.isValueTarget.value
       ? this.referenceForm.value || this.value.value
-      : undefined;
+      : this.value.value || this.referenceForm.value;
     console.log('sourceText', result);
     return result;
   });
 
   /**
    * The target text for transformation via operations.
-   * This is value when isValueTarget is true, or referenceForm or
-   * value when isValueTarget is false, or undefined any of them is
-   * undefined.
+   * This is value when isValueTarget is true (ref → value), or
+   * referenceForm when isValueTarget is false (value → ref).
    */
   public readonly targetText = computed<string | undefined>(() => {
     if (!this.referenceForm.value || !this.value.value) return undefined;
