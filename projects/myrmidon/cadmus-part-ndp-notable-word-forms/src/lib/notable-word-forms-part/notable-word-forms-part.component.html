@@ -87,7 +87,7 @@
       <fieldset>
         <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
           <mat-expansion-panel-header>
-            <mat-panel-title>Form #</mat-panel-title>
+            <mat-panel-title>Form #{{ editedIndex() + 1 }}</mat-panel-title>
           </mat-expansion-panel-header>
           <cadmus-notable-word-form-editor
             [tagEntries]="tagEntries()"

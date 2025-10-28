@@ -21,7 +21,7 @@ import {
 } from '@myrmidon/cadmus-core';
 
 import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import {
   MatCard,
   MatCardActions,
@@ -65,6 +65,7 @@ import { NotableWordFormEditorComponent } from '../notable-word-form-editor/nota
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
     MatIcon,
+    MatIconButton,
     MatTooltip,
     TitleCasePipe,
     FlatLookupPipe,

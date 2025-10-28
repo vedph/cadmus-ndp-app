@@ -18,6 +18,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -46,6 +47,7 @@ import { NotableWordForm } from '../notable-word-forms-part';
     MatFormField,
     MatIcon,
     MatIconButton,
+    MatInput,
     MatLabel,
     MatOption,
     MatSelect,
@@ -71,7 +73,7 @@ export class NotableWordFormEditorComponent {
    * undefined any of them is undefined.
    */
   public readonly sourceText = computed<string | undefined>(() => {
-    if (!this.isValueTarget.value || !this.value.value) return undefined;
+    if (!this.referenceForm.value || !this.value.value) return undefined;
     return this.isValueTarget.value
       ? this.referenceForm.value || this.value.value
       : undefined;
@@ -84,7 +86,7 @@ export class NotableWordFormEditorComponent {
    * undefined.
    */
   public readonly targetText = computed<string | undefined>(() => {
-    if (!this.isValueTarget.value || !this.value.value) return undefined;
+    if (!this.referenceForm.value || !this.value.value) return undefined;
     return this.isValueTarget.value
       ? this.value.value
       : this.referenceForm.value || this.value.value;
