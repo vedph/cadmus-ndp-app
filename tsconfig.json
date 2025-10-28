@@ -5,6 +5,12 @@
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
     "paths": {
+      "@myrmidon/cadmus-part-ndp-notable-word-forms": [
+        "./dist/myrmidon/cadmus-part-ndp-notable-word-forms"
+      ],
+      "@myrmidon/cadmus-part-ndp-pg": [
+        "./dist/myrmidon/cadmus-part-ndp-pg"
+      ],
       "@myrmidon/cadmus-part-ndpbooks-fig-plan": [
         "./dist/myrmidon/cadmus-part-ndpbooks-fig-plan"
       ],
@@ -56,5 +62,19 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "references": [
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndp-notable-word-forms/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndp-notable-word-forms/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndp-pg/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndp-pg/tsconfig.spec.json"
+    }
+  ]
 }
