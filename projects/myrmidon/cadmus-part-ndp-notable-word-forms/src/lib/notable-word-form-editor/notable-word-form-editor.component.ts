@@ -23,7 +23,10 @@ import { MatOption, MatSelect } from '@angular/material/select';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { MatTooltip } from '@angular/material/tooltip';
 
-import { LookupDocReferencesComponent, LookupDocReferenceComponent } from '@myrmidon/cadmus-refs-lookup';
+import {
+  LookupDocReferencesComponent,
+  LookupDocReferenceComponent,
+} from '@myrmidon/cadmus-refs-lookup';
 import {
   AssertedCompositeId,
   AssertedCompositeIdsComponent,
@@ -58,8 +61,8 @@ import { NotableWordForm } from '../notable-word-forms-part';
     EditOperationSetComponent,
     LookupDocReferencesComponent,
     AssertedCompositeIdsComponent,
-    LookupDocReferenceComponent
-],
+    LookupDocReferenceComponent,
+  ],
   templateUrl: './notable-word-form-editor.component.html',
   styleUrl: './notable-word-form-editor.component.css',
 })
@@ -74,9 +77,11 @@ export class NotableWordFormEditorComponent {
    */
   public readonly sourceText = computed<string | undefined>(() => {
     if (!this.referenceForm.value || !this.value.value) return undefined;
-    return this.isValueTarget.value
+    const result = this.isValueTarget.value
       ? this.referenceForm.value || this.value.value
       : undefined;
+    console.log('sourceText', result);
+    return result;
   });
 
   /**
@@ -87,9 +92,11 @@ export class NotableWordFormEditorComponent {
    */
   public readonly targetText = computed<string | undefined>(() => {
     if (!this.referenceForm.value || !this.value.value) return undefined;
-    return this.isValueTarget.value
+    const result = this.isValueTarget.value
       ? this.value.value
       : this.referenceForm.value || this.value.value;
+    console.log('targetText', result);
+    return result;
   });
 
   // notable-word-forms-languages
