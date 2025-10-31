@@ -5,7 +5,9 @@ import {
   input,
   model,
   output,
+  Signal,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
   FormControl,
@@ -70,33 +72,24 @@ export class NotableWordFormEditorComponent {
   public readonly form = model<NotableWordForm | undefined>();
   public readonly cancelEdit = output();
 
+  // signals tracking form control values (initialized in constructor)
+  private readonly valueSignal: Signal<string>;
+  private readonly referenceFormSignal: Signal<string | null>;
+  private readonly isValueTargetSignal: Signal<boolean>;
+
   /**
    * The source text for transformation via operations.
    * This is referenceForm when isValueTarget is true (ref → value), or
    * value when isValueTarget is false (value → ref).
    */
-  public readonly sourceText = computed<string | undefined>(() => {
-    if (!this.referenceForm.value || !this.value.value) return undefined;
-    const result = this.isValueTarget.value
-      ? this.referenceForm.value || this.value.value
-      : this.value.value || this.referenceForm.value;
-    console.log('sourceText', result);
-    return result;
-  });
+  public readonly sourceText: Signal<string | undefined>;
 
   /**
    * The target text for transformation via operations.
    * This is value when isValueTarget is true (ref → value), or
    * referenceForm when isValueTarget is false (value → ref).
    */
-  public readonly targetText = computed<string | undefined>(() => {
-    if (!this.referenceForm.value || !this.value.value) return undefined;
-    const result = this.isValueTarget.value
-      ? this.value.value
-      : this.referenceForm.value || this.value.value;
-    console.log('targetText', result);
-    return result;
-  });
+  public readonly targetText: Signal<string | undefined>;
 
   // notable-word-forms-languages
   public readonly langEntries = input<ThesaurusEntry[] | undefined>();
@@ -158,6 +151,38 @@ export class NotableWordFormEditorComponent {
       isValueTarget: this.isValueTarget,
       references: this.references,
       links: this.links,
+    });
+
+    // create signals from form control value changes
+    this.valueSignal = toSignal(this.value.valueChanges, {
+      initialValue: this.value.value,
+    });
+    this.referenceFormSignal = toSignal(this.referenceForm.valueChanges, {
+      initialValue: this.referenceForm.value,
+    });
+    this.isValueTargetSignal = toSignal(this.isValueTarget.valueChanges, {
+      initialValue: this.isValueTarget.value,
+    });
+
+    // create computed signals for source and target text
+    this.sourceText = computed<string | undefined>(() => {
+      const refForm = this.referenceFormSignal();
+      const val = this.valueSignal();
+      if (!refForm || !val) return undefined;
+      const result = this.isValueTargetSignal()
+        ? refForm || val
+        : val || refForm;
+      console.log('sourceText', result);
+      return result;
+    });
+
+    this.targetText = computed<string | undefined>(() => {
+      const refForm = this.referenceFormSignal();
+      const val = this.valueSignal();
+      if (!refForm || !val) return undefined;
+      const result = this.isValueTargetSignal() ? val : refForm || val;
+      console.log('targetText', result);
+      return result;
     });
 
     // when model changes, update form
