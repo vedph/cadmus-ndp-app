@@ -7,6 +7,7 @@ import {
   output,
   Signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
@@ -155,18 +156,30 @@ export class NotableWordFormEditorComponent {
     });
 
     // create signals from form control value changes
-    this._valueSignal = toSignal(this.value.valueChanges, {
-      initialValue: this.value.value,
-    });
-    this._referenceFormSignal = toSignal(this.referenceForm.valueChanges, {
-      initialValue: this.referenceForm.value,
-    });
-    this._isValueTargetSignal = toSignal(this.isValueTarget.valueChanges, {
-      initialValue: this.isValueTarget.value,
-    });
-    this._operationsSignal = toSignal(this.operations.valueChanges, {
-      initialValue: this.operations.value,
-    });
+    this._valueSignal = toSignal(
+      this.value.valueChanges.pipe(takeUntilDestroyed()),
+      {
+        initialValue: this.value.value,
+      }
+    );
+    this._referenceFormSignal = toSignal(
+      this.referenceForm.valueChanges.pipe(takeUntilDestroyed()),
+      {
+        initialValue: this.referenceForm.value,
+      }
+    );
+    this._isValueTargetSignal = toSignal(
+      this.isValueTarget.valueChanges.pipe(takeUntilDestroyed()),
+      {
+        initialValue: this.isValueTarget.value,
+      }
+    );
+    this._operationsSignal = toSignal(
+      this.operations.valueChanges.pipe(takeUntilDestroyed()),
+      {
+        initialValue: this.operations.value,
+      }
+    );
 
     // create computed signals for source and target text
     this.sourceText = computed<string | undefined>(() => {
