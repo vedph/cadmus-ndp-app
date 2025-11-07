@@ -69,13 +69,14 @@ import { NotableWordForm } from '../notable-word-forms-part';
   styleUrl: './notable-word-form-editor.component.css',
 })
 export class NotableWordFormEditorComponent {
+  // signals tracking form control values (initialized in constructor)
+  private readonly _valueSignal: Signal<string>;
+  private readonly _referenceFormSignal: Signal<string | null>;
+  private readonly _isValueTargetSignal: Signal<boolean>;
+  private readonly _operationsSignal: Signal<EditOperation[]>;
+
   public readonly form = model<NotableWordForm | undefined>();
   public readonly cancelEdit = output();
-
-  // signals tracking form control values (initialized in constructor)
-  private readonly valueSignal: Signal<string>;
-  private readonly referenceFormSignal: Signal<string | null>;
-  private readonly isValueTargetSignal: Signal<boolean>;
 
   /**
    * The source text for transformation via operations.
@@ -154,22 +155,25 @@ export class NotableWordFormEditorComponent {
     });
 
     // create signals from form control value changes
-    this.valueSignal = toSignal(this.value.valueChanges, {
+    this._valueSignal = toSignal(this.value.valueChanges, {
       initialValue: this.value.value,
     });
-    this.referenceFormSignal = toSignal(this.referenceForm.valueChanges, {
+    this._referenceFormSignal = toSignal(this.referenceForm.valueChanges, {
       initialValue: this.referenceForm.value,
     });
-    this.isValueTargetSignal = toSignal(this.isValueTarget.valueChanges, {
+    this._isValueTargetSignal = toSignal(this.isValueTarget.valueChanges, {
       initialValue: this.isValueTarget.value,
+    });
+    this._operationsSignal = toSignal(this.operations.valueChanges, {
+      initialValue: this.operations.value,
     });
 
     // create computed signals for source and target text
     this.sourceText = computed<string | undefined>(() => {
-      const refForm = this.referenceFormSignal();
-      const val = this.valueSignal();
+      const refForm = this._referenceFormSignal();
+      const val = this._valueSignal();
       if (!refForm || !val) return undefined;
-      const result = this.isValueTargetSignal()
+      const result = this._isValueTargetSignal()
         ? refForm || val
         : val || refForm;
       console.log('sourceText', result);
@@ -177,10 +181,10 @@ export class NotableWordFormEditorComponent {
     });
 
     this.targetText = computed<string | undefined>(() => {
-      const refForm = this.referenceFormSignal();
-      const val = this.valueSignal();
+      const refForm = this._referenceFormSignal();
+      const val = this._valueSignal();
       if (!refForm || !val) return undefined;
-      const result = this.isValueTargetSignal() ? val : refForm || val;
+      const result = this._isValueTargetSignal() ? val : refForm || val;
       console.log('targetText', result);
       return result;
     });
@@ -189,6 +193,20 @@ export class NotableWordFormEditorComponent {
     effect(() => {
       const form = this.form();
       this.updateForm(form);
+    });
+
+    // disable value and referenceForm when operations are present
+    effect(() => {
+      const ops = this._operationsSignal();
+      if (ops && ops.length > 0) {
+        // disable both controls when operations exist
+        this.value.disable({ emitEvent: false });
+        this.referenceForm.disable({ emitEvent: false });
+      } else {
+        // enable both controls when no operations
+        this.value.enable({ emitEvent: false });
+        this.referenceForm.enable({ emitEvent: false });
+      }
     });
   }
 
@@ -205,7 +223,13 @@ export class NotableWordFormEditorComponent {
   private updateForm(form: NotableWordForm | undefined | null): void {
     if (!form) {
       this.formCtl.reset();
+      // ensure controls are enabled when form is reset
+      this.value.enable({ emitEvent: false });
+      this.referenceForm.enable({ emitEvent: false });
     } else {
+      const parsedOperations =
+        form.operations?.map((s) => EditOperation.parseOperation(s)) || [];
+
       this.value.setValue(form.value);
       this.language.setValue(form.language || null);
       this.rank.setValue(form.rank || 0);
@@ -214,12 +238,20 @@ export class NotableWordFormEditorComponent {
       );
       this.note.setValue(form.note || null);
       this.referenceForm.setValue(form.referenceForm || null);
-      this.operations.setValue(
-        form.operations?.map((s) => EditOperation.parseOperation(s)) || []
-      );
+      this.operations.setValue(parsedOperations);
       this.isValueTarget.setValue(form.isValueTarget || false);
       this.references.setValue(form.references || []);
       this.links.setValue(form.links || []);
+
+      // disable/enable controls based on operations presence
+      if (parsedOperations.length > 0) {
+        this.value.disable({ emitEvent: false });
+        this.referenceForm.disable({ emitEvent: false });
+      } else {
+        this.value.enable({ emitEvent: false });
+        this.referenceForm.enable({ emitEvent: false });
+      }
+
       this.formCtl.markAsPristine();
     }
   }

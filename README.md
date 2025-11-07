@@ -22,7 +22,9 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
-- 2025-11-07: updated Angular and packages.
+- 2025-11-07:
+  - updated Angular and packages.
+  - disable value/referenceForm when operations are present in notable word form editor.
 - 2025-11-03: updated Angular and packages.
 - 2025-10-31: fixes to notable word form editor.
 - 2025-10-28:

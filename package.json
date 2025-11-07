@@ -73,7 +73,7 @@
     "@myrmidon/cadmus-part-iconography-instructions": "^0.0.1",
     "@myrmidon/cadmus-part-iconography-pg": "^0.0.1",
     "@myrmidon/cadmus-part-philology-pg": "^16.1.2",
-    "@myrmidon/cadmus-part-philology-ui": "^16.0.2",
+    "@myrmidon/cadmus-part-philology-ui": "^16.0.3",
     "@myrmidon/cadmus-preview-pg": "^17.0.0",
     "@myrmidon/cadmus-preview-ui": "^17.0.0",
     "@myrmidon/cadmus-profile-core": "^12.0.0",
