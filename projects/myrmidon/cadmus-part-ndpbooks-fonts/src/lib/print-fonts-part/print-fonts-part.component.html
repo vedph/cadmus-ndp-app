@@ -91,6 +91,14 @@
           </mat-expansion-panel-header>
           <cadmus-print-font-editor
             [font]="edited()"
+            [familyEntries]="familyEntries()"
+            [sectionEntries]="sectionEntries()"
+            [featureEntries]="featureEntries()"
+            [refTypeEntries]="docRefTypeEntries()"
+            [refTagEntries]="docRefTagEntries()"
+            [assTagEntries]="assTagEntries()"
+            [idTagEntries]="extIdTagEntries()"
+            [idScopeEntries]="extIdScopeEntries()"
             (fontChange)="saveFont($event!)"
             (cancelEdit)="closeFont()"
           />
