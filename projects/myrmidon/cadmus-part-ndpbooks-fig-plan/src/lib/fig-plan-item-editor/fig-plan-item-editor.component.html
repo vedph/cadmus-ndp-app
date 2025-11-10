@@ -1,5 +1,5 @@
 <form [formGroup]="form" (submit)="save()">
-  <div>
+  <div class="form-row">
     <!-- eid -->
     <mat-form-field>
       <mat-label>EID</mat-label>
@@ -36,8 +36,9 @@
       }
     </mat-form-field>
     }
-
-    <!-- citation -->
+  </div>
+  <!-- citation -->
+  <div>
     <cadmus-refs-compact-citation
       [citation]="editedCit()"
       (citationChange)="onCitationChange($event)"

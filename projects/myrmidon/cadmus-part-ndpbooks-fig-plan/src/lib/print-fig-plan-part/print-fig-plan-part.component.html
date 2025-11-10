@@ -10,7 +10,7 @@
     </mat-card-header>
     <mat-card-content>
       <mat-tab-group>
-        <mat-tab title="general">
+        <mat-tab label="general">
           <div>
             <!-- assertedIds -->
             <fieldset>
@@ -57,7 +57,7 @@
           </div>
           }
         </mat-tab>
-        <mat-tab title="items">
+        <mat-tab label="items">
           <div>
             <button
               type="button"
@@ -87,7 +87,7 @@
                     type="button"
                     mat-icon-button
                     color="primary"
-                    matTooltip="Edit this Item"
+                    matTooltip="Edit this item"
                     (click)="editItem(item, i)"
                   >
                     <mat-icon class="mat-primary">edit</mat-icon>
@@ -95,7 +95,7 @@
                   <button
                     type="button"
                     mat-icon-button
-                    matTooltip="Move this Item up"
+                    matTooltip="Move this item up"
                     [disabled]="first"
                     (click)="moveItemUp(i)"
                   >
@@ -104,7 +104,7 @@
                   <button
                     type="button"
                     mat-icon-button
-                    matTooltip="Move this Item down"
+                    matTooltip="Move this item down"
                     [disabled]="last"
                     (click)="moveItemDown(i)"
                   >
@@ -114,7 +114,7 @@
                     type="button"
                     mat-icon-button
                     color="warn"
-                    matTooltip="Delete this Item"
+                    matTooltip="Delete this item"
                     (click)="deleteItem(i)"
                   >
                     <mat-icon class="mat-warn">remove_circle</mat-icon>

@@ -83,7 +83,7 @@
 
   <!-- note -->
   <div>
-    <mat-form-field>
+    <mat-form-field class="long-text">
       <mat-label>note</mat-label>
       <input matInput [formControl]="note" />
       @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {

@@ -22,6 +22,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2025-11-10: fixes to figurative plan part editor.
 - 2025-11-09: updated packages (shelfmarks with city from libraries option).
 - 2025-11-07:
   - updated Angular and packages.

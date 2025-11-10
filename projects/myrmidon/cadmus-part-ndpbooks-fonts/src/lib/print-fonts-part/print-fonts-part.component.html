@@ -92,7 +92,7 @@
           <cadmus-print-font-editor
             [font]="edited()"
             (fontChange)="saveFont($event!)"
-            (editorClose)="closeFont()"
+            (cancelEdit)="closeFont()"
           />
         </mat-expansion-panel>
       </fieldset>
