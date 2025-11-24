@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpbooks-pg",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Cadmus - printed books editors wrappers.",
   "keywords": [
     "Cadmus",
@@ -15,11 +15,11 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^20.1.0",
-    "@angular/core": "^20.1.0",
-    "@angular/material": "^20.1.0",
-    "@myrmidon/cadmus-part-ndpbooks-fig-plan": "^0.0.2",
-    "@myrmidon/cadmus-part-ndpbooks-fonts": "^0.0.2"
+    "@angular/common": "^20.0.0 || ^21.0.0",
+    "@angular/core": "^20.0.0 || ^21.0.0",
+    "@angular/material": "^20.0.0 || ^21.0.0",
+    "@myrmidon/cadmus-part-ndpbooks-fig-plan": "^0.0.3",
+    "@myrmidon/cadmus-part-ndpbooks-fonts": "^0.0.3"
   },
   "dependencies": {
     "tslib": "^2.3.0"

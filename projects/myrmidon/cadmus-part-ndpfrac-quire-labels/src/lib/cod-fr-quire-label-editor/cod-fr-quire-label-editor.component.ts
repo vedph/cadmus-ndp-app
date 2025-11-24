@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   Component,
   computed,
@@ -48,7 +48,6 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 @Component({
   selector: 'cadmus-cod-fr-quire-label-editor',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -57,10 +56,9 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
-    // bricks
     FlagSetComponent,
-    AssertedCompositeIdComponent,
-  ],
+    AssertedCompositeIdComponent
+],
   templateUrl: './cod-fr-quire-label-editor.component.html',
   styleUrl: './cod-fr-quire-label-editor.component.css',
 })

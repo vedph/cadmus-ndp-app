@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   Component,
   computed,
@@ -46,7 +46,6 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 @Component({
   selector: 'cadmus-print-font-editor',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -56,8 +55,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatSelectModule,
     MatTooltipModule,
     AssertedCompositeIdsComponent,
-    FlagSetComponent,
-  ],
+    FlagSetComponent
+],
   templateUrl: './print-font-editor.component.html',
   styleUrl: './print-font-editor.component.css',
 })

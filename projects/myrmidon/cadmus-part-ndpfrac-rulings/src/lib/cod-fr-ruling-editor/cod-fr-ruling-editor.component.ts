@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   Component,
   computed,
@@ -43,7 +43,6 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 @Component({
   selector: 'cadmus-cod-fr-ruling-editor',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -52,8 +51,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
-    FlagSetComponent,
-  ],
+    FlagSetComponent
+],
   templateUrl: './cod-fr-ruling-editor.component.html',
   styleUrl: './cod-fr-ruling-editor.component.css',
 })

@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpfrac-rulings",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Cadmus - NDP FRAC rulings part.",
   "keywords": [
     "Cadmus",
@@ -15,13 +15,13 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "@angular/material": "^20.0.0",
-    "@myrmidon/ngx-tools": "^2.0.0",
-    "@myrmidon/cadmus-core": "^12.0.2",
-    "@myrmidon/cadmus-state": "^14.0.0",
-    "@myrmidon/cadmus-ui": "^14.0.0"
+    "@angular/common": "^20.0.0 || ^21.0.0",
+    "@angular/core": "^20.0.0 || ^21.0.0",
+    "@angular/material": "^20.0.0 || ^21.0.0",
+    "@myrmidon/ngx-tools": "^2.0.2",
+    "@myrmidon/cadmus-core": "^12.0.3",
+    "@myrmidon/cadmus-state": "^14.0.2",
+    "@myrmidon/cadmus-ui": "^15.1.4"
   },
   "dependencies": {
     "tslib": "^2.3.0"

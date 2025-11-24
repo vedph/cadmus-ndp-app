@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, effect, input, model, output, signal } from '@angular/core';
 import {
   FormBuilder,
@@ -39,7 +39,6 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 @Component({
   selector: 'cadmus-fig-plan-item-label-editor',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -52,7 +51,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     FlagSetComponent,
     PrintFontEditorComponent,
     FlatLookupPipe
-  ],
+],
   templateUrl: './fig-plan-item-label-editor.component.html',
   styleUrl: './fig-plan-item-label-editor.component.css',
 })

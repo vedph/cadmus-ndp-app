@@ -2,86 +2,90 @@
   <div class="form-row">
     <!-- system (bound) -->
     @if (systemEntries()?.length) {
-    <mat-form-field>
-      <mat-label>system</mat-label>
-      <mat-select [formControl]="system">
-        <mat-option *ngFor="let e of systemEntries()" [value]="e.id">{{
-          e.value
-        }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>system</mat-label>
+        <mat-select [formControl]="system">
+          @for (e of systemEntries(); track e) {
+            <mat-option [value]="e.id">{{
+              e.value
+            }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     } @else {
-    <!-- system (free) -->
-    <mat-form-field>
-      <mat-label>system</mat-label>
-      <input matInput [formControl]="system" />
-      @if ($any(system).errors?.maxLength && (system.dirty || system.touched)) {
-      <mat-error>system too long</mat-error>
-      }
-    </mat-form-field>
+      <!-- system (free) -->
+      <mat-form-field>
+        <mat-label>system</mat-label>
+        <input matInput [formControl]="system" />
+        @if ($any(system).errors?.maxLength && (system.dirty || system.touched)) {
+          <mat-error>system too long</mat-error>
+        }
+      </mat-form-field>
     }
 
     <!--type (bound) -->
     @if (typeEntries()?.length) {
-    <mat-form-field>
-      <mat-label>type</mat-label>
-      <mat-select [formControl]="type">
-        <mat-option *ngFor="let e of typeEntries()" [value]="e.id">{{
-          e.value
-        }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>type</mat-label>
+        <mat-select [formControl]="type">
+          @for (e of typeEntries(); track e) {
+            <mat-option [value]="e.id">{{
+              e.value
+            }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     } @else {
-    <!-- type (free) -->
-    <mat-form-field>
-      <mat-label>type</mat-label>
-      <input matInput [formControl]="type" />
-      @if ($any(type).errors?.maxLength && (type.dirty || type.touched)) {
-      <mat-error>type too long</mat-error>
-      }
-    </mat-form-field>
+      <!-- type (free) -->
+      <mat-form-field>
+        <mat-label>type</mat-label>
+        <input matInput [formControl]="type" />
+        @if ($any(type).errors?.maxLength && (type.dirty || type.touched)) {
+          <mat-error>type too long</mat-error>
+        }
+      </mat-form-field>
     }
   </div>
 
   <!-- features -->
   @if (featureFlags().length) {
-  <div>
-    <cadmus-ui-flag-set
-      [flags]="featureFlags()"
-      [checkedIds]="features.value"
-      (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
-    />
-  </div>
+    <div>
+      <cadmus-ui-flag-set
+        [flags]="featureFlags()"
+        [checkedIds]="features.value"
+        (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
+        />
+      </div>
 
-  <!-- note -->
-  <div>
-    <mat-form-field class="long-text">
-      <mat-label>note</mat-label>
-      <input matInput [formControl]="note" />
-      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
-      <mat-error>note too long</mat-error>
-      }
-    </mat-form-field>
-  </div>
-  }
+      <!-- note -->
+      <div>
+        <mat-form-field class="long-text">
+          <mat-label>note</mat-label>
+          <input matInput [formControl]="note" />
+          @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+            <mat-error>note too long</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    }
 
-  <!-- buttons -->
-  <div>
-    <button
-      type="button"
-      mat-icon-button
-      matTooltip="Discard changes"
-      (click)="cancel()"
-    >
-      <mat-icon class="mat-warn">clear</mat-icon>
-    </button>
-    <button
-      type="submit"
-      mat-icon-button
-      matTooltip="Accept changes"
-      [disabled]="form.invalid || form.pristine"
-    >
-      <mat-icon class="mat-primary">check_circle</mat-icon>
-    </button>
-  </div>
-</form>
+    <!-- buttons -->
+    <div>
+      <button
+        type="button"
+        mat-icon-button
+        matTooltip="Discard changes"
+        (click)="cancel()"
+        >
+        <mat-icon class="mat-warn">clear</mat-icon>
+      </button>
+      <button
+        type="submit"
+        mat-icon-button
+        matTooltip="Accept changes"
+        [disabled]="form.invalid || form.pristine"
+        >
+        <mat-icon class="mat-primary">check_circle</mat-icon>
+      </button>
+    </div>
+  </form>

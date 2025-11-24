@@ -7,7 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   FormBuilder,
   FormControl,
@@ -66,7 +66,6 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 @Component({
   selector: 'cadmus-fig-plan-impl-item-editor',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
@@ -82,8 +81,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     AssertedCompositeIdComponent,
     FlagSetComponent,
     PhysicalSizeComponent,
-    FigPlanItemLabelEditorComponent,
-  ],
+    FigPlanItemLabelEditorComponent
+],
   templateUrl: './fig-plan-impl-item-editor.component.html',
   styleUrl: './fig-plan-impl-item-editor.component.css',
 })

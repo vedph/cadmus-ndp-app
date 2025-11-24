@@ -1,5 +1,5 @@
 import { Component, effect, input, model, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   FormBuilder,
   FormControl,
@@ -33,7 +33,6 @@ import { FigPlanItem } from '../print-fig-plan-part';
 @Component({
   selector: 'cadmus-fig-plan-item-editor',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
@@ -43,8 +42,8 @@ import { FigPlanItem } from '../print-fig-plan-part';
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
-    CompactCitationComponent,
-  ],
+    CompactCitationComponent
+],
   templateUrl: './fig-plan-item-editor.component.html',
   styleUrl: './fig-plan-item-editor.component.css',
 })
