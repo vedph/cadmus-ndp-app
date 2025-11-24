@@ -22,6 +22,7 @@
     "build-lib": "npm run build-lbl && npm run build-lay && npm run build-rul && npm run build-sup && npm run build-fnt && npm run build-fpg && npm run build-fip && npm run build-bpg && npm run build-drw && npm run build-dpg && npm run build-nwf && npm run build-npg"
   },
   "private": true,
+  "packageManager": "pnpm@10.23.0",
   "dependencies": {
     "@angular/animations": "^20.3.10",
     "@angular/cdk": "^20.2.12",
@@ -137,5 +138,13 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^20.3.0",
     "typescript": "~5.9.2"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-arm64-msvc": "^4.53.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": "npm:@rollup/wasm-node"
+    }
   }
 }
