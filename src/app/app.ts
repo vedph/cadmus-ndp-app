@@ -26,6 +26,7 @@ import {
 } from '@myrmidon/cadmus-refs-lookup';
 import { ViafRefLookupService } from '@myrmidon/cadmus-refs-viaf-lookup';
 import { ZoteroRefLookupService } from '@myrmidon/cadmus-refs-zotero-lookup';
+import { MolRefLookupService } from '@myrmidon/cadmus-refs-mol-lookup';
 
 // cadmus
 import { AppRepository } from '@myrmidon/cadmus-state';
