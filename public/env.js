@@ -8,6 +8,8 @@
   window.__env.version = "1.0.0";
   // enable thesaurus import in thesaurus list for admins
   window.__env.thesImportEnabled = true;
+  // MOL
+  window.__env.molUrl = "http://localhost:5172/api/";
   // MUFI
   window.__env.mufiUrl = "http://localhost:5172/api/";
   // Zotero

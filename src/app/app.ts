@@ -63,7 +63,8 @@ export class App implements OnInit, OnDestroy {
     env: EnvService,
     storage: RamStorageService,
     viaf: ViafRefLookupService,
-    zotero: ZoteroRefLookupService
+    zotero: ZoteroRefLookupService,
+    mol: MolRefLookupService
   ) {
     this.version = env.get('version') || '';
 
@@ -119,6 +120,16 @@ export class App implements OnInit, OnDestroy {
         service: viaf,
         itemIdGetter: (item: any) => item?.viafid,
         itemLabelGetter: (item: any) => item?.term,
+      },
+      // MOL
+      {
+        name: 'MOL',
+        iconUrl: '/img/mol128.png',
+        description: 'Manus Online Authority File',
+        label: 'ID',
+        service: mol,
+        itemIdGetter: (item: any) => item?.id,
+        itemLabelGetter: (item: any) => mol.getName(item),
       },
     ] as RefLookupConfig[]);
   }

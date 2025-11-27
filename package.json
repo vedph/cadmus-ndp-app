@@ -22,7 +22,7 @@
     "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-npg"
   },
   "private": true,
-  "packageManager": "pnpm@10.23.0",
+  "packageManager": "pnpm@10.24.0",
   "dependencies": {
     "3d-force-graph": "^1.79.0",
     "@angular/animations": "^21.0.1",
@@ -90,6 +90,7 @@
     "@myrmidon/cadmus-refs-external-ids": "^10.0.3",
     "@myrmidon/cadmus-refs-historical-date": "^9.1.1",
     "@myrmidon/cadmus-refs-lookup": "^10.0.6",
+    "@myrmidon/cadmus-refs-mol-lookup": "^0.0.1",
     "@myrmidon/cadmus-refs-mufi-lookup": "^2.0.1",
     "@myrmidon/cadmus-refs-proper-name": "^10.0.4",
     "@myrmidon/cadmus-refs-viaf-lookup": "^10.0.3",

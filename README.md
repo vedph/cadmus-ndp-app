@@ -22,6 +22,8 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2025-11-27: added MOL.
+
 ### 1.0.0
 
 - 2025-11-26: Docker.
