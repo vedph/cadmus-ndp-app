@@ -22,6 +22,8 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2025-12-19: updated Angular.
+
 ### 1.0.2
 
 - 2025-12-12: updated Angular.
