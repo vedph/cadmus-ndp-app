@@ -108,8 +108,8 @@ importers:
         specifier: ^14.0.2
         version: 14.0.2(a0e72e8abd2d4c2dfd0fe201bcff5b88)
       '@myrmidon/cadmus-part-codicology-decorations':
-        specifier: ^14.0.4
-        version: 14.0.4(5daf64f1c4b87337911e2fe6da800ef2)
+        specifier: ^14.0.5
+        version: 14.0.5(5daf64f1c4b87337911e2fe6da800ef2)
       '@myrmidon/cadmus-part-codicology-edits':
         specifier: ^14.0.2
         version: 14.0.2(4eadee5f44429fd12e70556dc66fdcb8)
@@ -124,7 +124,7 @@ importers:
         version: 14.0.2(9522bb00480f0905e5769caae7710026)
       '@myrmidon/cadmus-part-codicology-pg':
         specifier: ^14.0.3
-        version: 14.0.3(0d483ddd0ae8c85a0c1ffa2e1a054ca7)
+        version: 14.0.3(7b9ecc52eabaa462cb1d2a85a8c0bce3)
       '@myrmidon/cadmus-part-codicology-sheet-labels':
         specifier: ^14.0.3
         version: 14.0.3(e9ee0037fc7cbaf0098afaed809b267f)
@@ -311,7 +311,7 @@ importers:
     devDependencies:
       '@angular/build':
         specifier: ^21.0.4
-        version: 21.0.4(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6)(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/localize@21.0.6(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6))(@angular/platform-browser@21.0.6(@angular/animations@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@types/node@24.10.1)(chokidar@4.0.3)(jiti@2.6.1)(karma@6.4.4)(less@4.4.2)(ng-packagr@21.0.0(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3))(postcss@8.5.6)(terser@5.44.0)(tslib@2.8.1)(typescript@5.9.3)
+        version: 21.0.4(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6)(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/localize@21.0.6(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6))(@angular/platform-browser@21.0.6(@angular/animations@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@types/node@24.10.1)(chokidar@4.0.3)(jiti@2.6.1)(karma@6.4.4)(less@4.4.2)(ng-packagr@21.0.1(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3))(postcss@8.5.6)(terser@5.44.0)(tslib@2.8.1)(typescript@5.9.3)
       '@angular/cli':
         specifier: ^21.0.4
         version: 21.0.4(@types/node@24.10.1)(chokidar@4.0.3)
@@ -346,8 +346,8 @@ importers:
         specifier: ~2.1.0
         version: 2.1.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4)
       ng-packagr:
-        specifier: ^21.0.0
-        version: 21.0.0(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
@@ -1717,15 +1717,15 @@ packages:
       '@myrmidon/ngx-mat-tools': ^1.0.1
       '@myrmidon/ngx-tools': ^2.0.2
 
-  '@myrmidon/cadmus-part-codicology-decorations@14.0.4':
-    resolution: {integrity: sha512-mMvB4akmSAIfCdw9sykDFPAqfZc3c17XtBBn6g0NQedM16ztITCnLCyCCruYV9FmqoQsSPOoVsJTNeF0VTkp4Q==}
+  '@myrmidon/cadmus-part-codicology-decorations@14.0.5':
+    resolution: {integrity: sha512-Fr4oj7mCexMsffs7i1BdNz+YVV1UZms5+F3V4zCCj+6Pqz+ZsVH0IYdVV/tTtNS+pKavyO2uUO9y5kaAx7i6OQ==}
     peerDependencies:
       '@angular/common': ^20.0.0 || ^21.0.0
       '@angular/core': ^20.0.0 || ^21.0.0
       '@angular/material': ^20.0.0 || ^21.0.0
       '@cisstech/nge': ^18.3.0
       '@myrmidon/cadmus-cod-location': ^9.0.3
-      '@myrmidon/cadmus-codicology-ui': ^13.0.4
+      '@myrmidon/cadmus-codicology-ui': ^13.0.5
       '@myrmidon/cadmus-mat-physical-size': ^9.0.11
       '@myrmidon/cadmus-refs-asserted-chronotope': ^10.0.6
       '@myrmidon/cadmus-refs-asserted-ids': ^10.0.12
@@ -2739,13 +2739,13 @@ packages:
     cpu: [arm64]
     os: [win32]
 
-  '@rollup/wasm-node@4.53.3':
-    resolution: {integrity: sha512-mB8z32H6kz4kVjn+tfTGcrXBae7rIeAvm/g6itsE3IqcXpjSRRvk1/EOWDEi5wL8NNmxXiH71t4jtNfr128zpw==}
+  '@rollup/wasm-node@4.53.5':
+    resolution: {integrity: sha512-WXEVEJrhhz6daplMeGBCpgLlv7+radmwvUZquNMUsLKrHDJxjzrnWTlsdueJDObkZ00cNmAF30LAD0tm+WytrQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
-  '@rollup/wasm-node@4.53.5':
-    resolution: {integrity: sha512-WXEVEJrhhz6daplMeGBCpgLlv7+radmwvUZquNMUsLKrHDJxjzrnWTlsdueJDObkZ00cNmAF30LAD0tm+WytrQ==}
+  '@rollup/wasm-node@4.54.0':
+    resolution: {integrity: sha512-CeEdHzNY+ZIR6NWpIOiJuCrr6tTK7cRGeOf6GYg5f73+UwJLqn5a4d5Ovf/hOWDyHM1KcySbxHQESJ9krhe0+A==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
@@ -4261,8 +4261,8 @@ packages:
     resolution: {integrity: sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==}
     engines: {node: '>= 0.6'}
 
-  ng-packagr@21.0.0:
-    resolution: {integrity: sha512-2lMGkmS91FyP+p/Tzmu49hY+p1PDgHBNM+Fce8yrzZo8/EbybNPBYfJnwFfl0lwGmqpYLevH2oh12+ikKCLv9g==}
+  ng-packagr@21.0.1:
+    resolution: {integrity: sha512-IZGxuF226GF0d8FOZIfPvHsyBl53PrDEg/IB2+CVamsm3r4+gUw3mBp27eygpowBpdVLG0Sm2IbUiH4aSspzyA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
@@ -5266,7 +5266,7 @@ snapshots:
       '@angular/core': 21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)
       tslib: 2.8.1
 
-  '@angular/build@21.0.4(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6)(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/localize@21.0.6(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6))(@angular/platform-browser@21.0.6(@angular/animations@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@types/node@24.10.1)(chokidar@4.0.3)(jiti@2.6.1)(karma@6.4.4)(less@4.4.2)(ng-packagr@21.0.0(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3))(postcss@8.5.6)(terser@5.44.0)(tslib@2.8.1)(typescript@5.9.3)':
+  '@angular/build@21.0.4(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6)(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/localize@21.0.6(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(@angular/compiler@21.0.6))(@angular/platform-browser@21.0.6(@angular/animations@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))(@types/node@24.10.1)(chokidar@4.0.3)(jiti@2.6.1)(karma@6.4.4)(less@4.4.2)(ng-packagr@21.0.1(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3))(postcss@8.5.6)(terser@5.44.0)(tslib@2.8.1)(typescript@5.9.3)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.2100.4(chokidar@4.0.3)
@@ -5306,7 +5306,7 @@ snapshots:
       karma: 6.4.4
       less: 4.4.2
       lmdb: 3.4.3
-      ng-packagr: 21.0.0(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
+      ng-packagr: 21.0.1(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
       postcss: 8.5.6
     transitivePeerDependencies:
       - '@types/node'
@@ -6385,7 +6385,7 @@ snapshots:
       '@myrmidon/ngx-tools': 2.0.2(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))
       tslib: 2.8.1
 
-  '@myrmidon/cadmus-part-codicology-decorations@14.0.4(5daf64f1c4b87337911e2fe6da800ef2)':
+  '@myrmidon/cadmus-part-codicology-decorations@14.0.5(5daf64f1c4b87337911e2fe6da800ef2)':
     dependencies:
       '@angular/common': 21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
       '@angular/core': 21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)
@@ -6478,14 +6478,14 @@ snapshots:
       '@myrmidon/ngx-tools': 2.0.2(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))
       tslib: 2.8.1
 
-  '@myrmidon/cadmus-part-codicology-pg@14.0.3(0d483ddd0ae8c85a0c1ffa2e1a054ca7)':
+  '@myrmidon/cadmus-part-codicology-pg@14.0.3(7b9ecc52eabaa462cb1d2a85a8c0bce3)':
     dependencies:
       '@angular/common': 21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
       '@angular/core': 21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)
       '@myrmidon/cadmus-core': 12.0.3(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(@myrmidon/ngx-tools@2.0.2(@angular/common@21.0.6(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.6(@angular/compiler@21.0.6)(rxjs@7.8.2)(zone.js@0.15.1)))
       '@myrmidon/cadmus-part-codicology-bindings': 14.0.2(27fbac25e88ffbbc2783ea871beb432d)
       '@myrmidon/cadmus-part-codicology-contents': 14.0.2(a0e72e8abd2d4c2dfd0fe201bcff5b88)
-      '@myrmidon/cadmus-part-codicology-decorations': 14.0.4(5daf64f1c4b87337911e2fe6da800ef2)
+      '@myrmidon/cadmus-part-codicology-decorations': 14.0.5(5daf64f1c4b87337911e2fe6da800ef2)
       '@myrmidon/cadmus-part-codicology-edits': 14.0.2(4eadee5f44429fd12e70556dc66fdcb8)
       '@myrmidon/cadmus-part-codicology-hands': 14.0.2(f790670913582f065514568cce222e67)
       '@myrmidon/cadmus-part-codicology-layouts': 14.0.2(88dfa90590a38945f4806ef856335223)
@@ -7315,30 +7315,30 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-beta.47': {}
 
-  '@rollup/plugin-json@6.1.0(@rollup/wasm-node@4.53.5)':
+  '@rollup/plugin-json@6.1.0(@rollup/wasm-node@4.54.0)':
     dependencies:
-      '@rollup/pluginutils': 5.3.0(@rollup/wasm-node@4.53.5)
+      '@rollup/pluginutils': 5.3.0(@rollup/wasm-node@4.54.0)
     optionalDependencies:
-      rollup: '@rollup/wasm-node@4.53.5'
+      rollup: '@rollup/wasm-node@4.54.0'
 
-  '@rollup/pluginutils@5.3.0(@rollup/wasm-node@4.53.5)':
+  '@rollup/pluginutils@5.3.0(@rollup/wasm-node@4.54.0)':
     dependencies:
       '@types/estree': 1.0.8
       estree-walker: 2.0.2
       picomatch: 4.0.3
     optionalDependencies:
-      rollup: '@rollup/wasm-node@4.53.5'
+      rollup: '@rollup/wasm-node@4.54.0'
 
   '@rollup/rollup-win32-arm64-msvc@4.53.3':
     optional: true
 
-  '@rollup/wasm-node@4.53.3':
+  '@rollup/wasm-node@4.53.5':
     dependencies:
       '@types/estree': 1.0.8
     optionalDependencies:
       fsevents: 2.3.3
 
-  '@rollup/wasm-node@4.53.5':
+  '@rollup/wasm-node@4.54.0':
     dependencies:
       '@types/estree': 1.0.8
     optionalDependencies:
@@ -9199,12 +9199,12 @@ snapshots:
 
   negotiator@1.0.0: {}
 
-  ng-packagr@21.0.0(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3):
+  ng-packagr@21.0.1(@angular/compiler-cli@21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 21.0.6(@angular/compiler@21.0.6)(typescript@5.9.3)
-      '@rollup/plugin-json': 6.1.0(@rollup/wasm-node@4.53.5)
-      '@rollup/wasm-node': 4.53.3
+      '@rollup/plugin-json': 6.1.0(@rollup/wasm-node@4.54.0)
+      '@rollup/wasm-node': 4.53.5
       ajv: 8.17.1
       ansi-colors: 4.1.3
       browserslist: 4.28.0
@@ -9219,14 +9219,14 @@ snapshots:
       ora: 9.0.0
       piscina: 5.1.4
       postcss: 8.5.6
-      rollup-plugin-dts: 6.2.3(@rollup/wasm-node@4.53.5)(typescript@5.9.3)
+      rollup-plugin-dts: 6.2.3(@rollup/wasm-node@4.54.0)(typescript@5.9.3)
       rxjs: 7.8.2
       sass: 1.94.2
       tinyglobby: 0.2.15
       tslib: 2.8.1
       typescript: 5.9.3
     optionalDependencies:
-      rollup: '@rollup/wasm-node@4.53.5'
+      rollup: '@rollup/wasm-node@4.54.0'
 
   ngraph.events@1.4.0: {}
 
@@ -9616,10 +9616,10 @@ snapshots:
       '@rolldown/binding-win32-ia32-msvc': 1.0.0-beta.47
       '@rolldown/binding-win32-x64-msvc': 1.0.0-beta.47
 
-  rollup-plugin-dts@6.2.3(@rollup/wasm-node@4.53.5)(typescript@5.9.3):
+  rollup-plugin-dts@6.2.3(@rollup/wasm-node@4.54.0)(typescript@5.9.3):
     dependencies:
       magic-string: 0.30.21
-      rollup: '@rollup/wasm-node@4.53.5'
+      rollup: '@rollup/wasm-node@4.54.0'
       typescript: 5.9.3
     optionalDependencies:
       '@babel/code-frame': 7.27.1
@@ -10038,7 +10038,7 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
       postcss: 8.5.6
-      rollup: '@rollup/wasm-node@4.53.5'
+      rollup: '@rollup/wasm-node@4.54.0'
       tinyglobby: 0.2.15
     optionalDependencies:
       '@types/node': 24.10.1
