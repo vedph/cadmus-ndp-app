@@ -81,6 +81,8 @@ export class PrintFontEditorComponent {
   public readonly idTagEntries = input<ThesaurusEntry[]>();
   // external-id-scopes
   public readonly idScopeEntries = input<ThesaurusEntry[]>();
+  // asserted-id-features
+  public readonly idFeatureEntries = input<ThesaurusEntry[]>();
 
   // flags mapped from thesaurus entries
   public sectionFlags = computed<Flag[]>(

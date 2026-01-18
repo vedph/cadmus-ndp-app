@@ -22,6 +22,10 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2026-01-17:
+  - updated Angular and packages.
+  - added `asserted-id-features` thesaurus wherever asserted composite IDs was used.
+
 ### 1.0.3
 
 - 2025-12-29: updated Angular and packages.

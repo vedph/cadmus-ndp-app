@@ -76,6 +76,8 @@ export class CodFrQuireLabelEditorComponent {
   public readonly idTagEntries = input<ThesaurusEntry[]>();
   // external-id-scopes
   public readonly idScopeEntries = input<ThesaurusEntry[]>();
+  // asserted-id-features
+  public readonly idFeatureEntries = input<ThesaurusEntry[]>();
 
   // cod-fr-quire-label-types
   public readonly typeEntries = input<ThesaurusEntry[]>();

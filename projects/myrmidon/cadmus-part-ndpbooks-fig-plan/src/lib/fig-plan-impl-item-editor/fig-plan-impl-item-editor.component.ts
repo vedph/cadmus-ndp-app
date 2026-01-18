@@ -132,6 +132,8 @@ export class FigPlanImplItemEditorComponent {
   public readonly layoutSectionEntries = input<ThesaurusEntry[]>();
   // print-font-features
   public readonly fontFeatureEntries = input<ThesaurusEntry[]>();
+  // asserted-id-features
+  public readonly idFeatureEntries = input<ThesaurusEntry[]>();
 
   // flags mapped from thesaurus entries
   public featureFlags = computed<Flag[]>(

@@ -21,6 +21,7 @@
                 [assTagEntries]="assTagEntries()"
                 [refTypeEntries]="docRefTypeEntries()"
                 [refTagEntries]="docRefTagEntries()"
+                [featureEntries]="idFeatureEntries()"
                 [ids]="artistIds.value || undefined"
                 [canSwitchMode]="true"
                 [canEditTarget]="true"
@@ -31,30 +32,30 @@
 
           <!-- techniques -->
           @if (techFlags().length) {
-          <div>
-            <fieldset>
-              <legend>techniques</legend>
-              <cadmus-ui-flag-set
-                [flags]="techFlags()"
-                [checkedIds]="techniques.value"
-                (checkedIdsChange)="onTechniqueCheckedIdsChange($event)"
-              />
-            </fieldset>
-          </div>
+            <div>
+              <fieldset>
+                <legend>techniques</legend>
+                <cadmus-ui-flag-set
+                  [flags]="techFlags()"
+                  [checkedIds]="techniques.value"
+                  (checkedIdsChange)="onTechniqueCheckedIdsChange($event)"
+                />
+              </fieldset>
+            </div>
           }
 
           <!-- features -->
           @if (featureFlags().length) {
-          <div>
-            <fieldset>
-              <legend>features</legend>
-              <cadmus-ui-flag-set
-                [flags]="featureFlags()"
-                [checkedIds]="features.value"
-                (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
-              />
-            </fieldset>
-          </div>
+            <div>
+              <fieldset>
+                <legend>features</legend>
+                <cadmus-ui-flag-set
+                  [flags]="featureFlags()"
+                  [checkedIds]="features.value"
+                  (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
+                />
+              </fieldset>
+            </div>
           }
         </mat-tab>
         <mat-tab label="items">
@@ -69,81 +70,90 @@
             </button>
           </div>
           @if (items.value.length) {
-          <table>
-            <thead>
-              <tr>
-                <th></th>
-                <th>EID</th>
-                <th>type</th>
-                <th>citation</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of items.value; track item; let i = $index; let first =
-              $first; let last = $last) {
-              <tr [class.selected]="item === edited()">
-                <td class="fit-width">
-                  <button
-                    type="button"
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Edit this item"
-                    (click)="editItem(item, i)"
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>EID</th>
+                  <th>type</th>
+                  <th>citation</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (
+                  item of items.value;
+                  track item;
+                  let i = $index;
+                  let first = $first;
+                  let last = $last
+                ) {
+                  <tr [class.selected]="item === edited()">
+                    <td class="fit-width">
+                      <button
+                        type="button"
+                        mat-icon-button
+                        color="primary"
+                        matTooltip="Edit this item"
+                        (click)="editItem(item, i)"
+                      >
+                        <mat-icon class="mat-primary">edit</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        mat-icon-button
+                        matTooltip="Move this item up"
+                        [disabled]="first"
+                        (click)="moveItemUp(i)"
+                      >
+                        <mat-icon>arrow_upward</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        mat-icon-button
+                        matTooltip="Move this item down"
+                        [disabled]="last"
+                        (click)="moveItemDown(i)"
+                      >
+                        <mat-icon>arrow_downward</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        mat-icon-button
+                        color="warn"
+                        matTooltip="Delete this item"
+                        (click)="deleteItem(i)"
+                      >
+                        <mat-icon class="mat-warn">remove_circle</mat-icon>
+                      </button>
+                    </td>
+                    <td>{{ item.eid }}</td>
+                    <td>
+                      {{
+                        item.type
+                          | flatLookup: planTypeEntries() : "id" : "value"
+                      }}
+                    </td>
+                    <td>{{ item.citation }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+          @if (edited()) {
+            <fieldset>
+              <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
+                <mat-expansion-panel-header>
+                  <mat-panel-title
+                    >item #{{ editedIndex() + 1 }}</mat-panel-title
                   >
-                    <mat-icon class="mat-primary">edit</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    matTooltip="Move this item up"
-                    [disabled]="first"
-                    (click)="moveItemUp(i)"
-                  >
-                    <mat-icon>arrow_upward</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    matTooltip="Move this item down"
-                    [disabled]="last"
-                    (click)="moveItemDown(i)"
-                  >
-                    <mat-icon>arrow_downward</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    color="warn"
-                    matTooltip="Delete this item"
-                    (click)="deleteItem(i)"
-                  >
-                    <mat-icon class="mat-warn">remove_circle</mat-icon>
-                  </button>
-                </td>
-                <td>{{ item.eid }}</td>
-                <td>
-                  {{
-                    item.type | flatLookup : planTypeEntries() : "id" : "value"
-                  }}
-                </td>
-                <td>{{ item.citation }}</td>
-              </tr>
-              }
-            </tbody>
-          </table>
-          } @if (edited()) {
-          <fieldset>
-            <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
-              <mat-expansion-panel-header>
-                <mat-panel-title>item #{{ editedIndex() + 1 }}</mat-panel-title>
-              </mat-expansion-panel-header>
-              <cadmus-fig-plan-item-editor
-                [item]="edited()"
-                (itemChange)="saveItem($event!)"
-                (editorClose)="closeItem()"
-              />
-            </mat-expansion-panel>
-          </fieldset>
+                </mat-expansion-panel-header>
+                <cadmus-fig-plan-item-editor
+                  [item]="edited()"
+                  (itemChange)="saveItem($event!)"
+                  (editorClose)="closeItem()"
+                />
+              </mat-expansion-panel>
+            </fieldset>
           }
         </mat-tab>
       </mat-tab-group>

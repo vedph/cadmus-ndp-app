@@ -38,7 +38,8 @@ import { PrintFontEditorComponent } from '../print-font-editor/print-font-editor
  * PrintFontsPart editor component.
  * Thesauri: print-font-families, print-layout-sections,
  * print-font-features, doc-reference-types, doc-reference-tags,
- * assertion-tags, external-id-tags, external-id-scopes.
+ * assertion-tags, external-id-tags, external-id-scopes,
+ * asserted-id-features.
  */
 @Component({
   selector: 'cadmus-print-fonts-part',
@@ -83,6 +84,8 @@ export class PrintFontsPartComponent
   public readonly extIdTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // external-id-scopes
   public readonly extIdScopeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  // asserted-id-features
+  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
 
   public fonts: FormControl<PrintFont[]>;
 
@@ -158,6 +161,12 @@ export class PrintFontsPartComponent
       this.extIdScopeEntries.set(thesauri[key].entries);
     } else {
       this.extIdScopeEntries.set(undefined);
+    }
+    key = 'asserted-id-features';
+    if (this.hasThesaurus(key)) {
+      this.idFeatureEntries.set(thesauri[key].entries);
+    } else {
+      this.idFeatureEntries.set(undefined);
     }
   }
 

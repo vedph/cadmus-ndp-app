@@ -40,7 +40,7 @@ import {
   EditOperation,
   EditOperationSetComponent,
 } from '@myrmidon/cadmus-part-philology-ui';
-import { ThesEntriesPickerComponent } from '@myrmidon/cadmus-ui';
+import { ThesaurusEntriesPickerComponent } from '@myrmidon/cadmus-thesaurus-store';
 
 import { NotableWordForm } from '../notable-word-forms-part';
 
@@ -60,7 +60,7 @@ import { NotableWordForm } from '../notable-word-forms-part';
     MatTabGroup,
     MatTab,
     MatTooltip,
-    ThesEntriesPickerComponent,
+    ThesaurusEntriesPickerComponent,
     EditOperationSetComponent,
     LookupDocReferencesComponent,
     AssertedCompositeIdsComponent,
@@ -113,6 +113,8 @@ export class NotableWordFormEditorComponent {
   public readonly linkDocRefTypeEntries = input<ThesaurusEntry[] | undefined>();
   // pin-link-docref-tags
   public readonly linkDocRefTagEntries = input<ThesaurusEntry[] | undefined>();
+  // asserted-id-features
+  public readonly idFeatureEntries = input<ThesaurusEntry[] | undefined>();
 
   public value: FormControl<string>;
   public language: FormControl<string | null>;

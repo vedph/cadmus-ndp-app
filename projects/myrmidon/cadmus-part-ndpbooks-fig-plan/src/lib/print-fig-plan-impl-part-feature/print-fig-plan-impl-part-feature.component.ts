@@ -57,6 +57,7 @@ export class PrintFigPlanImplPartFeatureComponent
       'print-font-families',
       'print-layout-sections',
       'print-font-features',
+      'asserted-id-features',
     ];
   }
 }

@@ -50,6 +50,7 @@ export class NotableWordFormsPartFeatureComponent
       'pin-link-assertion-tags',
       'pin-link-docref-types',
       'pin-link-docref-tags',
+      'asserted-id-features',
     ];
   }
 }

@@ -55,7 +55,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
  * Printed book figurative part editor component.
  * Thesauri: fig-plan-techniques, fig-plan-types, fig-plan-features,
  * asserted-id-scopes, asserted-id-tags, assertion-tags, doc-reference-types,
- * doc-reference-tags.
+ * doc-reference-tags, asserted-id-features.
  */
 @Component({
   selector: 'cadmus-print-fig-plan-part',
@@ -125,6 +125,10 @@ export class PrintFigPlanPartComponent
   );
   // doc-reference-tags
   public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
+  // asserted-id-features
+  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
     undefined
   );
 
@@ -216,6 +220,12 @@ export class PrintFigPlanPartComponent
       this.docRefTagEntries.set(thesauri[key].entries);
     } else {
       this.docRefTagEntries.set(undefined);
+    }
+    key = 'asserted-id-features';
+    if (this.hasThesaurus(key)) {
+      this.idFeatureEntries.set(thesauri[key].entries);
+    } else {
+      this.idFeatureEntries.set(undefined);
     }
   }
 

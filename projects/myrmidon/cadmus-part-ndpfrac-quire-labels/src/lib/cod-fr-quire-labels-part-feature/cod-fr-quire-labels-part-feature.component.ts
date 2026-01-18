@@ -45,6 +45,7 @@ export class CodFrQuireLabelsPartFeatureComponent
       'external-id-scopes',
       'cod-fr-quire-label-types',
       'cod-fr-quire-label-positions',
+      'asserted-id-features',
     ];
   }
 }

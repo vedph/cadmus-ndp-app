@@ -54,7 +54,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
  * asserted-id-scopes, asserted-id-tags, assertion-tags, doc-reference-types,
  * doc-reference-tags, physical-size-units, physical-size-tags, physical-size-dim-tags,
  * fig-plan-item-label-types, fig-plan-item-label-languages, print-font-families,
- * print-layout-sections, print-font-features.
+ * print-layout-sections, print-font-features, asserted-id-features.
  */
 @Component({
   selector: 'cadmus-print-fig-plan-impl-part',
@@ -171,6 +171,10 @@ export class PrintFigPlanImplPartComponent
   );
   // print-font-features
   public readonly fontFeatureEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
+  // asserted-id-features
+  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
     undefined
   );
 
@@ -362,6 +366,13 @@ export class PrintFigPlanImplPartComponent
       this.fontFeatureEntries.set(thesauri[key].entries);
     } else {
       this.fontFeatureEntries.set(undefined);
+    }
+    // asserted-id-features
+    key = 'asserted-id-features';
+    if (this.hasThesaurus(key)) {
+      this.idFeatureEntries.set(thesauri[key].entries);
+    } else {
+      this.idFeatureEntries.set(undefined);
     }
   }
 

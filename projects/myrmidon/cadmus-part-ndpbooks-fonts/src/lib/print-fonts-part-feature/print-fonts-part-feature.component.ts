@@ -46,6 +46,7 @@ export class PrintFontsPartFeatureComponent
       'assertion-tags',
       'external-id-tags',
       'external-id-scopes',
+      'asserted-id-features',
     ];
   }
 }

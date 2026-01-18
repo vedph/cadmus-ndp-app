@@ -42,7 +42,8 @@ import { CodFrQuireLabelEditorComponent } from '../cod-fr-quire-label-editor/cod
  * CodFrQuireLabelsPart editor component.
  * Thesauri: doc-reference-types, doc-reference-tags, assertion-tags,
  * external-id-tags, external-id-scopes,
- * cod-fr-quire-label-types, cod-fr-quire-label-positions.
+ * cod-fr-quire-label-types, cod-fr-quire-label-positions,
+ * asserted-id-features.
  */
 @Component({
   selector: 'cadmus-cod-fr-quire-labels-part',
@@ -87,6 +88,8 @@ export class CodFrQuireLabelsPartComponent
   public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // cod-fr-quire-label-positions
   public readonly positionEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  // asserted-id-features
+  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
 
   public labels: FormControl<CodFrQuireLabel[]>;
 
@@ -156,6 +159,12 @@ export class CodFrQuireLabelsPartComponent
       this.positionEntries.set(thesauri[key].entries);
     } else {
       this.positionEntries.set(undefined);
+    }
+    key = 'asserted-id-features';
+    if (this.hasThesaurus(key)) {
+      this.idFeatureEntries.set(thesauri[key].entries);
+    } else {
+      this.idFeatureEntries.set(undefined);
     }
   }
 

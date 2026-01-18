@@ -49,7 +49,7 @@ import { NotableWordFormEditorComponent } from '../notable-word-form-editor/nota
  * Thesauri: notable-word-forms-languages, notable-word-forms-tags,
  * notable-word-forms-op-tags, doc-reference-types, doc-reference-tags,
  * pin-link-scopes, pin-link-tags, pin-link-assertion-tags,
- * pin-link-docref-types, pin-link-docref-tags.
+ * pin-link-docref-types, pin-link-docref-tags, asserted-id-features.
  */
 @Component({
   selector: 'cadmus-notable-word-forms-part',
@@ -118,6 +118,10 @@ export class NotableWordFormsPartComponent
   public readonly pinLinkDocRefTagEntries = signal<
     ThesaurusEntry[] | undefined
   >(undefined);
+  // asserted-id-features
+  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined
+  );
 
   public entries: FormControl<NotableWordForm[]>;
 
@@ -205,6 +209,12 @@ export class NotableWordFormsPartComponent
       this.pinLinkDocRefTagEntries.set(thesauri[key].entries);
     } else {
       this.pinLinkDocRefTagEntries.set(undefined);
+    }
+    key = 'asserted-id-features';
+    if (this.hasThesaurus(key)) {
+      this.idFeatureEntries.set(thesauri[key].entries);
+    } else {
+      this.idFeatureEntries.set(undefined);
     }
   }
 
