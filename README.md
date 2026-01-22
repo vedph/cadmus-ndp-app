@@ -18,10 +18,15 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 1. `pnpm run build-lib`
 2. update version in `env.js` and `ng build --configuration=production`
-3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.3 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
+3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.4 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
 
+### 1.0.4
+
+- 2026-01-22:
+  - updated Angular and packages.
+  - added downloadable PDF policy to the homepage.
 - 2026-01-17:
   - updated Angular and packages.
   - added `asserted-id-features` thesaurus wherever asserted composite IDs was used.

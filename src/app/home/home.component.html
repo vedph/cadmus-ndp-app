@@ -16,9 +16,14 @@
         margin: 32px auto 32px auto;
       "
     >
-      <p>Welcome to the Cadmus Naples Dante Project editor.</p>
+      <p>
+        Welcome to the Cadmus Naples Dante Project editor. Users should have
+        downloaded, signed and sent the
+        <a href="policy.pdf" target="_blank" rel="noopener">policy</a> to their
+        reference contact before accessing the editor.
+      </p>
       @if (!logged()) {
-      <p>Please <a routerLink="/login">login</a> to start.</p>
+        <p>Please <a routerLink="/login">login</a> to start.</p>
       }
     </div>
   </div>
