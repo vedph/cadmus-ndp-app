@@ -77,7 +77,7 @@ services:
       - 4200:80
     depends_on:
       - cadmus-ndp-api
-      - cadmus-biblio-api
+      # - cadmus-biblio-api
     networks:
       - cadmus-ndp-network
 
