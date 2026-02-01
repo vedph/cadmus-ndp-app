@@ -1,17 +1,30 @@
 <div id="container">
   <h1>Cadmus NDP</h1>
+
   <div id="banner">
-    <img src="./img/ndp-300.png" alt="Cadmus" />
-    <div id="content">
-      <p>
-        Welcome to the Cadmus Naples Dante Project editor. Users should have
-        downloaded, signed and sent the
-        <a href="policy.pdf" target="_blank" rel="noopener">policy</a> to their
-        reference contact before accessing the editor.
-      </p>
-      @if (!logged()) {
-        <p>Please <a routerLink="/login">login</a> to start.</p>
-      }
-    </div>
+    <img src="./img/ndp-300.png" alt="Cadmus NDP" class="main-logo" />
+  </div>
+
+  <div id="content">
+    <p>
+      Welcome to the Cadmus Naples Dante Project editor. Users should have
+      downloaded, signed and sent the
+      <a href="policy.pdf" target="_blank" rel="noopener">policy</a> to their
+      reference contact before accessing the editor.
+    </p>
+    @if (!logged()) {
+      <p>Please <a routerLink="/login">login</a> to start.</p>
+    }
+  </div>
+
+  <hr class="separator" />
+
+  <div class="logo-grid">
+    <div class="logo-item"><img src="./img/dip-160.png" alt="DIP" /></div>
+    <div class="logo-item"><img src="./img/idp-160.png" alt="IDP" /></div>
+    <div class="logo-item"><img src="./img/hod-160.png" alt="HOD" /></div>
+    <div class="logo-item"><img src="./img/drw-160.png" alt="DRW" /></div>
+    <div class="logo-item"><img src="./img/frac-160.png" alt="FRAC" /></div>
+    <div class="logo-item"><img src="./img/dct-160.png" alt="DCT" /></div>
   </div>
 </div>
