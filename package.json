@@ -81,7 +81,7 @@
     "@myrmidon/cadmus-preview-ui": "^17.0.3",
     "@myrmidon/cadmus-profile-core": "^12.0.1",
     "@myrmidon/cadmus-refs-asserted-chronotope": "^10.0.6",
-    "@myrmidon/cadmus-refs-asserted-ids": "^10.0.13",
+    "@myrmidon/cadmus-refs-asserted-ids": "^10.0.14",
     "@myrmidon/cadmus-refs-assertion": "^10.0.5",
     "@myrmidon/cadmus-refs-citation": "^1.0.3",
     "@myrmidon/cadmus-refs-decorated-counts": "^9.0.2",
