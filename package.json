@@ -39,7 +39,7 @@
     "@cisstech/nge": "^18.3.0",
     "@myrmidon/auth-jwt-admin": "^8.0.3",
     "@myrmidon/auth-jwt-login": "^8.0.3",
-    "@myrmidon/cadmus-api": "^14.0.5",
+    "@myrmidon/cadmus-api": "^14.0.6",
     "@myrmidon/cadmus-cod-location": "^9.0.3",
     "@myrmidon/cadmus-codicology-ui": "^13.0.5",
     "@myrmidon/cadmus-core": "^12.0.3",
