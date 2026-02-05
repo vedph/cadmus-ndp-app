@@ -1,5 +1,12 @@
-
-import { Component, computed, effect, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -20,9 +27,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { FlatLookupPipe } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { PrintFont, PrintFontEditorComponent } from '@myrmidon/cadmus-part-ndpbooks-fonts';
+import {
+  PrintFont,
+  PrintFontEditorComponent,
+} from '@myrmidon/cadmus-part-ndpbooks-fonts';
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import { FigPlanItemLabel } from '../print-fig-plan-impl-part';
 
@@ -50,8 +61,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatTooltipModule,
     FlagSetComponent,
     PrintFontEditorComponent,
-    FlatLookupPipe
-],
+    FlatLookupPipe,
+  ],
   templateUrl: './fig-plan-item-label-editor.component.html',
   styleUrl: './fig-plan-item-label-editor.component.css',
 })
@@ -80,8 +91,12 @@ export class FigPlanItemLabelEditorComponent {
   // print-font-features
   public readonly fontFeatureEntries = input<ThesaurusEntry[]>();
 
+  public readonly lookupProviderOptions = input<
+    LookupProviderOptions | undefined
+  >();
+
   public readonly languageFlags = computed<Flag[]>(
-    () => this.languageEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.languageEntries()?.map((e) => entryToFlag(e)) || [],
   );
 
   public type: FormControl<string>;
@@ -94,7 +109,10 @@ export class FigPlanItemLabelEditorComponent {
   public readonly edited = signal<PrintFont | undefined>(undefined);
   public readonly editedIndex = signal<number>(-1);
 
-  constructor(formBuilder: FormBuilder, private _dialogService: DialogService) {
+  constructor(
+    formBuilder: FormBuilder,
+    private _dialogService: DialogService,
+  ) {
     // form
     this.type = formBuilder.control('', {
       nonNullable: true,

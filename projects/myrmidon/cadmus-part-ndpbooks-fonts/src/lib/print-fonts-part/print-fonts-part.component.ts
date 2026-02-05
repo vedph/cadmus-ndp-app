@@ -17,15 +17,23 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { deepCopy, FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
+import {
+  deepCopy,
+  FlatLookupPipe,
+  NgxToolsValidators,
+} from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
-import { CloseSaveButtonsComponent, ModelEditorComponentBase } from '@myrmidon/cadmus-ui';
+import {
+  CloseSaveButtonsComponent,
+  ModelEditorComponentBase,
+} from '@myrmidon/cadmus-ui';
 import {
   EditedObject,
   ThesauriSet,
   ThesaurusEntry,
 } from '@myrmidon/cadmus-core';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import {
   PRINT_FONTS_PART_TYPEID,
@@ -33,6 +41,10 @@ import {
   PrintFontsPart,
 } from '../print-fonts-part';
 import { PrintFontEditorComponent } from '../print-font-editor/print-font-editor.component';
+
+interface PrintFontsPartSettings {
+  lookupProviderOptions?: LookupProviderOptions;
+}
 
 /**
  * PrintFontsPart editor component.
@@ -56,7 +68,7 @@ import { PrintFontEditorComponent } from '../print-font-editor/print-font-editor
     MatTooltipModule,
     CloseSaveButtonsComponent,
     PrintFontEditorComponent,
-    FlatLookupPipe
+    FlatLookupPipe,
   ],
   templateUrl: './print-fonts-part.component.html',
   styleUrl: './print-fonts-part.component.css',
@@ -69,30 +81,53 @@ export class PrintFontsPartComponent
   public readonly edited = signal<PrintFont | undefined>(undefined);
 
   // print-font-families
-  public readonly familyEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly familyEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // print-layout-sections
-  public readonly sectionEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly sectionEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // print-font-features
-  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // doc-reference-types
-  public readonly docRefTypeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly docRefTypeEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // doc-reference-tags
-  public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // assertion-tags
-  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // external-id-tags
-  public readonly extIdTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly extIdTagEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // external-id-scopes
-  public readonly extIdScopeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly extIdScopeEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // asserted-id-features
-  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
+
+  // lookup options depending on role
+  public readonly lookupProviderOptions = signal<
+    LookupProviderOptions | undefined
+  >(undefined);
 
   public fonts: FormControl<PrintFont[]>;
 
   constructor(
     authService: AuthJwtService,
     formBuilder: FormBuilder,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
   ) {
     super(authService, formBuilder);
     // form
@@ -184,7 +219,16 @@ export class PrintFontsPartComponent
     if (data?.thesauri) {
       this.updateThesauri(data.thesauri);
     }
-
+    // settings
+    this._appRepository
+      ?.getSettingFor<PrintFontsPartSettings>(
+        PRINT_FONTS_PART_TYPEID,
+        this.identity()?.roleId || undefined,
+      )
+      .then((settings) => {
+        const options = settings?.lookupProviderOptions;
+        this.lookupProviderOptions.set(options || undefined);
+      });
     // form
     this.updateForm(data?.value);
   }

@@ -29,6 +29,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import {
   LookupDocReferencesComponent,
   LookupDocReferenceComponent,
+  LookupProviderOptions,
 } from '@myrmidon/cadmus-refs-lookup';
 import {
   AssertedCompositeId,
@@ -116,6 +117,10 @@ export class NotableWordFormEditorComponent {
   // asserted-id-features
   public readonly idFeatureEntries = input<ThesaurusEntry[] | undefined>();
 
+  public readonly lookupProviderOptions = input<
+    LookupProviderOptions | undefined
+  >();
+
   public value: FormControl<string>;
   public language: FormControl<string | null>;
   public rank: FormControl<number>;
@@ -162,25 +167,25 @@ export class NotableWordFormEditorComponent {
       this.value.valueChanges.pipe(takeUntilDestroyed()),
       {
         initialValue: this.value.value,
-      }
+      },
     );
     this._referenceFormSignal = toSignal(
       this.referenceForm.valueChanges.pipe(takeUntilDestroyed()),
       {
         initialValue: this.referenceForm.value,
-      }
+      },
     );
     this._isValueTargetSignal = toSignal(
       this.isValueTarget.valueChanges.pipe(takeUntilDestroyed()),
       {
         initialValue: this.isValueTarget.value,
-      }
+      },
     );
     this._operationsSignal = toSignal(
       this.operations.valueChanges.pipe(takeUntilDestroyed()),
       {
         initialValue: this.operations.value,
-      }
+      },
     );
 
     // create computed signals for source and target text
@@ -227,11 +232,11 @@ export class NotableWordFormEditorComponent {
 
   private mapIdsToEntries(
     ids: string[],
-    entries: ThesaurusEntry[] | undefined
+    entries: ThesaurusEntry[] | undefined,
   ): ThesaurusEntry[] {
     if (!entries) return ids.map((id) => ({ id, value: id }));
     return ids.map(
-      (id) => entries.find((e) => e.id === id) || { id, value: id }
+      (id) => entries.find((e) => e.id === id) || { id, value: id },
     );
   }
 
@@ -249,7 +254,7 @@ export class NotableWordFormEditorComponent {
       this.language.setValue(form.language || null);
       this.rank.setValue(form.rank || 0);
       this.tags.setValue(
-        this.mapIdsToEntries(form.tags || [], this.tagEntries())
+        this.mapIdsToEntries(form.tags || [], this.tagEntries()),
       );
       this.note.setValue(form.note || null);
       this.referenceForm.setValue(form.referenceForm || null);

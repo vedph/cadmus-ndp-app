@@ -1,30 +1,30 @@
 <form [formGroup]="form" (submit)="save()">
   <!-- types -->
   @if (typeFlags().length) {
-  <div>
-    <fieldset>
-      <legend>types</legend>
-      <cadmus-ui-flag-set
-        [flags]="typeFlags()"
-        [checkedIds]="types.value"
-        (checkedIdsChange)="onTypeCheckedIdsChange($event)"
-      />
-    </fieldset>
-  </div>
+    <div>
+      <fieldset>
+        <legend>types</legend>
+        <cadmus-ui-flag-set
+          [flags]="typeFlags()"
+          [checkedIds]="types.value"
+          (checkedIdsChange)="onTypeCheckedIdsChange($event)"
+        />
+      </fieldset>
+    </div>
   }
 
   <!-- positions -->
   @if (positionFlags().length) {
-  <div>
-    <fieldset>
-      <legend>positions</legend>
-      <cadmus-ui-flag-set
-        [flags]="positionFlags()"
-        [checkedIds]="positions.value"
-        (checkedIdsChange)="onPositionCheckedIdsChange($event)"
-      />
-    </fieldset>
-  </div>
+    <div>
+      <fieldset>
+        <legend>positions</legend>
+        <cadmus-ui-flag-set
+          [flags]="positionFlags()"
+          [checkedIds]="positions.value"
+          (checkedIdsChange)="onPositionCheckedIdsChange($event)"
+        />
+      </fieldset>
+    </div>
   }
 
   <!-- text -->
@@ -33,7 +33,7 @@
       <mat-label>text</mat-label>
       <input matInput [formControl]="text" />
       @if ($any(text).errors?.maxLength && (text.dirty || text.touched)) {
-      <mat-error>text too long</mat-error>
+        <mat-error>text too long</mat-error>
       }
     </mat-form-field>
   </div>
@@ -51,6 +51,7 @@
       [id]="handId.value || undefined"
       [canSwitchMode]="true"
       [canEditTarget]="true"
+      [lookupProviderOptions]="lookupProviderOptions()"
       (idChange)="onHandIdChange($event!)"
     />
   </fieldset>
@@ -61,7 +62,7 @@
       <mat-label>ink</mat-label>
       <input matInput [formControl]="ink" />
       @if ($any(ink).errors?.maxLength && (ink.dirty || ink.touched)) {
-      <mat-error>ink too long</mat-error>
+        <mat-error>ink too long</mat-error>
       }
     </mat-form-field>
   </div>
@@ -72,7 +73,7 @@
       <mat-label>note</mat-label>
       <textarea matInput [formControl]="note" rows="3"></textarea>
       @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
-      <mat-error>note too long</mat-error>
+        <mat-error>note too long</mat-error>
       }
     </mat-form-field>
   </div>

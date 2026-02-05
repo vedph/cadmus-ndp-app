@@ -20,7 +20,8 @@
         <input matInput [formControl]="type" />
         @if ($any(type).errors?.required && (type.dirty || type.touched)) {
           <mat-error>type required</mat-error>
-          } @if ($any(type).errors?.maxLength && (type.dirty || type.touched)) {
+        }
+        @if ($any(type).errors?.maxLength && (type.dirty || type.touched)) {
           <mat-error>type too long</mat-error>
         }
       </mat-form-field>
@@ -32,7 +33,8 @@
       <input matInput [formControl]="value" />
       @if ($any(value).errors?.required && (value.dirty || value.touched)) {
         <mat-error>value required</mat-error>
-        } @if ($any(value).errors?.maxLength && (value.dirty || value.touched)) {
+      }
+      @if ($any(value).errors?.maxLength && (value.dirty || value.touched)) {
         <mat-error>value too long</mat-error>
       }
     </mat-form-field>
@@ -46,97 +48,110 @@
         [flags]="languageFlags()"
         [checkedIds]="languages.value"
         (checkedIdsChange)="onLanguageIdsChange($event!)"
-        />
-      </fieldset>
-    </div>
+      />
+    </fieldset>
+  </div>
 
-    <!-- note -->
+  <!-- note -->
+  <div>
+    <mat-form-field class="long-text">
+      <mat-label>note</mat-label>
+      <textarea matInput [formControl]="note"></textarea>
+      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+        <mat-error>note too long</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- fonts -->
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>fonts</mat-panel-title>
+      <mat-panel-description>
+        {{ fonts.value.length }}
+      </mat-panel-description>
+    </mat-expansion-panel-header>
     <div>
-      <mat-form-field class="long-text">
-        <mat-label>note</mat-label>
-        <textarea matInput [formControl]="note"></textarea>
-        @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
-          <mat-error>note too long</mat-error>
-        }
-      </mat-form-field>
+      <button type="button" mat-flat-button color="primary" (click)="addFont()">
+        <mat-icon>add_circle</mat-icon> font
+      </button>
     </div>
-
-    <!-- fonts -->
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>fonts</mat-panel-title>
-        <mat-panel-description>
-          {{ fonts.value.length }}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <div>
-        <button type="button" mat-flat-button color="primary" (click)="addFont()">
-          <mat-icon>add_circle</mat-icon> font
-        </button>
-      </div>
-      @if (fonts.value.length) {
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>EID</th>
-              <th>family</th>
-              <th>sections</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (font of fonts.value; track font; let i = $index; let first =
-              $first; let last = $last) {
-              <tr [class.selected]="font === edited()">
-                <td class="fit-width">
-                  <button
-                    type="button"
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Edit this font"
-                    (click)="editFont(font, i)"
-                    >
-                    <mat-icon class="mat-primary">edit</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    matTooltip="Move this font up"
-                    [disabled]="first"
-                    (click)="moveFontUp(i)"
-                    >
-                    <mat-icon>arrow_upward</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    matTooltip="Move this font down"
-                    [disabled]="last"
-                    (click)="moveFontDown(i)"
-                    >
-                    <mat-icon>arrow_downward</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    color="warn"
-                    matTooltip="Delete this font"
-                    (click)="deleteFont(i)"
-                    >
-                    <mat-icon class="mat-warn">remove_circle</mat-icon>
-                  </button>
-                </td>
-                <td>{{ font.eid }}</td>
-                <td>{{ font.family }}</td>
-                <td>
-                  @if (font.sections?.length) {
-                    <ng-container>
-                      @for (section of font.sections; track section; let last = $last) {
-                        <ng-container>
-                          {{
+    @if (fonts.value.length) {
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>EID</th>
+            <th>family</th>
+            <th>sections</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (
+            font of fonts.value;
+            track font;
+            let i = $index;
+            let first = $first;
+            let last = $last
+          ) {
+            <tr [class.selected]="font === edited()">
+              <td class="fit-width">
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="primary"
+                  matTooltip="Edit this font"
+                  (click)="editFont(font, i)"
+                >
+                  <mat-icon class="mat-primary">edit</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matTooltip="Move this font up"
+                  [disabled]="first"
+                  (click)="moveFontUp(i)"
+                >
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matTooltip="Move this font down"
+                  [disabled]="last"
+                  (click)="moveFontDown(i)"
+                >
+                  <mat-icon>arrow_downward</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="warn"
+                  matTooltip="Delete this font"
+                  (click)="deleteFont(i)"
+                >
+                  <mat-icon class="mat-warn">remove_circle</mat-icon>
+                </button>
+              </td>
+              <td>{{ font.eid }}</td>
+              <td>{{ font.family }}</td>
+              <td>
+                @if (font.sections?.length) {
+                  <ng-container>
+                    @for (
+                      section of font.sections;
+                      track section;
+                      let last = $last
+                    ) {
+                      <ng-container>
+                        {{
                           section
-                          | flatLookup : layoutSectionEntries() : "id" : "value"
-                          }}@if (!last) {
+                            | flatLookup
+                              : layoutSectionEntries()
+                              : "id"
+                              : "value"
+                        }}
+                        @if (!last) {
                           <span>, </span>
                         }
                       </ng-container>
@@ -148,7 +163,8 @@
           }
         </tbody>
       </table>
-      } @if (edited()) {
+    }
+    @if (edited()) {
       <fieldset>
         <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
           <mat-expansion-panel-header>
@@ -162,32 +178,33 @@
             [idScopeEntries]="assIdScopeEntries()"
             [refTypeEntries]="docRefTypeEntries()"
             [sectionEntries]="layoutSectionEntries()"
+            [lookupProviderOptions]="lookupProviderOptions()"
             [font]="edited()"
             (fontChange)="saveFont($event!)"
             (editorClose)="closeFont()"
-            />
-          </mat-expansion-panel>
-        </fieldset>
-      }
-    </mat-expansion-panel>
+          />
+        </mat-expansion-panel>
+      </fieldset>
+    }
+  </mat-expansion-panel>
 
-    <!-- buttons -->
-    <div>
-      <button
-        type="button"
-        mat-icon-button
-        matTooltip="Discard changes"
-        (click)="cancel()"
-        >
-        <mat-icon class="mat-warn">clear</mat-icon>
-      </button>
-      <button
-        type="submit"
-        mat-icon-button
-        matTooltip="Accept changes"
-        [disabled]="form.invalid || form.pristine"
-        >
-        <mat-icon class="mat-primary">check_circle</mat-icon>
-      </button>
-    </div>
-  </form>
+  <!-- buttons -->
+  <div>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Discard changes"
+      (click)="cancel()"
+    >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      mat-icon-button
+      matTooltip="Accept changes"
+      [disabled]="form.invalid || form.pristine"
+    >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+</form>

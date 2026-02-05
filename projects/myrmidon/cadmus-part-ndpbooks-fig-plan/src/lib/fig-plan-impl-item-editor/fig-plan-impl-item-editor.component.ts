@@ -49,6 +49,7 @@ import {
 } from '@myrmidon/cadmus-mat-physical-size';
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import { FigPlanImplItem, FigPlanItemLabel } from '../print-fig-plan-impl-part';
 import { FigPlanItemLabelEditorComponent } from '../fig-plan-item-label-editor/fig-plan-item-label-editor.component';
@@ -81,8 +82,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     AssertedCompositeIdComponent,
     FlagSetComponent,
     PhysicalSizeComponent,
-    FigPlanItemLabelEditorComponent
-],
+    FigPlanItemLabelEditorComponent,
+  ],
   templateUrl: './fig-plan-impl-item-editor.component.html',
   styleUrl: './fig-plan-impl-item-editor.component.css',
 })
@@ -135,14 +136,18 @@ export class FigPlanImplItemEditorComponent {
   // asserted-id-features
   public readonly idFeatureEntries = input<ThesaurusEntry[]>();
 
+  public readonly lookupProviderOptions = input<
+    LookupProviderOptions | undefined
+  >();
+
   // flags mapped from thesaurus entries
   public featureFlags = computed<Flag[]>(
-    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || [],
   );
 
   // the edited citation
   public readonly editedCit = signal<Citation | CitationSpan | undefined>(
-    undefined
+    undefined,
   );
   // the edited label
   public readonly editedLabel = signal<FigPlanItemLabel | undefined>(undefined);
@@ -167,7 +172,7 @@ export class FigPlanImplItemEditorComponent {
   constructor(
     formBuilder: FormBuilder,
     private _citService: CitSchemeService,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
   ) {
     this.eid = formBuilder.control<string>('', {
       nonNullable: true,
@@ -229,7 +234,7 @@ export class FigPlanImplItemEditorComponent {
         this.editedCit.set(
           item.citation.includes(' - ')
             ? this._citService.parseSpan(item.citation, 'dc')
-            : this._citService.parse(item.citation, 'dc')
+            : this._citService.parse(item.citation, 'dc'),
         );
       } else {
         this.editedCit.set(undefined);
@@ -238,7 +243,7 @@ export class FigPlanImplItemEditorComponent {
         const location = CodLocationParser.parseLocation(item.location);
         this.location.setValue(
           location ? [{ start: location, end: location }] : [],
-          { emitEvent: false }
+          { emitEvent: false },
         );
       }
       this.position.setValue(item.position || null, { emitEvent: false });
@@ -266,12 +271,12 @@ export class FigPlanImplItemEditorComponent {
         const span = citation as CitationSpan;
         this.citation?.setValue(
           `${this._citService.toString(span.a)} - ${this._citService.toString(
-            span.b || span.a
-          )}`
+            span.b || span.a,
+          )}`,
         );
       } else {
         this.citation?.setValue(
-          this._citService.toString(citation as Citation)
+          this._citService.toString(citation as Citation),
         );
       }
     }

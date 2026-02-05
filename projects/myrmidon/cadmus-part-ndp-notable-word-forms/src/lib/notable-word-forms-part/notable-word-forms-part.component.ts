@@ -35,6 +35,7 @@ import {
   MatExpansionPanelTitle,
 } from '@angular/material/expansion';
 import { MatTooltip } from '@angular/material/tooltip';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import {
   NOTABLE_WORD_FORMS_PART_TYPEID,
@@ -43,6 +44,10 @@ import {
 } from '../notable-word-forms-part';
 import { TitleCasePipe } from '@angular/common';
 import { NotableWordFormEditorComponent } from '../notable-word-form-editor/notable-word-form-editor.component';
+
+interface NotableWordFormsPartSettings {
+  lookupProviderOptions?: LookupProviderOptions;
+}
 
 /**
  * NotableWordFormsPart editor component.
@@ -88,23 +93,23 @@ export class NotableWordFormsPartComponent
   public readonly tagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // notable-word-forms-op-tags
   public readonly opTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // doc-reference-types
   public readonly docRefTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // doc-reference-tags
   public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // pin-link-scopes
   public readonly pinLinkScopeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // pin-link-tags
   public readonly pinLinkTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // pin-link-assertion-tags
   public readonly pinLinkAssertionTagEntries = signal<
@@ -120,15 +125,20 @@ export class NotableWordFormsPartComponent
   >(undefined);
   // asserted-id-features
   public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
+
+  // lookup options depending on role
+  public readonly lookupProviderOptions = signal<
+    LookupProviderOptions | undefined
+  >(undefined);
 
   public entries: FormControl<NotableWordForm[]>;
 
   constructor(
     authService: AuthJwtService,
     formBuilder: FormBuilder,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
   ) {
     super(authService, formBuilder);
     // form
@@ -228,20 +238,29 @@ export class NotableWordFormsPartComponent
   }
 
   protected override onDataSet(
-    data?: EditedObject<NotableWordFormsPart>
+    data?: EditedObject<NotableWordFormsPart>,
   ): void {
     // thesauri
     if (data?.thesauri) {
       this.updateThesauri(data.thesauri);
     }
-
+    // settings
+    this._appRepository
+      ?.getSettingFor<NotableWordFormsPartSettings>(
+        NOTABLE_WORD_FORMS_PART_TYPEID,
+        this.identity()?.roleId || undefined,
+      )
+      .then((settings) => {
+        const options = settings?.lookupProviderOptions;
+        this.lookupProviderOptions.set(options || undefined);
+      });
     // form
     this.updateForm(data?.value);
   }
 
   protected getValue(): NotableWordFormsPart {
     let part = this.getEditedPart(
-      NOTABLE_WORD_FORMS_PART_TYPEID
+      NOTABLE_WORD_FORMS_PART_TYPEID,
     ) as NotableWordFormsPart;
     part.forms = this.entries.value || [];
     return part;

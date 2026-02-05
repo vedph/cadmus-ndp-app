@@ -1,4 +1,3 @@
-
 import {
   Component,
   computed,
@@ -35,6 +34,7 @@ import {
   AssertedCompositeId,
   AssertedCompositeIdComponent,
 } from '@myrmidon/cadmus-refs-asserted-ids';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import { CodFrQuireLabel } from '../cod-fr-quire-labels-part';
 
@@ -57,8 +57,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatSelectModule,
     MatTooltipModule,
     FlagSetComponent,
-    AssertedCompositeIdComponent
-],
+    AssertedCompositeIdComponent,
+  ],
   templateUrl: './cod-fr-quire-label-editor.component.html',
   styleUrl: './cod-fr-quire-label-editor.component.css',
 })
@@ -83,15 +83,19 @@ export class CodFrQuireLabelEditorComponent {
   public readonly typeEntries = input<ThesaurusEntry[]>();
   // flags mapped from thesaurus entries
   public typeFlags = computed<Flag[]>(
-    () => this.typeEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.typeEntries()?.map((e) => entryToFlag(e)) || [],
   );
 
   // cod-fr-quire-label-positions
   public readonly positionEntries = input<ThesaurusEntry[]>();
   // flags mapped from thesaurus entries
   public positionFlags = computed<Flag[]>(
-    () => this.positionEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.positionEntries()?.map((e) => entryToFlag(e)) || [],
   );
+
+  public readonly lookupProviderOptions = input<
+    LookupProviderOptions | undefined
+  >();
 
   public types: FormControl<string[]>;
   public positions: FormControl<string[]>;

@@ -35,6 +35,8 @@ import {
   AssertedCompositeId,
   AssertedCompositeIdsComponent,
 } from '@myrmidon/cadmus-refs-asserted-ids';
+import { deepCopy, FlatLookupPipe } from '@myrmidon/ngx-tools';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import {
   FigPlanItem,
@@ -42,13 +44,16 @@ import {
   PrintFigPlanPart,
 } from '../print-fig-plan-part';
 import { FigPlanItemEditorComponent } from '../fig-plan-item-editor/fig-plan-item-editor.component';
-import { deepCopy, FlatLookupPipe } from '@myrmidon/ngx-tools';
 
 function entryToFlag(entry: ThesaurusEntry): Flag {
   return {
     id: entry.id,
     label: entry.value,
   };
+}
+
+interface PrintFigPlanPartSettings {
+  lookupProviderOptions?: LookupProviderOptions;
 }
 
 /**
@@ -97,53 +102,58 @@ export class PrintFigPlanPartComponent
 
   // fig-plan-techniques
   public readonly planTechEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // fig-plan-types
   public readonly planTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // fig-plan-features
   public readonly planFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // asserted-id-scopes
   public readonly assIdScopeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // asserted-id-tags
   public readonly assIdTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // assertion-tags
   public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // doc-reference-types
   public readonly docRefTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // doc-reference-tags
   public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
   // asserted-id-features
   public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+    undefined,
   );
 
   // flags mapped from thesaurus entries
   public techFlags = computed<Flag[]>(
-    () => this.planTechEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.planTechEntries()?.map((e) => entryToFlag(e)) || [],
   );
   public featureFlags = computed<Flag[]>(
-    () => this.planFeatureEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.planFeatureEntries()?.map((e) => entryToFlag(e)) || [],
   );
+
+  // lookup options depending on role
+  public readonly lookupProviderOptions = signal<
+    LookupProviderOptions | undefined
+  >(undefined);
 
   constructor(
     authService: AuthJwtService,
     formBuilder: FormBuilder,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
   ) {
     super(authService, formBuilder);
     // form
@@ -249,7 +259,16 @@ export class PrintFigPlanPartComponent
     if (data?.thesauri) {
       this.updateThesauri(data.thesauri);
     }
-
+    // settings
+    this._appRepository
+      ?.getSettingFor<PrintFigPlanPartSettings>(
+        PRINT_FIG_PLAN_PART_TYPEID,
+        this.identity()?.roleId || undefined,
+      )
+      .then((settings) => {
+        const options = settings?.lookupProviderOptions;
+        this.lookupProviderOptions.set(options || undefined);
+      });
     // form
     this.updateForm(data?.value);
   }
@@ -348,7 +367,7 @@ export class PrintFigPlanPartComponent
 
   protected getValue(): PrintFigPlanPart {
     let part = this.getEditedPart(
-      PRINT_FIG_PLAN_PART_TYPEID
+      PRINT_FIG_PLAN_PART_TYPEID,
     ) as PrintFigPlanPart;
 
     part.artistIds = this.artistIds.value?.length

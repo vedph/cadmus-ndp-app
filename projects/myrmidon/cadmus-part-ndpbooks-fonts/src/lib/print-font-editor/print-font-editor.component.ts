@@ -1,4 +1,3 @@
-
 import {
   Component,
   computed,
@@ -30,6 +29,7 @@ import {
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import { PrintFont } from '../print-fonts-part';
 
@@ -55,8 +55,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     MatSelectModule,
     MatTooltipModule,
     AssertedCompositeIdsComponent,
-    FlagSetComponent
-],
+    FlagSetComponent,
+  ],
   templateUrl: './print-font-editor.component.html',
   styleUrl: './print-font-editor.component.css',
 })
@@ -86,11 +86,15 @@ export class PrintFontEditorComponent {
 
   // flags mapped from thesaurus entries
   public sectionFlags = computed<Flag[]>(
-    () => this.sectionEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.sectionEntries()?.map((e) => entryToFlag(e)) || [],
   );
   public featureFlags = computed<Flag[]>(
-    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || [],
   );
+
+  public readonly lookupProviderOptions = input<
+    LookupProviderOptions | undefined
+  >();
 
   public eid: FormControl<string | null>;
   public family: FormControl<string>;

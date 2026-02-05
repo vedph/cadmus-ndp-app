@@ -34,6 +34,7 @@ export class PrintFigPlanImplPartFeatureComponent
       thesaurusService,
       editorService
     );
+    this.roleIdInThesauri = true;
   }
 
   protected override getReqThesauriIds(): string[] {

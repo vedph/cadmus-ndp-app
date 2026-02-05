@@ -20,91 +20,104 @@
         </button>
       </div>
       @if (fonts.value.length) {
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>eid</th>
-            <th>family</th>
-            <th>sections</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (font of fonts.value; track font; let i = $index; let first =
-          $first; let last = $last) {
-          <tr [class.selected]="i === editedIndex()">
-            <td class="fit-width">
-              <button
-                type="button"
-                mat-icon-button
-                color="primary"
-                matTooltip="Edit this Font"
-                (click)="editFont(font, i)"
-              >
-                <mat-icon class="mat-primary">edit</mat-icon>
-              </button>
-              <button
-                type="button"
-                mat-icon-button
-                matTooltip="Move this Font up"
-                [disabled]="first"
-                (click)="moveFontUp(i)"
-              >
-                <mat-icon>arrow_upward</mat-icon>
-              </button>
-              <button
-                type="button"
-                mat-icon-button
-                matTooltip="Move this Font down"
-                [disabled]="last"
-                (click)="moveFontDown(i)"
-              >
-                <mat-icon>arrow_downward</mat-icon>
-              </button>
-              <button
-                type="button"
-                mat-icon-button
-                color="warn"
-                matTooltip="Delete this Font"
-                (click)="deleteFont(i)"
-              >
-                <mat-icon class="mat-warn">remove_circle</mat-icon>
-              </button>
-            </td>
-            <td>{{ font.eid }}</td>
-            <td>{{ font.family }}</td>
-            <td>
-              @if (font.sections?.length) { @for (s of font.sections; track s;
-              let last = $last) {
-              {{ s | flatLookup : sectionEntries() : "id" : "value" }}
-              @if (!last) {, } } } @else { - }
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-      } @if (edited()) {
-      <fieldset>
-        <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Font #</mat-panel-title>
-          </mat-expansion-panel-header>
-          <cadmus-print-font-editor
-            [font]="edited()"
-            [familyEntries]="familyEntries()"
-            [sectionEntries]="sectionEntries()"
-            [featureEntries]="featureEntries()"
-            [refTypeEntries]="docRefTypeEntries()"
-            [refTagEntries]="docRefTagEntries()"
-            [assTagEntries]="assTagEntries()"
-            [idTagEntries]="extIdTagEntries()"
-            [idScopeEntries]="extIdScopeEntries()"
-            [idFeatureEntries]="idFeatureEntries()"
-            (fontChange)="saveFont($event!)"
-            (cancelEdit)="closeFont()"
-          />
-        </mat-expansion-panel>
-      </fieldset>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>eid</th>
+              <th>family</th>
+              <th>sections</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (
+              font of fonts.value;
+              track font;
+              let i = $index;
+              let first = $first;
+              let last = $last
+            ) {
+              <tr [class.selected]="i === editedIndex()">
+                <td class="fit-width">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Edit this Font"
+                    (click)="editFont(font, i)"
+                  >
+                    <mat-icon class="mat-primary">edit</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this Font up"
+                    [disabled]="first"
+                    (click)="moveFontUp(i)"
+                  >
+                    <mat-icon>arrow_upward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this Font down"
+                    [disabled]="last"
+                    (click)="moveFontDown(i)"
+                  >
+                    <mat-icon>arrow_downward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="warn"
+                    matTooltip="Delete this Font"
+                    (click)="deleteFont(i)"
+                  >
+                    <mat-icon class="mat-warn">remove_circle</mat-icon>
+                  </button>
+                </td>
+                <td>{{ font.eid }}</td>
+                <td>{{ font.family }}</td>
+                <td>
+                  @if (font.sections?.length) {
+                    @for (s of font.sections; track s; let last = $last) {
+                      {{ s | flatLookup: sectionEntries() : "id" : "value" }}
+                      @if (!last) {
+                        ,
+                      }
+                    }
+                  } @else {
+                    -
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+      @if (edited()) {
+        <fieldset>
+          <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Font #</mat-panel-title>
+            </mat-expansion-panel-header>
+            <cadmus-print-font-editor
+              [font]="edited()"
+              [familyEntries]="familyEntries()"
+              [sectionEntries]="sectionEntries()"
+              [featureEntries]="featureEntries()"
+              [refTypeEntries]="docRefTypeEntries()"
+              [refTagEntries]="docRefTagEntries()"
+              [assTagEntries]="assTagEntries()"
+              [idTagEntries]="extIdTagEntries()"
+              [idScopeEntries]="extIdScopeEntries()"
+              [idFeatureEntries]="idFeatureEntries()"
+              [lookupProviderOptions]="lookupProviderOptions()"
+              (fontChange)="saveFont($event!)"
+              (cancelEdit)="closeFont()"
+            />
+          </mat-expansion-panel>
+        </fieldset>
       }
     </mat-card-content>
     <mat-card-actions>

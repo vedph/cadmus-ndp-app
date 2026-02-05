@@ -27,6 +27,10 @@ import {
 import { ViafRefLookupService } from '@myrmidon/cadmus-refs-viaf-lookup';
 import { ZoteroRefLookupService } from '@myrmidon/cadmus-refs-zotero-lookup';
 import { MolRefLookupService } from '@myrmidon/cadmus-refs-mol-lookup';
+import {
+  BiblissimaCandidate,
+  BiblissimaRefLookupService,
+} from '@myrmidon/cadmus-refs-biblissima-lookup';
 
 // cadmus
 import { AppRepository } from '@myrmidon/cadmus-state';
@@ -65,7 +69,8 @@ export class App implements OnInit, OnDestroy {
     storage: RamStorageService,
     viaf: ViafRefLookupService,
     zotero: ZoteroRefLookupService,
-    mol: MolRefLookupService
+    mol: MolRefLookupService,
+    biblissima: BiblissimaRefLookupService,
   ) {
     this.version = env.get('version') || '';
 
@@ -111,6 +116,15 @@ export class App implements OnInit, OnDestroy {
           }
           return sb.join('');
         },
+      },
+      {
+        name: 'Biblissima+',
+        iconUrl: '/img/biblissima128.png',
+        description: 'Biblissima+ knowledge base',
+        label: 'entity',
+        service: biblissima,
+        itemIdGetter: (item: BiblissimaCandidate) => item?.id,
+        itemLabelGetter: (item: BiblissimaCandidate) => item?.name,
       },
       // VIAF
       {
@@ -160,7 +174,7 @@ export class App implements OnInit, OnDestroy {
         } else {
           console.log('User logged out');
         }
-      })
+      }),
     );
 
     // when the thesaurus is loaded, get the item browsers
@@ -168,8 +182,8 @@ export class App implements OnInit, OnDestroy {
       this._appRepository.itemBrowserThesaurus$.subscribe(
         (thesaurus: Thesaurus | undefined) => {
           this.itemBrowsers = thesaurus ? thesaurus.entries : undefined;
-        }
-      )
+        },
+      ),
     );
   }
 

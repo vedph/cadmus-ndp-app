@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpfrac-quire-labels",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Cadmus - NDP FRAC quire labels part.",
   "keywords": [
     "Cadmus",
@@ -20,8 +20,8 @@
     "@angular/material": "^20.0.0 || ^21.0.0",
     "@myrmidon/ngx-tools": "^2.0.2",
     "@myrmidon/cadmus-core": "^12.0.3",
-    "@myrmidon/cadmus-state": "^14.0.2",
-    "@myrmidon/cadmus-ui": "^15.1.4"
+    "@myrmidon/cadmus-state": "^14.0.4",
+    "@myrmidon/cadmus-ui": "^16.0.1"
   },
   "dependencies": {
     "tslib": "^2.3.0"

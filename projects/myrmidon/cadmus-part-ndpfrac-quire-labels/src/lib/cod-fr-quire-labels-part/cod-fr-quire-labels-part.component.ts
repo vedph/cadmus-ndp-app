@@ -17,7 +17,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { deepCopy, FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
+import {
+  deepCopy,
+  FlatLookupPipe,
+  NgxToolsValidators,
+} from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 
@@ -30,6 +34,7 @@ import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
 } from '@myrmidon/cadmus-ui';
+import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import {
   COD_FR_QUIRE_LABELS_PART_TYPEID,
@@ -37,6 +42,10 @@ import {
   CodFrQuireLabelsPart,
 } from '../cod-fr-quire-labels-part';
 import { CodFrQuireLabelEditorComponent } from '../cod-fr-quire-label-editor/cod-fr-quire-label-editor.component';
+
+interface CodFrQuireLabelsPartSettings {
+  lookupProviderOptions?: LookupProviderOptions;
+}
 
 /**
  * CodFrQuireLabelsPart editor component.
@@ -75,28 +84,47 @@ export class CodFrQuireLabelsPartComponent
   public readonly edited = signal<CodFrQuireLabel | undefined>(undefined);
 
   // doc-reference-types
-  public readonly refTypeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly refTypeEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // doc-reference-tags
-  public readonly refTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly refTagEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // assertion-tags
-  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // external-id-tags
-  public readonly idTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly idTagEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // external-id-scopes
-  public readonly idScopeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly idScopeEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // cod-fr-quire-label-types
   public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
   // cod-fr-quire-label-positions
-  public readonly positionEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly positionEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
   // asserted-id-features
-  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
+
+  // lookup options depending on role
+  public readonly lookupProviderOptions = signal<
+    LookupProviderOptions | undefined
+  >(undefined);
 
   public labels: FormControl<CodFrQuireLabel[]>;
 
   constructor(
     authService: AuthJwtService,
     formBuilder: FormBuilder,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
   ) {
     super(authService, formBuilder);
     // form
@@ -178,20 +206,29 @@ export class CodFrQuireLabelsPartComponent
   }
 
   protected override onDataSet(
-    data?: EditedObject<CodFrQuireLabelsPart>
+    data?: EditedObject<CodFrQuireLabelsPart>,
   ): void {
     // thesauri
     if (data?.thesauri) {
       this.updateThesauri(data.thesauri);
     }
-
+    // settings
+    this._appRepository
+      ?.getSettingFor<CodFrQuireLabelsPartSettings>(
+        COD_FR_QUIRE_LABELS_PART_TYPEID,
+        this.identity()?.roleId || undefined,
+      )
+      .then((settings) => {
+        const options = settings?.lookupProviderOptions;
+        this.lookupProviderOptions.set(options || undefined);
+      });
     // form
     this.updateForm(data?.value);
   }
 
   protected getValue(): CodFrQuireLabelsPart {
     let part = this.getEditedPart(
-      COD_FR_QUIRE_LABELS_PART_TYPEID
+      COD_FR_QUIRE_LABELS_PART_TYPEID,
     ) as CodFrQuireLabelsPart;
     part.labels = this.labels.value || [];
     return part;
