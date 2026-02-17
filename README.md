@@ -22,6 +22,10 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2026-02-17:
+  - added import facets and settings pages.
+  - updated packages and added dependencies for geo packages.
+- 2026-02-16: updated Angular and packages.
 - 2026-02-09: updated Angular and packages.
 
 ### 1.0.6
