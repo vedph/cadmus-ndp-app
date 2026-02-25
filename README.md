@@ -22,6 +22,8 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2026-02-25: updated login page.
+
 ### 1.0.7
 
 - 2026-02-17:
