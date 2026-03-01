@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -85,6 +85,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   ],
   templateUrl: './cod-fr-layout-part.component.html',
   styleUrl: './cod-fr-layout-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrLayoutPartComponent
   extends ModelEditorComponentBase<CodFrLayoutPart>

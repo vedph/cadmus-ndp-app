@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { DrawingTechPartComponent } from '../drawing-tech-part/drawing-tech-part
   imports: [CurrentItemBarComponent, DrawingTechPartComponent],
   templateUrl: './drawing-tech-part-feature.component.html',
   styleUrl: './drawing-tech-part-feature.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DrawingTechPartFeatureComponent
   extends EditPartFeatureBase

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -61,6 +62,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   ],
   templateUrl: './cod-fr-quire-label-editor.component.html',
   styleUrl: './cod-fr-quire-label-editor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrQuireLabelEditorComponent {
   public readonly label = model<CodFrQuireLabel | undefined>();

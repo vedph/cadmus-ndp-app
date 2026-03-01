@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { CodFrQuireLabelsPartComponent } from '../cod-fr-quire-labels-part/cod-f
   imports: [CodFrQuireLabelsPartComponent, CurrentItemBarComponent],
   templateUrl: './cod-fr-quire-labels-part-feature.component.html',
   styleUrls: ['./cod-fr-quire-labels-part-feature.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrQuireLabelsPartFeatureComponent
   extends EditPartFeatureBase

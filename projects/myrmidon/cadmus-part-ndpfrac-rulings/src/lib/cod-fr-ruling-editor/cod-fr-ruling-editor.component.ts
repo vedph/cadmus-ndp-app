@@ -1,5 +1,6 @@
 
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -55,6 +56,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 ],
   templateUrl: './cod-fr-ruling-editor.component.html',
   styleUrl: './cod-fr-ruling-editor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrRulingEditorComponent {
   public readonly ruling = model<CodFrRuling | undefined>();

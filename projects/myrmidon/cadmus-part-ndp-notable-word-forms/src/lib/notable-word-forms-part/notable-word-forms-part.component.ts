@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -79,6 +79,7 @@ interface NotableWordFormsPartSettings {
   ],
   templateUrl: './notable-word-forms-part.component.html',
   styleUrl: './notable-word-forms-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotableWordFormsPartComponent
   extends ModelEditorComponentBase<NotableWordFormsPart>

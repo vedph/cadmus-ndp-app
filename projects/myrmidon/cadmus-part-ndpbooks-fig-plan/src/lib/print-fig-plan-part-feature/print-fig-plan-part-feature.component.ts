@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { PrintFigPlanPartComponent } from '../print-fig-plan-part/print-fig-plan
   imports: [CurrentItemBarComponent, PrintFigPlanPartComponent],
   templateUrl: './print-fig-plan-part-feature.component.html',
   styleUrl: './print-fig-plan-part-feature.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrintFigPlanPartFeatureComponent
   extends EditPartFeatureBase

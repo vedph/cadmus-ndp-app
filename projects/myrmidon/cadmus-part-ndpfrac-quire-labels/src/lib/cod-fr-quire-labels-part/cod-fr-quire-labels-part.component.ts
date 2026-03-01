@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -75,6 +75,7 @@ interface CodFrQuireLabelsPartSettings {
   ],
   templateUrl: './cod-fr-quire-labels-part.component.html',
   styleUrl: './cod-fr-quire-labels-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrQuireLabelsPartComponent
   extends ModelEditorComponentBase<CodFrQuireLabelsPart>

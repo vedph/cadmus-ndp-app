@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { PrintFontsPartComponent } from '../print-fonts-part/print-fonts-part.co
   imports: [CurrentItemBarComponent, PrintFontsPartComponent],
   templateUrl: './print-fonts-part-feature.component.html',
   styleUrl: './print-fonts-part-feature.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrintFontsPartFeatureComponent
   extends EditPartFeatureBase

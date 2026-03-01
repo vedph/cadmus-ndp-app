@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { NotableWordFormsPartComponent } from '../notable-word-forms-part/notabl
   imports: [NotableWordFormsPartComponent, CurrentItemBarComponent],
   templateUrl: './notable-word-forms-part-feature.component.html',
   styleUrl: './notable-word-forms-part-feature.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotableWordFormsPartFeatureComponent
   extends EditPartFeatureBase

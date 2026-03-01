@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -65,6 +66,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   ],
   templateUrl: './fig-plan-item-label-editor.component.html',
   styleUrl: './fig-plan-item-label-editor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FigPlanItemLabelEditorComponent {
   public readonly label = model<FigPlanItemLabel | undefined>();
@@ -180,7 +182,7 @@ export class FigPlanItemLabelEditorComponent {
 
   public editFont(font: PrintFont, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(font);
+    this.edited.set(structuredClone(font));
   }
 
   public closeFont(): void {

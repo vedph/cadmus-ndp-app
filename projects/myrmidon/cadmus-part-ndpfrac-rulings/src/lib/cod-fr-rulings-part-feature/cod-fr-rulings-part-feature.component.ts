@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { CodFrRulingsPartComponent } from '../cod-fr-rulings-part/cod-fr-rulings
   imports: [CurrentItemBarComponent, CodFrRulingsPartComponent],
   templateUrl: './cod-fr-rulings-part-feature.component.html',
   styleUrl: './cod-fr-rulings-part-feature.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrRulingsPartFeatureComponent
   extends EditPartFeatureBase

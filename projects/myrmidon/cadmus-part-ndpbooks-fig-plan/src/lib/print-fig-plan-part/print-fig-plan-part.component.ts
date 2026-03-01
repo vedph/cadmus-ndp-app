@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -86,6 +86,7 @@ interface PrintFigPlanPartSettings {
   ],
   templateUrl: './print-fig-plan-part.component.html',
   styleUrl: './print-fig-plan-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrintFigPlanPartComponent
   extends ModelEditorComponentBase<PrintFigPlanPart>

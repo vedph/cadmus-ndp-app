@@ -1,4 +1,4 @@
-import { Component, effect, input, model, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, model, output, signal } from '@angular/core';
 
 import {
   FormBuilder,
@@ -46,6 +46,7 @@ import { FigPlanItem } from '../print-fig-plan-part';
 ],
   templateUrl: './fig-plan-item-editor.component.html',
   styleUrl: './fig-plan-item-editor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FigPlanItemEditorComponent {
   public readonly item = model<FigPlanItem | undefined>();

@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -78,6 +78,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   ],
   templateUrl: './print-fig-plan-impl-part.component.html',
   styleUrl: './print-fig-plan-impl-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrintFigPlanImplPartComponent
   extends ModelEditorComponentBase<PrintFigPlanImplPart>
@@ -256,9 +257,9 @@ export class PrintFigPlanImplPartComponent
     }
     key = 'fig-plan-impl-item-features';
     if (this.hasThesaurus(key)) {
-      this.featureEntries.set(thesauri[key].entries);
+      this.itemFeatureEntries.set(thesauri[key].entries);
     } else {
-      this.featureEntries.set(undefined);
+      this.itemFeatureEntries.set(undefined);
     }
     key = 'fig-plan-impl-matrix-types';
     if (this.hasThesaurus(key)) {

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -59,6 +60,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   ],
   templateUrl: './print-font-editor.component.html',
   styleUrl: './print-font-editor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrintFontEditorComponent {
   public readonly font = model<PrintFont | undefined>();

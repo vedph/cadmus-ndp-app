@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   FormControl,
@@ -72,6 +72,7 @@ import '@myrmidon/cod-layout-view';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './cod-fr-support-part.component.html',
   styleUrl: './cod-fr-support-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrSupportPartComponent
   extends ModelEditorComponentBase<CodFrSupportPart>

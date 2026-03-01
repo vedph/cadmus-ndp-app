@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -72,6 +72,7 @@ interface PrintFontsPartSettings {
   ],
   templateUrl: './print-fonts-part.component.html',
   styleUrl: './print-fonts-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrintFontsPartComponent
   extends ModelEditorComponentBase<PrintFontsPart>

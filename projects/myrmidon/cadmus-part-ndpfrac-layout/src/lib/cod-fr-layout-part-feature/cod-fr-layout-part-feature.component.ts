@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,6 +13,7 @@ import { CodFrLayoutPartComponent } from '../cod-fr-layout-part/cod-fr-layout-pa
   imports: [CurrentItemBarComponent, CodFrLayoutPartComponent],
   templateUrl: './cod-fr-layout-part-feature.component.html',
   styleUrl: './cod-fr-layout-part-feature.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrLayoutPartFeatureComponent
   extends EditPartFeatureBase

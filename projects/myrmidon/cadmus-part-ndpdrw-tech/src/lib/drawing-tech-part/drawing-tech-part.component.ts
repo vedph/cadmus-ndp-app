@@ -1,4 +1,4 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -71,6 +71,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 ],
   templateUrl: './drawing-tech-part.component.html',
   styleUrl: './drawing-tech-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DrawingTechPartComponent
   extends ModelEditorComponentBase<DrawingTechPart>

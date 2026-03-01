@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -63,6 +63,7 @@ import { CodFrRulingEditorComponent } from '../cod-fr-ruling-editor/cod-fr-rulin
   ],
   templateUrl: './cod-fr-rulings-part.component.html',
   styleUrls: ['./cod-fr-rulings-part.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodFrRulingsPartComponent
   extends ModelEditorComponentBase<CodFrRulingsPart>

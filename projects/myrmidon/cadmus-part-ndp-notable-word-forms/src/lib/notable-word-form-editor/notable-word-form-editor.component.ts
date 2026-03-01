@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -69,6 +70,7 @@ import { NotableWordForm } from '../notable-word-forms-part';
   ],
   templateUrl: './notable-word-form-editor.component.html',
   styleUrl: './notable-word-form-editor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotableWordFormEditorComponent {
   // signals tracking form control values (initialized in constructor)
@@ -196,7 +198,6 @@ export class NotableWordFormEditorComponent {
       const result = this._isValueTargetSignal()
         ? refForm || val
         : val || refForm;
-      console.log('sourceText', result);
       return result;
     });
 
@@ -205,7 +206,6 @@ export class NotableWordFormEditorComponent {
       const val = this._valueSignal();
       if (!refForm || !val) return undefined;
       const result = this._isValueTargetSignal() ? val : refForm || val;
-      console.log('targetText', result);
       return result;
     });
 
