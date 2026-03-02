@@ -1,4 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+} from '@angular/core';
 import {
   FormControl,
   FormBuilder,
@@ -42,7 +47,7 @@ import {
 import { TextPassageEditorComponent } from '../text-passage-editor/text-passage-editor.component';
 
 @Component({
-  selector: 'lib-text-passages-part',
+  selector: 'cadmus-text-passages-part',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -61,6 +66,7 @@ import { TextPassageEditorComponent } from '../text-passage-editor/text-passage-
   ],
   templateUrl: './text-passages-part.component.html',
   styleUrl: './text-passages-part.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextPassagesPartComponent
   extends ModelEditorComponentBase<TextPassagesPart>

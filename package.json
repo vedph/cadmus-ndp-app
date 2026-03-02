@@ -18,8 +18,9 @@
     "build-drw": "ng build @myrmidon/cadmus-part-ndpdrw-tech",
     "build-dpg": "ng build @myrmidon/cadmus-part-ndpdrw-pg",
     "build-nwf": "ng build @myrmidon/cadmus-part-ndp-notable-word-forms",
+    "build-tpp": "ng build @myrmidon/cadmus-part-ndp-text-passages",
     "build-npg": "ng build @myrmidon/cadmus-part-ndp-pg",
-    "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-npg"
+    "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-tpp && pnpm run build-npg"
   },
   "private": true,
   "packageManager": "pnpm@10.30.3",

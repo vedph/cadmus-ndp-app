@@ -36,22 +36,20 @@ import { COD_SHEET_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-s
 import { COD_SHELFMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-shelfmarks';
 import { COD_WATERMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-watermarks';
 
-// ndp-frac
+// iconography
+import { ICO_INSTRUCTIONS_PART_TYPEID } from '@myrmidon/cadmus-part-iconography-instructions';
+
+// ndp
 import { COD_FR_LAYOUT_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-layout';
 import { COD_FR_QUIRE_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-quire-labels';
 import { COD_FR_RULINGS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-rulings';
 import { COD_FR_SUPPORT_PART_TYPEID } from '@myrmidon/cadmus-part-ndpfrac-support';
-
-// ndp-books
 import { PRINT_FONTS_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fonts';
 import { PRINT_FIG_PLAN_IMPL_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
 import { PRINT_FIG_PLAN_PART_TYPEID } from '@myrmidon/cadmus-part-ndpbooks-fig-plan';
-
-// iconography
-import { ICO_INSTRUCTIONS_PART_TYPEID } from '@myrmidon/cadmus-part-iconography-instructions';
-
 import { DRAWING_TECH_PART_TYPEID } from '@myrmidon/cadmus-part-ndpdrw-tech';
 import { NOTABLE_WORD_FORMS_PART_TYPEID } from '@myrmidon/cadmus-part-ndp-notable-word-forms';
+import { TEXT_PASSAGES_PART_TYPEID } from '@myrmidon/cadmus-part-ndp-text-passages';
 
 // route constants
 const GENERAL = 'general';
@@ -164,6 +162,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
   },
   // ndp
   [NOTABLE_WORD_FORMS_PART_TYPEID]: {
+    part: NDP,
+  },
+  [TEXT_PASSAGES_PART_TYPEID]: {
     part: NDP,
   },
   // ndp-frac

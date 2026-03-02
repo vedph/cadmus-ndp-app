@@ -7,12 +7,22 @@ import {
 
 // cadmus
 import { pendingChangesGuard } from '@myrmidon/cadmus-core';
+import {
+  TEXT_PASSAGES_PART_TYPEID,
+  TextPassagesPartFeatureComponent,
+} from '@myrmidon/cadmus-part-ndp-text-passages';
 
 export const CADMUS_PART_NDP_PG_ROUTES: Routes = [
   {
     path: `${NOTABLE_WORD_FORMS_PART_TYPEID}/:pid`,
     pathMatch: 'full',
     component: NotableWordFormsPartFeatureComponent,
+    canDeactivate: [pendingChangesGuard],
+  },
+  {
+    path: `${TEXT_PASSAGES_PART_TYPEID}/:pid`,
+    pathMatch: 'full',
+    component: TextPassagesPartFeatureComponent,
     canDeactivate: [pendingChangesGuard],
   },
 ];
