@@ -35,8 +35,11 @@ import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { TextPassage } from '../text-passages-part';
 
+/**
+ * Editor for a single text passage.
+ */
 @Component({
-  selector: 'lib-text-passage-editor',
+  selector: 'cadmus-text-passage-editor',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -55,8 +58,16 @@ import { TextPassage } from '../text-passages-part';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextPassageEditorComponent {
+  /**
+   * The text passage to edit. This implies a dataChange event when the user
+   * saves the form.
+   */
   public readonly data = model<TextPassage | undefined>();
+  /**
+   * Emitted when the user cancels editing.
+   */
   public readonly cancelEdit = output();
+
   // text-passage-tags
   public readonly tagEntries = input<ThesaurusEntry[] | undefined>();
   // text-passage-features
@@ -77,12 +88,18 @@ export class TextPassageEditorComponent {
     this.citation = formBuilder.control<Citation | CitationSpan | null>(null, {
       validators: Validators.required,
     });
-    this.tag = formBuilder.control<string | null>(null);
+    this.tag = formBuilder.control<string | null>(null, {
+      validators: Validators.maxLength(100),
+    });
     this.features = formBuilder.control<ThesaurusEntry[]>([], {
       nonNullable: true,
     });
-    this.text = formBuilder.control<string | null>(null);
-    this.note = formBuilder.control<string | null>(null);
+    this.text = formBuilder.control<string | null>(null, {
+      validators: Validators.maxLength(5000),
+    });
+    this.note = formBuilder.control<string | null>(null, {
+      validators: Validators.maxLength(5000),
+    });
     this.form = formBuilder.group({
       citation: this.citation,
       tag: this.tag,
@@ -130,6 +147,12 @@ export class TextPassageEditorComponent {
     this.citation.setValue(citation);
     this.citation.markAsDirty();
     this.citation.updateValueAndValidity();
+  }
+
+  public onFeaturesChange(entries: ThesaurusEntry[]): void {
+    this.features.setValue(entries);
+    this.features.markAsDirty();
+    this.features.updateValueAndValidity();
   }
 
   private getData(): TextPassage {

@@ -4,3 +4,4 @@
 
 export * from './lib/text-passages-part';
 export * from './lib/text-passage-editor/text-passage-editor.component';
+export * from './lib/text-passages-part/text-passages-part.component';

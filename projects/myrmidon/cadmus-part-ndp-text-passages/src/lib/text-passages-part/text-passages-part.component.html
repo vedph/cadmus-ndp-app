@@ -1,0 +1,121 @@
+<form [formGroup]="form" (submit)="save()">
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar>
+        <mat-icon>picture_in_picture</mat-icon>
+      </div>
+      <mat-card-title>
+        {{ (modelName() | titlecase) || "Text Passages Part" }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          (click)="addPassage()"
+        >
+          <mat-icon>add_circle</mat-icon> passage
+        </button>
+      </div>
+      @if (entries.value.length) {
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>citation</th>
+              <th>tag</th>
+              <th>features</th>
+              <th>text</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (
+              entry of entries.value;
+              track entry;
+              let i = $index;
+              let first = $first;
+              let last = $last
+            ) {
+              <tr [class.selected]="entry === edited()">
+                <td class="fit-width">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Edit this passage"
+                    (click)="editPassage(entry, i)"
+                  >
+                    <mat-icon class="mat-primary">edit</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this passage up"
+                    [disabled]="first"
+                    (click)="movePassageUp(i)"
+                  >
+                    <mat-icon>arrow_upward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    matTooltip="Move this passage down"
+                    [disabled]="last"
+                    (click)="movePassageDown(i)"
+                  >
+                    <mat-icon>arrow_downward</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    mat-icon-button
+                    color="warn"
+                    matTooltip="Delete this passage"
+                    (click)="deletePassage(i)"
+                  >
+                    <mat-icon class="mat-warn">remove_circle</mat-icon>
+                  </button>
+                </td>
+                <td>{{ entry.citation }}</td>
+                <td>
+                  {{ entry.tag | flatLookup: tagEntries() : "id" : "value" }}
+                </td>
+                <td>
+                  @for (f of entry.features; track f) {
+                    {{ f | flatLookup: featureEntries() : "id" : "value"
+                    }}{{ $last ? "" : ", " }}
+                  }
+                </td>
+                <td>{{ entry.text | ellipsis }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+      @if (edited()) {
+        <fieldset>
+          <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>passage #</mat-panel-title>
+            </mat-expansion-panel-header>
+            <cadmus-text-passage-editor
+              [data]="edited()"
+              [tagEntries]="tagEntries()"
+              [featureEntries]="featureEntries()"
+              (dataChange)="savePassage($event!)"
+              (cancelEdit)="closePassage()"
+            />
+          </mat-expansion-panel>
+        </fieldset>
+      }
+    </mat-card-content>
+    <mat-card-actions>
+      <cadmus-close-save-buttons
+        [form]="form"
+        [noSave]="userLevel < 2"
+        (closeRequest)="close()"
+      />
+    </mat-card-actions>
+  </mat-card>
+</form>
