@@ -11,6 +11,9 @@
       "@myrmidon/cadmus-part-ndp-pg": [
         "./dist/myrmidon/cadmus-part-ndp-pg"
       ],
+      "@myrmidon/cadmus-part-ndp-text-passages": [
+        "./dist/myrmidon/cadmus-part-ndp-text-passages"
+      ],
       "@myrmidon/cadmus-part-ndpbooks-fig-plan": [
         "./dist/myrmidon/cadmus-part-ndpbooks-fig-plan"
       ],
@@ -62,5 +65,13 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "references": [
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndp-text-passages/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/myrmidon/cadmus-part-ndp-text-passages/tsconfig.spec.json"
+    }
+  ]
 }

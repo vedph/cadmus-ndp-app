@@ -1,0 +1,29 @@
+<form [formGroup]="form" (submit)="save()">
+  <fieldset>
+    <legend>location</legend>
+    <cadmus-refs-compact-citation
+      [schemeKeys]="['dc']"
+      [citation]="citation.value || undefined"
+      (citationChange)="onCitationChange($event!)"
+    />
+  </fieldset>
+  <!-- buttons -->
+  <div>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Discard changes"
+      (click)="cancel()"
+    >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      mat-icon-button
+      matTooltip="Accept changes"
+      [disabled]="form.invalid || form.pristine"
+    >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+</form>
