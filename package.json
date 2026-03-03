@@ -88,7 +88,7 @@
     "@myrmidon/cadmus-refs-asserted-ids": "^10.0.16",
     "@myrmidon/cadmus-refs-assertion": "^10.0.6",
     "@myrmidon/cadmus-refs-biblissima-lookup": "^10.0.3",
-    "@myrmidon/cadmus-refs-citation": "^1.0.3",
+    "@myrmidon/cadmus-refs-citation": "^1.0.4",
     "@myrmidon/cadmus-refs-decorated-counts": "^9.0.2",
     "@myrmidon/cadmus-refs-decorated-ids": "^9.0.5",
     "@myrmidon/cadmus-refs-doc-references": "^10.0.3",
@@ -108,7 +108,7 @@
     "@myrmidon/cadmus-text-ed-txt": "^9.0.2",
     "@myrmidon/cadmus-thesaurus-editor": "^16.1.0",
     "@myrmidon/cadmus-thesaurus-list": "^16.1.0",
-    "@myrmidon/cadmus-thesaurus-store": "^0.0.6",
+    "@myrmidon/cadmus-thesaurus-store": "^0.1.0",
     "@myrmidon/cadmus-thesaurus-ui": "^15.1.0",
     "@myrmidon/cadmus-ui": "^16.1.0",
     "@myrmidon/cadmus-ui-flag-set": "^9.0.3",
@@ -117,7 +117,7 @@
     "@myrmidon/cod-layout-view": "^2.0.2",
     "@myrmidon/ngx-mat-tools": "^1.0.1",
     "@myrmidon/ngx-tools": "^2.0.2",
-    "@myrmidon/paged-data-browsers": "^5.1.4",
+    "@myrmidon/paged-data-browsers": "^5.2.0",
     "@terraformer/wkt": "^2.2.1",
     "@types/geojson": "^7946.0.16",
     "echarts": "^6.0.0",
@@ -140,7 +140,7 @@
     "@angular/localize": "^21.2.0",
     "@types/jasmine": "~6.0.0",
     "jasmine-core": "~6.1.0",
-    "jsdom": "^28.0.0",
+    "jsdom": "^28.1.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.1",
@@ -148,7 +148,7 @@
     "karma-jasmine-html-reporter": "~2.2.0",
     "ng-packagr": "^21.2.0",
     "typescript": "~5.9.3",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.18"
   },
   "optionalDependencies": {
     "@rollup/rollup-win32-arm64-msvc": "^4.59.0"

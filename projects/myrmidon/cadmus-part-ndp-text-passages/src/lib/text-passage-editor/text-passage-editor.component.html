@@ -42,7 +42,7 @@
   </fieldset>
   <!-- text -->
   <div>
-    <mat-form-field>
+    <mat-form-field class="long-text">
       <mat-label>text</mat-label>
       <textarea matInput [formControl]="text" rows="3"></textarea>
       @if ($any(text).errors?.maxLength && (text.dirty || text.touched)) {
@@ -52,7 +52,7 @@
   </div>
   <!-- note -->
   <div>
-    <mat-form-field>
+    <mat-form-field class="long-text">
       <mat-label>note</mat-label>
       <textarea matInput [formControl]="note" rows="3"></textarea>
       @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {

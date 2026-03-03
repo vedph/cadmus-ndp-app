@@ -97,7 +97,9 @@
         <fieldset>
           <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
             <mat-expansion-panel-header>
-              <mat-panel-title>passage #</mat-panel-title>
+              <mat-panel-title
+                >passage #{{ editedIndex() + 1 }}</mat-panel-title
+              >
             </mat-expansion-panel-header>
             <cadmus-text-passage-editor
               [data]="edited()"

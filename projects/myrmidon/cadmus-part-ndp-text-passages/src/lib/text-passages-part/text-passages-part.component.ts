@@ -152,7 +152,7 @@ export class TextPassagesPartComponent
 
   public addPassage(): void {
     const passage: TextPassage = {
-      citation: '',
+      citation: '@dc:If. I 1',
     };
     this.editPassage(passage, -1);
   }
