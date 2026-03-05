@@ -161,7 +161,7 @@ export class TextPassageEditorComponent {
         ? this._citService.toString(this.citation.value!)
         : '',
       tag: this.tag.value || undefined,
-      features: this.features.value
+      features: this.features.value?.length
         ? this.features.value.map((e) => e.id)
         : undefined,
       text: this.text.value || undefined,

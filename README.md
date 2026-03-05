@@ -18,10 +18,13 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 1. `pnpm run build-lib`
 2. update version in `env.js` and `ng build --configuration=production`
-3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.7 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
+3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.8 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
 
+### 1.0.8
+
+- 2026-03-05: updated Angular and packages.
 - 2026-03-03: 🆕 added new text passages part.
 - 2026-03-01:
   - updated Angular and packages.

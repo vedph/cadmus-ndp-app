@@ -38,7 +38,7 @@
               let first = $first;
               let last = $last
             ) {
-              <tr [class.selected]="entry === edited()">
+              <tr [class.selected]="i === editedIndex()">
                 <td class="fit-width">
                   <button
                     type="button"
@@ -95,7 +95,7 @@
       }
       @if (edited()) {
         <fieldset>
-          <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
+          <mat-expansion-panel [expanded]="true">
             <mat-expansion-panel-header>
               <mat-panel-title
                 >passage #{{ editedIndex() + 1 }}</mat-panel-title
