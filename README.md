@@ -18,9 +18,13 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 1. `pnpm run build-lib`
 2. update version in `env.js` and `ng build --configuration=production`
-3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.8 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
+3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.9 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
+
+### 1.0.9
+
+- 2026-03-12: updated Angular and packages (Codicology has fixes and new step feature for sheet labels).
 
 ### 1.0.8
 
