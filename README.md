@@ -22,6 +22,10 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2026-03-18:
+  - updated Angular and packages.
+  - 🆕 migrated shell app to M3 themes and added dark theme support to components.
+
 ### 1.0.9
 
 - 2026-03-12: updated Angular and packages (Codicology has fixes and new step feature for sheet labels).
