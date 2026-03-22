@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 
 // material
 import { MatButtonModule } from '@angular/material/button';
+import { MatDivider } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -43,6 +44,7 @@ import { DC_SCHEME } from './cit-schemes';
   imports: [
     RouterModule,
     MatButtonModule,
+    MatDivider,
     MatIconModule,
     MatMenuModule,
     MatToolbarModule,

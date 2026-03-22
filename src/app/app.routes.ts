@@ -197,9 +197,18 @@ export const routes: Routes = [
       ),
     canActivate: [jwtGuard],
   },
-  // cadmus - profile import
+  // cadmus - profile editor
   {
     path: 'profile',
+    loadChildren: () =>
+      import('@myrmidon/cadmus-profile-editor').then(
+        (module) => module.CADMUS_PROFILE_EDIT_ROUTES,
+      ),
+    canActivate: [jwtAdminGuard],
+  },
+  // cadmus - profile import
+  {
+    path: 'profile/import',
     loadChildren: () =>
       import('@myrmidon/cadmus-profile-import').then(
         (module) => module.CADMUS_PROFILE_IMPORT_ROUTES,

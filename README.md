@@ -22,6 +22,10 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2026-03-22:
+  - 🆕 added facet editor, updating app routes and admin menus accordingly.
+  - updated Angular and packages.
+
 ### 1.0.10
 
 - 2026-03-18:
