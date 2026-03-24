@@ -18,9 +18,11 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 1. `pnpm run build-lib`
 2. update version in `env.js` and `ng build --configuration=production`
-3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.10 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
+3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.11 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
+
+### 1.0.11
 
 - 2026-03-22:
   - 🆕 added facet editor, updating app routes and admin menus accordingly.
