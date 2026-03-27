@@ -15,15 +15,15 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^20.0.0 || ^21.0.0",
-    "@angular/core": "^20.0.0 || ^21.0.0",
-    "@angular/material": "^20.0.0 || ^21.0.0",
-    "@myrmidon/cadmus-mat-physical-size": "^9.0.11",
-    "@myrmidon/cadmus-refs-decorated-counts": "^9.0.2",
-    "@myrmidon/cadmus-codicology-ui": "^13.0.5",
-    "@myrmidon/cadmus-core": "^12.0.3",
-    "@myrmidon/cadmus-state": "^14.0.2",
-    "@myrmidon/cadmus-ui": "^15.1.4"
+    "@angular/common": "^21.2.6",
+    "@angular/core": "^21.2.6",
+    "@angular/material": "^21.2.4",
+    "@myrmidon/cadmus-mat-physical-size": "^9.0.12",
+    "@myrmidon/cadmus-refs-decorated-counts": "^9.0.3",
+    "@myrmidon/cadmus-codicology-ui": "^13.1.2",
+    "@myrmidon/cadmus-core": "^12.0.4",
+    "@myrmidon/cadmus-state": "^15.0.0",
+    "@myrmidon/cadmus-ui": "^16.1.1"
   },
   "dependencies": {
     "tslib": "^2.3.0"

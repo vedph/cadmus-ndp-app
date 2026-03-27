@@ -15,12 +15,12 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^20.0.0 || ^21.0.0",
-    "@angular/core": "^20.0.0 || ^21.0.0",
-    "@angular/material": "^20.0.0 || ^21.0.0",
+    "@angular/common": "^21.2.6",
+    "@angular/core": "^21.2.6",
+    "@angular/material": "^21.2.4",
     "@myrmidon/ngx-tools": "^2.0.2",
     "@myrmidon/cadmus-mat-physical-grid": "^9.0.4",
-    "@myrmidon/cadmus-core": "^12.0.3",
+    "@myrmidon/cadmus-core": "^12.0.4",
     "@myrmidon/cadmus-state": "^15.0.0",
     "@myrmidon/cadmus-ui": "^16.1.1"
   },

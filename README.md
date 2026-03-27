@@ -18,11 +18,15 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 1. `pnpm run build-lib`
 2. update version in `env.js` and `ng build --configuration=production`
-3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.11 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
+3. `docker build . -t vedph2020/cadmus-ndp-app:1.0.12 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 
 ## History
 
-- 2026-03-27: added branding for app toolbar.
+### 1.0.12
+
+- 2026-03-27:
+  - added branding for app toolbar.
+  - updated Angular and packages.
 
 ### 1.0.11
 
