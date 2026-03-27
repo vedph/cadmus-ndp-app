@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy, computed } from '@angular/core';
 import { Thesaurus, ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { Router, RouterModule } from '@angular/router';
 import { take } from 'rxjs/operators';
@@ -50,7 +50,7 @@ import { DC_SCHEME } from './cit-schemes';
     MatToolbarModule,
     MatTooltipModule,
     GravatarPipe,
-    ThemeToggleComponent
+    ThemeToggleComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -63,20 +63,40 @@ export class App implements OnInit, OnDestroy {
   public itemBrowsers?: ThesaurusEntry[];
   public version: string;
 
+  readonly branding = computed(() => {
+    switch (this._env.get('branding')) {
+      case 'staging':
+        return {
+          bg: 'var(--mat-sys-tertiary)',
+          text: 'var(--mat-sys-on-tertiary)',
+        };
+      case 'dev':
+        return {
+          bg: 'var(--mat-sys-error)',
+          text: 'var(--mat-sys-on-error)',
+        };
+      default: // Production
+        return {
+          bg: 'var(--mat-sys-primary)',
+          text: 'var(--mat-sys-on-primary)',
+        };
+    }
+  });
+
   constructor(
     @Inject('itemBrowserKeys')
     private _itemBrowserKeys: { [key: string]: string },
     private _authService: AuthJwtService,
     private _appRepository: AppRepository,
     private _router: Router,
-    env: EnvService,
+    private _env: EnvService,
     storage: RamStorageService,
     viaf: ViafRefLookupService,
     zotero: ZoteroRefLookupService,
     mol: MolRefLookupService,
     biblissima: BiblissimaRefLookupService,
   ) {
-    this.version = env.get('version') || '';
+    this.version = this._env.get('version') || '';
 
     // configure citation schemes
     this.configureCitationService(storage);

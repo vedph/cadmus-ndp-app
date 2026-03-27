@@ -22,6 +22,8 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
+- 2026-03-27: added branding for app toolbar.
+
 ### 1.0.11
 
 - 2026-03-22:

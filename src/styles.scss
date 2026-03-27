@@ -150,3 +150,26 @@ mat-icon.mat-accent {
 .mat-accent {
   color: var(--mat-sys-tertiary);
 }
+
+.env-branded-toolbar {
+  // Use a variable that we will set via [style.--app-env-color]
+  background-color: var(--app-env-color, var(--mat-sys-primary)) !important;
+
+  // Ensure the text color contrasts correctly.
+  // If the background is a 'sys' color, the 'on-sys' color is its natural pair.
+  color: var(--app-env-on-color, var(--mat-sys-on-primary)) !important;
+
+  // Apply the same logic to internal component tokens (as you did in your original code)
+  --mat-toolbar-container-text-color: var(
+    --app-env-on-color,
+    var(--mat-sys-on-primary)
+  );
+  --mat-icon-button-icon-color: var(
+    --app-env-on-color,
+    var(--mat-sys-on-primary)
+  );
+  --mat-button-text-label-text-color: var(
+    --app-env-on-color,
+    var(--mat-sys-on-primary)
+  );
+}
