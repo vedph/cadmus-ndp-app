@@ -99,6 +99,7 @@
             <mat-panel-title>passage #{{ editedIndex() + 1 }}</mat-panel-title>
           </mat-expansion-panel-header>
           <cadmus-text-passage-editor
+            [citSchemeKey]="settings.value()?.citSchemeKey"
             [data]="edited()"
             [tagEntries]="tagEntries()"
             [featureEntries]="featureEntries()"

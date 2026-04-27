@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  resource,
+  ResourceLoaderParams,
   signal,
 } from '@angular/core';
 import {
@@ -46,6 +48,17 @@ import {
 } from '../text-passages-part';
 import { TextPassageEditorComponent } from '../text-passage-editor/text-passage-editor.component';
 
+/**
+ * Settings for this part.
+ */
+interface TextPassagesPartSettings {
+  /** Citation scheme key to use for parsing and formatting the citation. */
+  citSchemeKey?: string;
+}
+
+// define a type that represents only the data we need for the fetch
+type SettingRequest = { typeId: string; roleId: string | undefined } | null;
+
 @Component({
   selector: 'cadmus-text-passages-part',
   imports: [
@@ -74,6 +87,36 @@ export class TextPassagesPartComponent
 {
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<TextPassage | undefined>(undefined);
+
+  /**
+   * The settings for this part,
+   * Given that the setting getter returns a promise, we use resource
+   * to handle it reactively.
+   */
+  public readonly settings = resource({
+    params: (): SettingRequest => {
+      const id = this.identity();
+      if (!id) return null;
+      return {
+        typeId: id.typeId,
+        roleId: id.roleId ?? undefined,
+      };
+    },
+
+    loader: async ({
+      params,
+    }: ResourceLoaderParams<SettingRequest>): Promise<
+      TextPassagesPartSettings | undefined
+    > => {
+      if (!params || !this._appRepository) {
+        return undefined;
+      }
+      return await this._appRepository.getSettingFor<TextPassagesPartSettings>(
+        params.typeId,
+        params.roleId,
+      );
+    },
+  });
 
   // text-passage-tags
   public readonly tagEntries = signal<ThesaurusEntry[] | undefined>(undefined);

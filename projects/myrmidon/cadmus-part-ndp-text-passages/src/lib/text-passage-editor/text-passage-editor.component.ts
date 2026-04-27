@@ -68,12 +68,20 @@ export class TextPassageEditorComponent {
    */
   public readonly cancelEdit = output();
 
+  /**
+   * The citation scheme key to use for parsing and formatting the citation.
+   * If undefined or null, a free text citation is used.
+   * Default is 'dc' (Dante's Commedia).
+   */
+  public readonly citSchemeKey = input<string | undefined | null>('dc');
+
   // text-passage-tags
   public readonly tagEntries = input<ThesaurusEntry[] | undefined>();
   // text-passage-features
   public readonly featureEntries = input<ThesaurusEntry[] | undefined>();
 
   public citation: FormControl<Citation | CitationSpan | null>;
+  public freeCitation: FormControl<string | null>;
   public tag: FormControl<string | null>;
   public features: FormControl<ThesaurusEntry[]>;
   public text: FormControl<string | null>;
@@ -87,6 +95,9 @@ export class TextPassageEditorComponent {
     // form
     this.citation = formBuilder.control<Citation | CitationSpan | null>(null, {
       validators: Validators.required,
+    });
+    this.freeCitation = formBuilder.control<string | null>(null, {
+      validators: Validators.maxLength(100),
     });
     this.tag = formBuilder.control<string | null>(null, {
       validators: Validators.maxLength(100),
@@ -102,6 +113,7 @@ export class TextPassageEditorComponent {
     });
     this.form = formBuilder.group({
       citation: this.citation,
+      freeCitation: this.freeCitation,
       tag: this.tag,
       features: this.features,
       text: this.text,
@@ -119,16 +131,22 @@ export class TextPassageEditorComponent {
     if (!data) {
       this.form.reset();
     } else {
-      // parse as single citation or span
-      if (data.citation.includes(' - ')) {
-        this.citation.setValue(
-          this._citService.parseSpan(data.citation, 'dc') || null,
-        );
+      if (this.citSchemeKey()) {
+        // parse as single citation or span
+        if (data.citation.includes(' - ')) {
+          this.citation.setValue(
+            this._citService.parseSpan(data.citation, this.citSchemeKey()!) ||
+              null,
+          );
+        } else {
+          this.citation.setValue(
+            this._citService.parse(data.citation, this.citSchemeKey()!) || null,
+          );
+        }
       } else {
-        this.citation.setValue(
-          this._citService.parse(data.citation, 'dc') || null,
-        );
+        this.freeCitation.setValue(data.citation || null);
       }
+
       this.tag.setValue(data.tag || null);
       this.features.setValue(
         data.features
@@ -157,9 +175,11 @@ export class TextPassageEditorComponent {
 
   private getData(): TextPassage {
     return {
-      citation: this.citation.value
-        ? this._citService.toString(this.citation.value!)
-        : '',
+      citation: this.citSchemeKey()
+        ? this.citation.value
+          ? this._citService.toString(this.citation.value!)
+          : ''
+        : this.freeCitation.value || '',
       tag: this.tag.value || undefined,
       features: this.features.value?.length
         ? this.features.value.map((e) => e.id)

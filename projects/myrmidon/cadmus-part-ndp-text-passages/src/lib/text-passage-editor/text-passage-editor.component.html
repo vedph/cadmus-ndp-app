@@ -1,13 +1,25 @@
 <form [formGroup]="form" (submit)="save()">
   <!-- location -->
-  <fieldset>
-    <legend>location</legend>
-    <cadmus-refs-compact-citation
-      [schemeKeys]="['dc']"
-      [citation]="citation.value || undefined"
-      (citationChange)="onCitationChange($event!)"
-    />
-  </fieldset>
+  @if (!citSchemeKey()) {
+    <mat-form-field>
+      <mat-label>location</mat-label>
+      <input matInput [formControl]="freeCitation" />
+      @if (
+        $any(freeCitation).errors?.maxLength && (freeCitation.dirty || freeCitation.touched)
+      ) {
+        <mat-error>location too long</mat-error>
+      }
+    </mat-form-field>
+  } @else {
+    <fieldset>
+      <legend>location</legend>
+      <cadmus-refs-compact-citation
+        [schemeKeys]="[citSchemeKey()!]"
+        [citation]="citation.value || undefined"
+        (citationChange)="onCitationChange($event!)"
+      />
+    </fieldset>
+  }
   <div>
     <!-- tag (bound) -->
     @if (tagEntries()?.length) {
