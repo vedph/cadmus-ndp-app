@@ -5,7 +5,8 @@
       <mat-label>location</mat-label>
       <input matInput [formControl]="freeCitation" />
       @if (
-        $any(freeCitation).errors?.maxLength && (freeCitation.dirty || freeCitation.touched)
+        $any(freeCitation).errors?.maxLength &&
+        (freeCitation.dirty || freeCitation.touched)
       ) {
         <mat-error>location too long</mat-error>
       }
@@ -73,6 +74,12 @@
         <mat-error>note too long</mat-error>
       }
     </mat-form-field>
+  </div>
+  <!-- form validation -->
+  <div>
+    @if (form.hasError("atLeastOneRequired") && (form.touched || form.dirty)) {
+      <small class="mat-error">Please provide a citation.</small>
+    }
   </div>
   <!-- buttons -->
   <div>

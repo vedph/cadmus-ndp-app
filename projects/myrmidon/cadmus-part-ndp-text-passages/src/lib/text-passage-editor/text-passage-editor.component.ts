@@ -34,6 +34,7 @@ import { ThesaurusEntriesPickerComponent } from '@myrmidon/cadmus-thesaurus-stor
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { TextPassage } from '../text-passages-part';
+import { NgxToolsValidators } from '@myrmidon/ngx-tools';
 
 /**
  * Editor for a single text passage.
@@ -93,9 +94,7 @@ export class TextPassageEditorComponent {
     private _citService: CitSchemeService,
   ) {
     // form
-    this.citation = formBuilder.control<Citation | CitationSpan | null>(null, {
-      validators: Validators.required,
-    });
+    this.citation = formBuilder.control<Citation | CitationSpan | null>(null);
     this.freeCitation = formBuilder.control<string | null>(null, {
       validators: Validators.maxLength(100),
     });
@@ -111,14 +110,21 @@ export class TextPassageEditorComponent {
     this.note = formBuilder.control<string | null>(null, {
       validators: Validators.maxLength(5000),
     });
-    this.form = formBuilder.group({
-      citation: this.citation,
-      freeCitation: this.freeCitation,
-      tag: this.tag,
-      features: this.features,
-      text: this.text,
-      note: this.note,
-    });
+    this.form = formBuilder.group(
+      {
+        citation: this.citation,
+        freeCitation: this.freeCitation,
+        tag: this.tag,
+        features: this.features,
+        text: this.text,
+        note: this.note,
+      },
+      {
+        validators: [
+          NgxToolsValidators.atLeastOneRequired(['citation', 'freeCitation']),
+        ],
+      },
+    );
 
     // when model changes, update form
     effect(() => {

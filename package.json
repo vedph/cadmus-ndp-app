@@ -116,7 +116,7 @@
     "@myrmidon/cadmus-ui-object-view": "^0.0.4",
     "@myrmidon/cod-layout-view": "^2.0.2",
     "@myrmidon/ngx-mat-tools": "^1.0.2",
-    "@myrmidon/ngx-tools": "^2.0.2",
+    "@myrmidon/ngx-tools": "^2.0.3",
     "@myrmidon/paged-data-browsers": "^5.2.2",
     "@terraformer/wkt": "^2.2.1",
     "@types/geojson": "^7946.0.16",

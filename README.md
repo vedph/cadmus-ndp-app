@@ -22,7 +22,16 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## History
 
-- 2026-04-27: updated Angular and packages.
+- 2026-04-27:
+  - updated Angular and packages.
+  - 🆕⚠️ text passages is now independent from NDP logic by fetching citation schema from settings. If not specified in settings, there will be no schema and users can freely enter any text. Ensure that you add this to backend settings:
+
+```json
+"it.vedph.ndp.text-passages": {
+  "citSchemeKey": "dc"
+}
+```
+
 - 2026-04-04: updated Angular and packages.
 
 ### 1.0.13
