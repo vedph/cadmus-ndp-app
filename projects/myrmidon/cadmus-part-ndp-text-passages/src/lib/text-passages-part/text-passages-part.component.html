@@ -9,7 +9,7 @@
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div>
+      <div class="margin-bottom">
         <button
           type="button"
           mat-flat-button
@@ -94,22 +94,18 @@
         </table>
       }
       @if (edited()) {
-        <fieldset>
-          <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header>
-              <mat-panel-title
-                >passage #{{ editedIndex() + 1 }}</mat-panel-title
-              >
-            </mat-expansion-panel-header>
-            <cadmus-text-passage-editor
-              [data]="edited()"
-              [tagEntries]="tagEntries()"
-              [featureEntries]="featureEntries()"
-              (dataChange)="savePassage($event!)"
-              (cancelEdit)="closePassage()"
-            />
-          </mat-expansion-panel>
-        </fieldset>
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>passage #{{ editedIndex() + 1 }}</mat-panel-title>
+          </mat-expansion-panel-header>
+          <cadmus-text-passage-editor
+            [data]="edited()"
+            [tagEntries]="tagEntries()"
+            [featureEntries]="featureEntries()"
+            (dataChange)="savePassage($event!)"
+            (cancelEdit)="closePassage()"
+          />
+        </mat-expansion-panel>
       }
     </mat-card-content>
     <mat-card-actions>
