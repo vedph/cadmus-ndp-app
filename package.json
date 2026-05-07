@@ -23,19 +23,19 @@
     "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-tpp && pnpm run build-npg"
   },
   "private": true,
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@10.33.4",
   "dependencies": {
     "3d-force-graph": "^1.80.0",
-    "@angular/animations": "^21.2.10",
-    "@angular/cdk": "^21.2.8",
-    "@angular/common": "^21.2.10",
-    "@angular/compiler": "^21.2.10",
-    "@angular/core": "^21.2.10",
-    "@angular/forms": "^21.2.10",
-    "@angular/material": "^21.2.8",
-    "@angular/platform-browser": "^21.2.10",
-    "@angular/platform-browser-dynamic": "^21.2.10",
-    "@angular/router": "^21.2.10",
+    "@angular/animations": "^21.2.12",
+    "@angular/cdk": "^21.2.10",
+    "@angular/common": "^21.2.12",
+    "@angular/compiler": "^21.2.12",
+    "@angular/core": "^21.2.12",
+    "@angular/forms": "^21.2.12",
+    "@angular/material": "^21.2.10",
+    "@angular/platform-browser": "^21.2.12",
+    "@angular/platform-browser-dynamic": "^21.2.12",
+    "@angular/router": "^21.2.12",
     "@auth0/angular-jwt": "^5.2.0",
     "@cisstech/nge": "^18.3.0",
     "@maplibre/ngx-maplibre-gl": "^21.0.2",
@@ -123,21 +123,21 @@
     "echarts": "^6.0.0",
     "force-graph": "^1.51.4",
     "maplibre-gl": "^5.24.0",
-    "marked": "^18.0.2",
+    "marked": "^18.0.3",
     "monaco-editor": "^0.54.0",
     "ngx-echarts": "^21.0.0",
-    "ngx-markdown": "^21.2.0",
+    "ngx-markdown": "^21.3.0",
     "rxjs": "~7.8.0",
     "three.js": "^0.77.1",
     "ts-md5": "^2.0.1",
     "tslib": "^2.3.0",
-    "zone.js": "~0.16.1"
+    "zone.js": "~0.16.2"
   },
   "devDependencies": {
-    "@angular/build": "^21.2.8",
-    "@angular/cli": "^21.2.8",
-    "@angular/compiler-cli": "^21.2.10",
-    "@angular/localize": "^21.2.10",
+    "@angular/build": "^21.2.10",
+    "@angular/cli": "^21.2.10",
+    "@angular/compiler-cli": "^21.2.12",
+    "@angular/localize": "^21.2.12",
     "@types/jasmine": "~6.0.0",
     "jasmine-core": "~6.2.0",
     "jsdom": "^29.1.0",
@@ -151,7 +151,7 @@
     "vitest": "^4.1.5"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.60.2"
+    "@rollup/rollup-win32-arm64-msvc": "^4.60.3"
   },
   "pnpm": {
     "overrides": {
