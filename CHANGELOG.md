@@ -1,0 +1,199 @@
+# History
+
+- 2026-05-20:
+  - updated Angular and packages.
+  - ⚠️ migrated app to zoneless.
+- 2026-05-07: updated Angular and packages.
+
+## 1.0.14
+
+- 2026-04-27:
+  - updated Angular and packages.
+  - 🆕⚠️ text passages is now independent from NDP logic by fetching citation schema from settings. If not specified in settings, there will be no schema and users can freely enter any text. Ensure that you add this to backend settings:
+
+```json
+"it.vedph.ndp.text-passages": {
+  "citSchemeKey": "dc"
+}
+```
+
+- 2026-04-04: updated Angular and packages.
+
+## 1.0.13
+
+- 2026-03-30: updated packages (having minor fixes).
+
+## 1.0.12
+
+- 2026-03-27:
+  - added branding for app toolbar.
+  - updated Angular and packages.
+
+## 1.0.11
+
+- 2026-03-22:
+  - 🆕 added facet editor, updating app routes and admin menus accordingly.
+  - updated Angular and packages.
+
+## 1.0.10
+
+- 2026-03-18:
+  - updated Angular and packages.
+  - 🆕 migrated shell app to M3 themes and added dark theme support to components.
+  - removed `@myrmidon/cadmus-ui-pg`.
+
+## 1.0.9
+
+- 2026-03-12: updated Angular and packages (Codicology has fixes and new step feature for sheet labels).
+
+## 1.0.8
+
+- 2026-03-05: updated Angular and packages.
+- 2026-03-03: 🆕 added new text passages part.
+- 2026-03-01:
+  - updated Angular and packages.
+  - ⚠️ migrated to `OnPush`.
+- 2026-02-25: updated login page.
+
+## 1.0.7
+
+- 2026-02-17:
+  - added import facets and settings pages.
+  - updated packages and added dependencies for geo packages.
+- 2026-02-16: updated Angular and packages.
+- 2026-02-09: updated Angular and packages.
+
+## 1.0.6
+
+- 2026-02-05:
+  - updated Angular and packages.
+  - added `lookupProviderOptions` wherever lookup components are used, getting data from settings and changing the corresponding part thesauri to be role-dependent.
+
+## 1.0.5
+
+- 2026-02-03: updated packages.
+- 2026-02-01:
+  - updated Angular and packages.
+  - added logos to homepage.
+
+## 1.0.4
+
+- 2026-01-22:
+  - updated Angular and packages.
+  - added downloadable PDF policy to the homepage.
+- 2026-01-17:
+  - updated Angular and packages.
+  - added `asserted-id-features` thesaurus wherever asserted composite IDs was used.
+
+## 1.0.3
+
+- 2025-12-29: updated Angular and packages.
+- 2025-12-19: updated Angular.
+
+## 1.0.2
+
+- 2025-12-12: updated Angular.
+- 2025-12-04: updated Angular and packages.
+
+## 1.0.1
+
+- 2025-11-28:
+  - updated packages (fix to codicology sheet labels).
+  - updated Angular.
+- 2025-11-27:
+  - 🆕 added MOL lookup.
+  - updated Angular.
+
+## 1.0.0
+
+- 2025-11-26: Docker.
+- 2025-11-24:
+  - ⚠️ upgraded to Angular 21.
+  - migrated to `pnpm`.
+
+## 0.0.8
+
+- 2025-11-10: fixes to figurative plan part editor.
+- 2025-11-09: updated packages (shelfmarks with city from libraries option).
+- 2025-11-07:
+  - updated Angular and packages.
+  - disable value/referenceForm when operations are present in notable word form editor.
+- 2025-11-03: updated Angular and packages.
+- 2025-10-31: fixes to notable word form editor.
+- 2025-10-28:
+  - updated packages.
+  - adding notable word form entries.
+
+## 0.0.7
+
+- 2025-10-23:
+  - updated Angular and packages.
+  - generated Docker image and updated Docker script.
+- 2025-10-17:
+  - updated Angular and packages.
+  - minor UI improvements.
+- 2025-10-15:
+  - updated packages.
+  - better UI for drawing techniques.
+- 2025-10-14:
+  - updated `@myrmidon/cod-layout-view` after fix.
+  - added missing flags part in part editor keys.
+  - fixes in figurative plan implementation editor.
+
+## 0.0.6
+
+- 2025-10-14: updated packages.
+- 2025-10-08: updated Angular and packages.
+
+## 0.0.5
+
+- 2025-10-06:
+  - added iconography parts.
+  - generated Docker image.
+
+## 0.0.4
+
+- 2025-10-03:
+  - updated Angular and packages.
+  - removed biblio packages and config (going to use Zotero).
+  - generated Docker image.
+- 2025-10-02: updated Angular and packages.
+- 2025-09-26:
+  - updated philology and bricks packages.
+  - removed `diff-match-patch` package.
+  - ⚠️ refactored to remove bibliography and use Zotero via references.
+
+## 0.0.3
+
+- 2025-09-24: updated packages.
+
+## 0.0.2
+
+- 2025-09-19: updated packages.
+- 2025-09-16:
+  - refactored for full reactivity.
+  - updated Angular and packages.
+- 2025-08-28: updated Angular and packages.
+- 2025-08-18: added figurative plan part editor.
+- 2025-08-17: adding figurative plan item editor and its dependencies.
+- 2025-08-14:
+  - added features to FRAC layout part and let it opt in for role-dependent thesauri. This allows using this part also for printed books.
+  - added books figurative plan library.
+- 2025-08-07:
+  - updated Angular and packages.
+  - updated Docker compose bibliography API version.
+- 2025-07-24:
+  - updated Angular and packages.
+  - added JWT URI exception for VIAF.
+  - replaced guards and interceptor.
+- 2025-07-23: updated Angular and packages.
+- 2025-07-17:
+  - updated Angular and packages.
+  - added citation configurations.
+
+## 0.0.1
+
+- 2025-07-16: updated Angular and packages.
+- 2025-07-14:
+  - updated Angular.
+  - updated packages after replacing graph rendering library in walker. This implied installing `force.graph` and `three.js`.
