@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpdrw-pg",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Cadmus - NDP drawing editors wrappers.",
   "keywords": [
     "Cadmus",
@@ -15,9 +15,9 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^21.2.6",
-    "@angular/core": "^21.2.6",
-    "@angular/material": "^21.2.4"
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/material": "^22.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

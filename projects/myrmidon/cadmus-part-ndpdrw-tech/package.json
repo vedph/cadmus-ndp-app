@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpdrw-tech",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "Cadmus - NDP drawings techniques.",
   "keywords": [
     "Cadmus",
@@ -15,13 +15,13 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^21.2.6",
-    "@angular/core": "^21.2.6",
-    "@angular/material": "^21.2.4",
-    "@myrmidon/auth-jwt-login": "^8.0.6",
-    "@myrmidon/cadmus-core": "^12.0.4",
-    "@myrmidon/cadmus-mat-physical-size": "^9.0.12",
-    "@myrmidon/cadmus-ui-flag-set": "^9.0.4"
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "@myrmidon/auth-jwt-login": "^9.0.0",
+    "@myrmidon/cadmus-core": "^13.0.0",
+    "@myrmidon/cadmus-mat-physical-size": "^10.0.0",
+    "@myrmidon/cadmus-ui-flag-set": "^10.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

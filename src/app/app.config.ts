@@ -7,6 +7,7 @@ import {
   provideHttpClient,
   withInterceptors,
   withJsonpSupport,
+  withXhr
 } from '@angular/common/http';
 import { provideRouter, withViewTransitions } from '@angular/router';
 
@@ -51,7 +52,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes, withViewTransitions()),
     provideNativeDateAdapter(),
-    provideHttpClient(withInterceptors([jwtInterceptor]), withJsonpSupport()),
+    provideHttpClient(withXhr(), withInterceptors([jwtInterceptor]), withJsonpSupport()),
     // vendor
     importProvidersFrom(NgeMonacoModule.forRoot({})),
     importProvidersFrom(NgeMarkdownModule),

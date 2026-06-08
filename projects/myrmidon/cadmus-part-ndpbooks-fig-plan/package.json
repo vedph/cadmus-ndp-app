@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpbooks-fig-plan",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "description": "Cadmus - printed books figurative plan part.",
   "keywords": [
     "Cadmus",
@@ -15,10 +15,10 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^21.2.6",
-    "@angular/core": "^21.2.6",
-    "@angular/material": "^21.2.4",
-    "@myrmidon/cadmus-part-ndpbooks-fonts": "^0.0.3"
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "@myrmidon/cadmus-part-ndpbooks-fonts": "^0.0.5"
   },
   "dependencies": {
     "tslib": "^2.3.0"

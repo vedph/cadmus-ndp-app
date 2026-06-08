@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -12,6 +12,7 @@ import { TextPassagesPartComponent } from '../text-passages-part/text-passages-p
   selector: 'cadmus-text-passages-part-feature',
   imports: [CurrentItemBarComponent, TextPassagesPartComponent],
   templateUrl: './text-passages-part-feature.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './text-passages-part-feature.component.css',
 })
 export class TextPassagesPartFeatureComponent
