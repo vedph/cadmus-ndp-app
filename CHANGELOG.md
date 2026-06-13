@@ -1,5 +1,6 @@
 # History
 
+- 2026-03-13: ⚠️ migrated to new [Monaco wrapper](https://vedph.github.io/cadmus-doc/history/20260613-monaco.html).
 - 2026-06-08: ⚠️ upgraded to Angular 22.
 - 2026-05-20:
   - updated Angular and packages.
