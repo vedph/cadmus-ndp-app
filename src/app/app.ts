@@ -1,4 +1,12 @@
-import { Component, OnInit, Inject, OnDestroy, computed, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  OnDestroy,
+  computed,
+  ChangeDetectionStrategy,
+  inject,
+} from '@angular/core';
 import { Thesaurus, ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { Router, RouterModule } from '@angular/router';
 import { take } from 'rxjs/operators';
@@ -26,6 +34,7 @@ import {
   LOOKUP_CONFIGS_KEY,
   RefLookupConfig,
 } from '@myrmidon/cadmus-refs-lookup';
+import { IconclassRefLookupService } from '@myrmidon/cadmus-refs-iconclass-lookup';
 import { ViafRefLookupService } from '@myrmidon/cadmus-refs-viaf-lookup';
 import { ZoteroRefLookupService } from '@myrmidon/cadmus-refs-zotero-lookup';
 import { MolRefLookupService } from '@myrmidon/cadmus-refs-mol-lookup';
@@ -91,18 +100,16 @@ export class App implements OnInit, OnDestroy {
     private _appRepository: AppRepository,
     private _router: Router,
     private _env: EnvService,
-    storage: RamStorageService,
-    viaf: ViafRefLookupService,
-    zotero: ZoteroRefLookupService,
-    mol: MolRefLookupService,
-    biblissima: BiblissimaRefLookupService,
   ) {
     this.version = this._env.get('version') || '';
+
+    const storage = inject(RamStorageService);
 
     // configure citation schemes
     this.configureCitationService(storage);
 
     // configure external lookup for asserted composite IDs
+    const mol = inject(MolRefLookupService);
     storage.store(LOOKUP_CONFIGS_KEY, [
       // Zotero
       {
@@ -110,7 +117,7 @@ export class App implements OnInit, OnDestroy {
         iconUrl: '/img/zotero128.png',
         description: 'Zotero bibliography',
         label: 'ID',
-        service: zotero,
+        service: inject(ZoteroRefLookupService),
         itemIdGetter: (item: any) =>
           item ? `${item.library?.id}/${item.key}` : '',
         itemLabelGetter: (item: any) => {
@@ -142,14 +149,25 @@ export class App implements OnInit, OnDestroy {
           return sb.join('');
         },
       },
+      // Biblissima+
       {
         name: 'Biblissima+',
         iconUrl: '/img/biblissima128.png',
         description: 'Biblissima+ knowledge base',
         label: 'entity',
-        service: biblissima,
+        service: inject(BiblissimaRefLookupService),
         itemIdGetter: (item: BiblissimaCandidate) => item?.id,
         itemLabelGetter: (item: BiblissimaCandidate) => item?.name,
+      },
+      // ICONCLASS
+      {
+        name: 'Iconclass',
+        iconUrl: '/img/iconclass128.png',
+        description: 'Iconclass classification system',
+        label: 'ID',
+        service: inject(IconclassRefLookupService),
+        itemIdGetter: (item: any) => item?.n,
+        itemLabelGetter: (item: any) => item?.txt?.en,
       },
       // VIAF
       {
@@ -157,7 +175,7 @@ export class App implements OnInit, OnDestroy {
         iconUrl: '/img/viaf128.png',
         description: 'Virtual International Authority File',
         label: 'ID',
-        service: viaf,
+        service: inject(ViafRefLookupService),
         itemIdGetter: (item: any) => item?.viafid,
         itemLabelGetter: (item: any) => item?.term,
       },

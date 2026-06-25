@@ -23,7 +23,7 @@
     "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-tpp && pnpm run build-npg"
   },
   "private": true,
-  "packageManager": "pnpm@11.6.0",
+  "packageManager": "pnpm@11.9.0",
   "dependencies": {
     "3d-force-graph": "^1.80.0",
     "@angular/animations": "^22.0.1",
@@ -96,6 +96,7 @@
     "@myrmidon/cadmus-refs-doc-references": "^11.0.0",
     "@myrmidon/cadmus-refs-external-ids": "^11.0.0",
     "@myrmidon/cadmus-refs-historical-date": "^10.0.0",
+    "@myrmidon/cadmus-refs-iconclass-lookup": "^0.0.1",
     "@myrmidon/cadmus-refs-lookup": "^11.0.0",
     "@myrmidon/cadmus-refs-mol-lookup": "^1.0.0",
     "@myrmidon/cadmus-refs-mufi-lookup": "^3.0.0",
@@ -149,10 +150,10 @@
     "karma-jasmine-html-reporter": "~2.2.0",
     "ng-packagr": "^22.0.0",
     "typescript": "~6.0.3",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.9"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.62.0"
+    "@rollup/rollup-win32-arm64-msvc": "^4.62.2"
   },
   "pnpm": {
     "overrides": {

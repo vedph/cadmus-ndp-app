@@ -4,8 +4,10 @@ import {
   provideZonelessChangeDetection,
 } from '@angular/core';
 import {
+  HTTP_INTERCEPTORS,
   provideHttpClient,
   withInterceptors,
+  withInterceptorsFromDi,
   withJsonpSupport,
   withXhr,
 } from '@angular/common/http';
@@ -37,6 +39,10 @@ import {
   CADMUS_TEXT_ED_SERVICE_OPTIONS_TOKEN,
   CadmusTextEdService,
 } from '@myrmidon/cadmus-text-ed';
+import {
+  PROXY_INTERCEPTOR_OPTIONS,
+  ProxyInterceptor,
+} from '@myrmidon/cadmus-refs-lookup';
 
 // locals
 import { routes } from './app.routes';
@@ -58,6 +64,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withXhr(),
       withInterceptors([jwtInterceptor]),
+      withInterceptorsFromDi(),
       withJsonpSupport(),
     ),
     // vendor
@@ -92,6 +99,16 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AUTH_JWT_EXCLUDED_URLS,
       useValue: ['https://viaf.org/viaf/'],
+    },
+    // proxy interceptor
+    { provide: HTTP_INTERCEPTORS, useClass: ProxyInterceptor, multi: true },
+    {
+      provide: PROXY_INTERCEPTOR_OPTIONS,
+      useValue: {
+        proxyUrl:
+          (window as any).__env?.proxyUrl || 'http://localhost:5172/api/proxy',
+        urls: ['https://iconclass.org'],
+      },
     },
     // Zotero
     {
