@@ -1,5 +1,6 @@
 # History
 
+- 2026-07-28: upgraded to Maplibre v6.
 - 2026-07-01: updated packages.
 - 2026-06-25:
   - updated Angular and packages.

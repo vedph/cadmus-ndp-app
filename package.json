@@ -23,7 +23,7 @@
     "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-tpp && pnpm run build-npg"
   },
   "private": true,
-  "packageManager": "pnpm@11.10.0",
+  "packageManager": "pnpm@11.17.0",
   "dependencies": {
     "3d-force-graph": "^1.80.0",
     "@angular/animations": "^22.0.1",
@@ -37,9 +37,8 @@
     "@angular/platform-browser-dynamic": "^22.0.1",
     "@angular/router": "^22.0.1",
     "@auth0/angular-jwt": "^5.2.0",
-    "@cisstech/nge": "^18.3.0",
     "@jean-merelis/ngx-monaco-editor": "^21.0.0",
-    "@maplibre/ngx-maplibre-gl": "^21.0.2",
+    "@maplibre/ngx-maplibre-gl": "^22.0.0",
     "@myrmidon/auth-jwt-admin": "^10.0.0",
     "@myrmidon/auth-jwt-login": "^10.0.0",
     "@myrmidon/cadmus-api": "^15.0.1",
@@ -48,7 +47,7 @@
     "@myrmidon/cadmus-core": "^13.0.0",
     "@myrmidon/cadmus-flags-pg": "^16.0.0",
     "@myrmidon/cadmus-flags-ui": "^16.0.0",
-    "@myrmidon/cadmus-geo-location": "^1.0.0",
+    "@myrmidon/cadmus-geo-location": "^1.0.1",
     "@myrmidon/cadmus-graph-pg": "^16.0.0",
     "@myrmidon/cadmus-graph-pg-ex": "^17.0.0",
     "@myrmidon/cadmus-graph-ui": "^16.0.0",
@@ -74,9 +73,9 @@
     "@myrmidon/cadmus-part-epigraphy-support-frr": "^13.0.0",
     "@myrmidon/cadmus-part-general-pg": "^18.0.0",
     "@myrmidon/cadmus-part-general-ui": "^18.0.1",
-    "@myrmidon/cadmus-part-geo-asserted-locations": "^12.1.3",
-    "@myrmidon/cadmus-part-geo-asserted-toponyms": "^11.1.3",
-    "@myrmidon/cadmus-part-geo-pg": "^11.0.3",
+    "@myrmidon/cadmus-part-geo-asserted-locations": "^12.1.4",
+    "@myrmidon/cadmus-part-geo-asserted-toponyms": "^11.1.4",
+    "@myrmidon/cadmus-part-geo-pg": "^11.0.4",
     "@myrmidon/cadmus-part-iconography-instructions": "^1.0.0",
     "@myrmidon/cadmus-part-iconography-pg": "^1.0.0",
     "@myrmidon/cadmus-part-philology-pg": "^18.0.0",
@@ -87,7 +86,7 @@
     "@myrmidon/cadmus-profile-editor": "^1.0.0",
     "@myrmidon/cadmus-profile-import": "^1.0.0",
     "@myrmidon/cadmus-refs-asserted-chronotope": "^12.0.0",
-    "@myrmidon/cadmus-refs-asserted-ids": "^11.0.0",
+    "@myrmidon/cadmus-refs-asserted-ids": "^11.0.1",
     "@myrmidon/cadmus-refs-assertion": "^11.0.0",
     "@myrmidon/cadmus-refs-biblissima-lookup": "^11.0.0",
     "@myrmidon/cadmus-refs-citation": "^2.0.0",
@@ -124,7 +123,7 @@
     "@types/geojson": "^7946.0.16",
     "echarts": "^6.1.0",
     "force-graph": "^1.51.4",
-    "maplibre-gl": "^5.24.0",
+    "maplibre-gl": "^6.0.0",
     "marked": "^18.0.5",
     "monaco-editor": "^0.47.0",
     "ngx-echarts": "^22.0.0",
@@ -142,18 +141,18 @@
     "@types/jasmine": "~6.0.0",
     "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~6.3.0",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.2.0",
-    "ng-packagr": "^22.0.1",
+    "ng-packagr": "^22.0.2",
     "typescript": "~6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.62.2"
+    "@rollup/rollup-win32-arm64-msvc": "^4.62.3"
   },
   "pnpm": {
     "overrides": {
