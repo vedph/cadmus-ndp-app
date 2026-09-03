@@ -1,5 +1,6 @@
 # History
 
+- 2026-09-03: updated packages (including signal-based bricks).
 - 2026-07-28: upgraded to Maplibre v6.
 - 2026-07-01: updated packages.
 - 2026-06-25:
