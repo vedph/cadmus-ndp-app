@@ -1,5 +1,6 @@
 # History
 
+- 2026-09-08: 🆕 added configuration for taxonomies (topics, subjects, descriptors).
 - 2026-09-05: updated packages.
 - 2026-09-03: updated packages (including signal-based bricks).
 - 2026-07-28: upgraded to Maplibre v6.

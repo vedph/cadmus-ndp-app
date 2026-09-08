@@ -42,6 +42,10 @@ import {
   BiblissimaCandidate,
   BiblissimaRefLookupService,
 } from '@myrmidon/cadmus-refs-biblissima-lookup';
+import {
+  LOOKUP_TAXOSTORE_CONFIGS_KEY,
+  TaxoStoreLookupConfig,
+} from '@myrmidon/cadmus-refs-asserted-ids';
 
 // cadmus
 import { AppRepository } from '@myrmidon/cadmus-state';
@@ -190,6 +194,9 @@ export class App implements OnInit, OnDestroy {
         itemLabelGetter: (item: any) => mol.getName(item),
       },
     ] as RefLookupConfig[]);
+
+    // configure TaxoStore
+    this.configureTaxoLookup(storage);
   }
 
   private configureCitationService(storage: RamStorageService): void {
@@ -200,6 +207,32 @@ export class App implements OnInit, OnDestroy {
         dc: DC_SCHEME,
       },
     } as CitSchemeSettings);
+  }
+
+  private configureTaxoLookup(storage: RamStorageService): void {
+    storage.store(LOOKUP_TAXOSTORE_CONFIGS_KEY, [
+      {
+        treeId: 'topics',
+        treeName: 'topics',
+        canEdit: true,
+        canAdd: true,
+        canDelete: false,
+      },
+      {
+        treeId: 'subjects',
+        treeName: 'subjects',
+        canEdit: true,
+        canAdd: true,
+        canDelete: false,
+      },
+      {
+        treeId: 'descriptors',
+        treeName: 'descriptors',
+        canEdit: true,
+        canAdd: true,
+        canDelete: false,
+      },
+    ] as TaxoStoreLookupConfig[]);
   }
 
   public ngOnInit(): void {

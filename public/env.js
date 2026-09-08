@@ -5,13 +5,15 @@
   // environment-dependent settings
   window.__env.apiUrl = "http://localhost:5172/api/";
   // window.__env.biblioApiUrl = "http://localhost:60058/api/";
-  window.__env.version = "1.0.14";
+  window.__env.version = "2.0.0";
   // enable thesaurus import in thesaurus list for admins
   window.__env.thesImportEnabled = true;
   // MOL
   window.__env.molUrl = "http://localhost:5172/api/";
   // MUFI
   window.__env.mufiUrl = "http://localhost:5172/api/";
+  // Taxo
+  window.__env.taxoUrl = "http://localhost:5172/api/";
   // Zotero
   window.__env.zoteroApiKey = "TODO:YOUR_ZOTERO_KEY";
   window.__env.zoteroUserId = "TODO:YOUR_ZOTERO_USER_ID";
