@@ -232,6 +232,13 @@ export class App implements OnInit, OnDestroy {
         canAdd: true,
         canDelete: false,
       },
+      {
+        treeId: 'toponyms',
+        treeName: 'toponyms',
+        canEdit: false,
+        canAdd: false,
+        canDelete: false,
+      },
     ] as TaxoStoreLookupConfig[]);
   }
 
