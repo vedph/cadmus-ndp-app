@@ -351,6 +351,12 @@ export class PrintFigPlanPartComponent
     this.items.setValue(items);
     this.items.markAsDirty();
     this.items.updateValueAndValidity();
+    // keep editedIndex in sync
+    if (this.editedIndex() === index) {
+      this.editedIndex.set(index - 1);
+    } else if (this.editedIndex() === index - 1) {
+      this.editedIndex.set(index);
+    }
   }
 
   public moveItemDown(index: number): void {
@@ -364,6 +370,12 @@ export class PrintFigPlanPartComponent
     this.items.setValue(items);
     this.items.markAsDirty();
     this.items.updateValueAndValidity();
+    // keep editedIndex in sync
+    if (this.editedIndex() === index) {
+      this.editedIndex.set(index + 1);
+    } else if (this.editedIndex() === index + 1) {
+      this.editedIndex.set(index);
+    }
   }
 
   protected getValue(): PrintFigPlanPart {

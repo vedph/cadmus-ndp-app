@@ -253,6 +253,7 @@ export class FigPlanImplItemEditorComponent {
       this.iconographyId.setValue(item.iconographyId || null, {
         emitEvent: false,
       });
+      this.features.setValue(item.features || [], { emitEvent: false });
       this.size.setValue(item.size || null, { emitEvent: false });
       this.matrixType.setValue(item.matrixType || null, { emitEvent: false });
       this.matrixState.setValue(item.matrixState || null, { emitEvent: false });
@@ -369,6 +370,12 @@ export class FigPlanImplItemEditorComponent {
     this.labels.setValue(entries);
     this.labels.markAsDirty();
     this.labels.updateValueAndValidity();
+    // keep editedLabelIndex in sync
+    if (this.editedLabelIndex() === index) {
+      this.editedLabelIndex.set(index - 1);
+    } else if (this.editedLabelIndex() === index - 1) {
+      this.editedLabelIndex.set(index);
+    }
   }
 
   public moveLabelDown(index: number): void {
@@ -382,6 +389,12 @@ export class FigPlanImplItemEditorComponent {
     this.labels.setValue(entries);
     this.labels.markAsDirty();
     this.labels.updateValueAndValidity();
+    // keep editedLabelIndex in sync
+    if (this.editedLabelIndex() === index) {
+      this.editedLabelIndex.set(index + 1);
+    } else if (this.editedLabelIndex() === index + 1) {
+      this.editedLabelIndex.set(index);
+    }
   }
   //#endregion
 

@@ -40,6 +40,8 @@ export class PrintFigPlanImplPartFeatureComponent
 
   protected override getReqThesauriIds(): string[] {
     return [
+      'fig-plan-techniques',
+      'fig-plan-impl-features',
       'fig-plan-types',
       'fig-plan-impl-positions',
       'fig-plan-impl-change-types',
