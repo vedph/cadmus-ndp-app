@@ -169,7 +169,13 @@ export class CodFrLayoutPartComponent
   }
 
   private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'cod-fr-layout-prickings';
+    let key = 'cod-fr-layout-features';
+    if (this.hasThesaurus(key)) {
+      this.featureEntries.set(thesauri[key].entries);
+    } else {
+      this.featureEntries.set(undefined);
+    }
+    key = 'cod-fr-layout-prickings';
     if (this.hasThesaurus(key)) {
       this.prickingEntries.set(thesauri[key].entries);
     } else {
@@ -273,5 +279,9 @@ export class CodFrLayoutPartComponent
     this.formula.setValue(data.formula);
     this.formula.markAsDirty();
     this.formula.updateValueAndValidity();
+
+    this.dimensions.setValue(data.dimensions || []);
+    this.dimensions.markAsDirty();
+    this.dimensions.updateValueAndValidity();
   }
 }

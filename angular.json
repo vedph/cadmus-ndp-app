@@ -233,10 +233,9 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.spec.json",
-            "polyfills": []
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.spec.json"
           }
         }
       }
