@@ -298,6 +298,12 @@ export class PrintFontsPartComponent
     this.fonts.setValue(fonts);
     this.fonts.markAsDirty();
     this.fonts.updateValueAndValidity();
+    // keep editedIndex in sync
+    if (this.editedIndex() === index) {
+      this.editedIndex.set(index - 1);
+    } else if (this.editedIndex() === index - 1) {
+      this.editedIndex.set(index);
+    }
   }
 
   public moveFontDown(index: number): void {
@@ -311,5 +317,11 @@ export class PrintFontsPartComponent
     this.fonts.setValue(fonts);
     this.fonts.markAsDirty();
     this.fonts.updateValueAndValidity();
+    // keep editedIndex in sync
+    if (this.editedIndex() === index) {
+      this.editedIndex.set(index + 1);
+    } else if (this.editedIndex() === index + 1) {
+      this.editedIndex.set(index);
+    }
   }
 }

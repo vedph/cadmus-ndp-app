@@ -1,23 +1,125 @@
+import { Component, input, model, output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject } from 'rxjs';
+
+import { ItemService, ThesaurusService } from '@myrmidon/cadmus-api';
+import { PartEditorService } from '@myrmidon/cadmus-state';
+import { CurrentItemBarComponent } from '@myrmidon/cadmus-item-editor';
 
 import { PrintFontsPartFeatureComponent } from './print-fonts-part-feature.component';
+import { PrintFontsPartComponent } from '../print-fonts-part/print-fonts-part.component';
 
-describe('PrintFontsPartFeatureComponent', () => {
-  let component: PrintFontsPartFeatureComponent;
+function makeRoute(): ActivatedRoute {
+  return {
+    snapshot: {
+      params: { iid: 'item1', pid: 'part1' },
+      routeConfig: { path: 'it.vedph.ndp.print-fonts/:pid' },
+      queryParams: {},
+    },
+  } as unknown as ActivatedRoute;
+}
+
+describe('PrintFontsPartFeatureComponent (constructor/getReqThesauriIds)', () => {
+  function createFeature() {
+    const router = { navigate: vi.fn() };
+    const snackbar = { open: vi.fn() };
+    const editorService = {
+      loading$: new Subject<boolean>(),
+      saving$: new Subject<boolean>(),
+      load: vi.fn().mockResolvedValue(undefined),
+      save: vi.fn(),
+    };
+    const feature = new PrintFontsPartFeatureComponent(
+      router as unknown as Router,
+      makeRoute(),
+      snackbar as unknown as MatSnackBar,
+      {} as unknown as ItemService,
+      {} as unknown as ThesaurusService,
+      editorService as unknown as PartEditorService,
+    );
+    return { feature, editorService };
+  }
+
+  it('should require all the print-fonts related thesauri', () => {
+    const { feature } = createFeature();
+
+    const ids = (feature as any).getReqThesauriIds();
+
+    expect(ids).toEqual([
+      'print-font-families',
+      'print-layout-sections',
+      'print-font-features',
+      'doc-reference-types',
+      'doc-reference-tags',
+      'assertion-tags',
+      'external-id-tags',
+      'external-id-scopes',
+      'asserted-id-features',
+    ]);
+  });
+
+  it('should enable role-suffixed thesauri lookup already from the constructor', () => {
+    const { feature } = createFeature();
+
+    expect((feature as any).roleIdInThesauri).toBe(true);
+  });
+});
+
+@Component({
+  selector: 'cadmus-current-item-bar',
+  template: '',
+})
+class MockCurrentItemBarComponent {}
+
+@Component({
+  selector: 'cadmus-print-fonts-part',
+  template: '',
+})
+class MockPrintFontsPartComponent {
+  public readonly identity = input<unknown>();
+  public readonly data = model<unknown>();
+  public readonly editorClose = output();
+  public readonly dirtyChange = output<boolean>();
+}
+
+describe('PrintFontsPartFeatureComponent (TestBed wiring)', () => {
   let fixture: ComponentFixture<PrintFontsPartFeatureComponent>;
 
   beforeEach(async () => {
+    const editorService = {
+      loading$: new Subject<boolean>(),
+      saving$: new Subject<boolean>(),
+      load: vi.fn().mockResolvedValue(undefined),
+      save: vi.fn(),
+    };
+
     await TestBed.configureTestingModule({
-      imports: [PrintFontsPartFeatureComponent]
+      imports: [PrintFontsPartFeatureComponent],
+      providers: [
+        { provide: ActivatedRoute, useValue: makeRoute() },
+        { provide: ItemService, useValue: {} },
+        { provide: ThesaurusService, useValue: {} },
+        { provide: PartEditorService, useValue: editorService },
+      ],
     })
-    .compileComponents();
+      .overrideComponent(PrintFontsPartFeatureComponent, {
+        remove: {
+          imports: [CurrentItemBarComponent, PrintFontsPartComponent],
+        },
+        add: {
+          imports: [MockCurrentItemBarComponent, MockPrintFontsPartComponent],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(PrintFontsPartFeatureComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });
