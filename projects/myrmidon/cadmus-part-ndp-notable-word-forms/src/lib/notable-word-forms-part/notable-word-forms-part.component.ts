@@ -325,6 +325,12 @@ export class NotableWordFormsPartComponent
     this.entries.setValue(entries);
     this.entries.markAsDirty();
     this.entries.updateValueAndValidity();
+    // keep editedIndex in sync
+    if (this.editedIndex() === index) {
+      this.editedIndex.set(index - 1);
+    } else if (this.editedIndex() === index - 1) {
+      this.editedIndex.set(index);
+    }
   }
 
   public moveFormDown(index: number): void {
@@ -338,5 +344,11 @@ export class NotableWordFormsPartComponent
     this.entries.setValue(entries);
     this.entries.markAsDirty();
     this.entries.updateValueAndValidity();
+    // keep editedIndex in sync
+    if (this.editedIndex() === index) {
+      this.editedIndex.set(index + 1);
+    } else if (this.editedIndex() === index + 1) {
+      this.editedIndex.set(index);
+    }
   }
 }

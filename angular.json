@@ -393,10 +393,9 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/cadmus-part-ndp-notable-word-forms/tsconfig.spec.json",
-            "polyfills": []
+            "tsConfig": "projects/myrmidon/cadmus-part-ndp-notable-word-forms/tsconfig.spec.json"
           }
         }
       }

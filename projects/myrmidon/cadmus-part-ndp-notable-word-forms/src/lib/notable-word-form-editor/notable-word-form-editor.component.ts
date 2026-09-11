@@ -29,7 +29,6 @@ import { MatTooltip } from '@angular/material/tooltip';
 
 import {
   LookupDocReferencesComponent,
-  LookupDocReferenceComponent,
   LookupProviderOptions,
 } from '@myrmidon/cadmus-refs-lookup';
 import {
@@ -66,7 +65,6 @@ import { NotableWordForm } from '../notable-word-forms-part';
     EditOperationSetComponent,
     LookupDocReferencesComponent,
     AssertedCompositeIdsComponent,
-    LookupDocReferenceComponent,
   ],
   templateUrl: './notable-word-form-editor.component.html',
   styleUrl: './notable-word-form-editor.component.css',
