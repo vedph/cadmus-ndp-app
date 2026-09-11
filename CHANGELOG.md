@@ -1,5 +1,15 @@
 # History
 
+- 2026-09-11: ⚠️ migrated tests from Karma to ViTest and implemented them. Bugs found and fixed while writing tests:
+  - autoInstallPeers/pnpm phantom zone.js breaking Vitest for every library (infra-level).
+  - repeated `editedIndex` desync bug in moveXUp/moveXDown across 6 different components (notable-word-forms, print-fonts, cod-fr-layout, cod-fr-quire-labels, cod-fr-rulings, print-fig-plan × 2, fig-plan-item-label-editor, fig-plan-impl-item-editor) — reordering the item being edited left the index pointing at the wrong entry, so a subsequent save could silently overwrite the wrong record.
+  - reference-equality "selected" row bug (comparing an array entry to a structuredClone/deepCopy snapshot, always false) in several of the same components.
+  - `cod-fr-layout`: featureEntries never populated from its thesaurus, so the features UI could never appear.
+  - `cod-fr-layout`: editing dimensions in the layout-formula editor was silently dropped on save.
+  - `cod-fr-ruling-editor`: a misplaced template brace hid the "note" field whenever no feature thesaurus was configured.
+  - `fig-plan-impl-item-editor`: features was never restored when loading an existing item.
+  - `print-fig-plan-impl-part-feature`: never requested the fig-plan-techniques/fig-plan-impl-features thesauri its own part component needs, so those UI sections could never populate in production.
+
 - 2026-09-08: 🆕 added configuration for taxonomies (topics, subjects, descriptors).
 - 2026-09-05: updated packages.
 - 2026-09-03: updated packages (including signal-based bricks).

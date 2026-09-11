@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpdrw-tech",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cadmus - NDP drawings techniques.",
   "keywords": [
     "Cadmus",
@@ -18,10 +18,10 @@
     "@angular/common": "^22.0.0",
     "@angular/core": "^22.0.0",
     "@angular/material": "^22.0.0",
-    "@myrmidon/auth-jwt-login": "^9.0.0",
-    "@myrmidon/cadmus-core": "^13.0.0",
-    "@myrmidon/cadmus-mat-physical-size": "^10.0.0",
-    "@myrmidon/cadmus-ui-flag-set": "^10.0.0"
+    "@myrmidon/auth-jwt-login": "^10.0.0",
+    "@myrmidon/cadmus-core": "^13.0.1",
+    "@myrmidon/cadmus-mat-physical-size": "^10.0.2",
+    "@myrmidon/cadmus-ui-flag-set": "^10.0.2"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpfrac-support",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cadmus - NDP FRAC support part.",
   "keywords": [
     "Cadmus",
@@ -18,11 +18,11 @@
     "@angular/common": "^22.0.0",
     "@angular/core": "^22.0.0",
     "@angular/material": "^22.0.0",
-    "@myrmidon/ngx-tools": "^3.0.0",
-    "@myrmidon/cadmus-mat-physical-grid": "^10.0.0",
-    "@myrmidon/cadmus-core": "^13.0.0",
-    "@myrmidon/cadmus-state": "^16.0.0",
-    "@myrmidon/cadmus-ui": "^17.0.0"
+    "@myrmidon/ngx-tools": "^3.0.2",
+    "@myrmidon/cadmus-mat-physical-grid": "^10.0.2",
+    "@myrmidon/cadmus-core": "^13.0.1",
+    "@myrmidon/cadmus-state": "^16.0.1",
+    "@myrmidon/cadmus-ui": "^18.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

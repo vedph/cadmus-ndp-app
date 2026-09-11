@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/cadmus-part-ndpbooks-pg",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cadmus - printed books editors wrappers.",
   "keywords": [
     "Cadmus",
@@ -18,8 +18,8 @@
     "@angular/common": "^22.0.0",
     "@angular/core": "^22.0.0",
     "@angular/material": "^22.0.0",
-    "@myrmidon/cadmus-part-ndpbooks-fig-plan": "^0.0.6",
-    "@myrmidon/cadmus-part-ndpbooks-fonts": "^0.0.5"
+    "@myrmidon/cadmus-part-ndpbooks-fig-plan": "^1.0.0",
+    "@myrmidon/cadmus-part-ndpbooks-fonts": "^1.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
