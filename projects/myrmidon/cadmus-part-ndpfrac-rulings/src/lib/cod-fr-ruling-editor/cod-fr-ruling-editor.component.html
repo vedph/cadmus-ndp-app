@@ -55,37 +55,37 @@
         [checkedIds]="features.value"
         (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
         />
-      </div>
-
-      <!-- note -->
-      <div>
-        <mat-form-field class="long-text">
-          <mat-label>note</mat-label>
-          <input matInput [formControl]="note" />
-          @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
-            <mat-error>note too long</mat-error>
-          }
-        </mat-form-field>
-      </div>
-    }
-
-    <!-- buttons -->
-    <div>
-      <button
-        type="button"
-        mat-icon-button
-        matTooltip="Discard changes"
-        (click)="cancel()"
-        >
-        <mat-icon class="mat-warn">clear</mat-icon>
-      </button>
-      <button
-        type="submit"
-        mat-icon-button
-        matTooltip="Accept changes"
-        [disabled]="form.invalid || form.pristine"
-        >
-        <mat-icon class="mat-primary">check_circle</mat-icon>
-      </button>
     </div>
-  </form>
+  }
+
+  <!-- note -->
+  <div>
+    <mat-form-field class="long-text">
+      <mat-label>note</mat-label>
+      <input matInput [formControl]="note" />
+      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+        <mat-error>note too long</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- buttons -->
+  <div>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Discard changes"
+      (click)="cancel()"
+      >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      mat-icon-button
+      matTooltip="Accept changes"
+      [disabled]="form.invalid || form.pristine"
+      >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+</form>
