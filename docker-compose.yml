@@ -3,6 +3,13 @@ services:
   cadmus-ndp-mongo:
     image: mongo
     container_name: cadmus-ndp-mongo
+    # start MongoDB in quiet mode which suppresses most of the log output;
+    # comment this out if you want to see the full MongoDB log
+    command: mongod --quiet
+    # add this if required because of old Ubuntu Kernel issues
+    # (https://vedph.github.io/cadmus-doc/deploy/app.html#ubuntu-old-kernel-and-mongodb)
+    environment:
+      - GLIBC_TUNABLES=glibc.pthread.rseq=1
     ports:
       - 127.0.0.1:27017:27017
     networks:
@@ -33,7 +40,7 @@ services:
 
   # Cadmus NDP API
   cadmus-ndp-api:
-    image: vedph2020/cadmus-ndp-api:16.0.0
+    image: vedph2020/cadmus-ndp-api:16.0.1
     container_name: cadmus-ndp-api
     ports:
       - 5172:8080
@@ -44,16 +51,20 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_URLS=http://+:8080
+      - ALLOWEDORIGINS__1=*
       - CONNECTIONSTRINGS__DEFAULT=mongodb://cadmus-ndp-mongo:27017/{0}
       - CONNECTIONSTRINGS__AUTH=Server=cadmus-ndp-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
       - CONNECTIONSTRINGS__INDEX=Server=cadmus-ndp-pgsql;port=5432;Database={0};User Id=postgres;Password=postgres;Include Error Detail=True
       - CONNECTIONSTRINGS__MOL=Server=cadmus-ndp-pgsql;port=5432;Database=mol;User Id=postgres;Password=postgres;Include Error Detail=True
+      - CONNECTIONSTRINGS__TAXOSTORE=Server=cadmus-ndp-pgsql;port=5432;Database=mol;User Id=postgres;Password=postgres;Include Error Detail=True
       - SERILOG__CONNECTIONSTRING=mongodb://cadmus-ndp-mongo:27017/{0}-log
       - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
       - SEED__DELAY=20
       - MESSAGING__APIROOTURL=http://cadmusapi.azurewebsites.net
       - MESSAGING__APPROOTURL=http://cadmusapi.com/
       - MESSAGING__SUPPORTEMAIL=support@cadmus.com
+      # MOL takes about 80 seconds so avoid too many concurrent initializations
+      - TAXOSTORE__INITIALIZATIONDELAYSECONDS=120
     networks:
       - cadmus-ndp-network
 
