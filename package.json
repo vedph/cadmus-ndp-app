@@ -24,7 +24,7 @@
     "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-tpp && pnpm run build-npg"
   },
   "private": true,
-  "packageManager": "pnpm@12.3.4",
+  "packageManager": "pnpm@12.4.1",
   "dependencies": {
     "3d-force-graph": "^1.80.0",
     "@angular/animations": "^22.0.1",
@@ -87,8 +87,8 @@
     "@myrmidon/cadmus-profile-editor": "^1.0.1",
     "@myrmidon/cadmus-profile-import": "^1.0.1",
     "@myrmidon/cadmus-refs-asserted-chronotope": "^12.0.2",
-    "@myrmidon/cadmus-refs-asserted-ids": "^11.0.3",
-    "@myrmidon/cadmus-refs-assertion": "^11.0.2",
+    "@myrmidon/cadmus-refs-asserted-ids": "^11.0.5",
+    "@myrmidon/cadmus-refs-assertion": "^11.0.5",
     "@myrmidon/cadmus-refs-biblissima-lookup": "^11.0.2",
     "@myrmidon/cadmus-refs-citation": "^2.0.2",
     "@myrmidon/cadmus-refs-decorated-counts": "^10.0.2",
@@ -97,7 +97,7 @@
     "@myrmidon/cadmus-refs-external-ids": "^11.0.2",
     "@myrmidon/cadmus-refs-historical-date": "^10.0.2",
     "@myrmidon/cadmus-refs-iconclass-lookup": "^0.0.3",
-    "@myrmidon/cadmus-refs-lookup": "^11.0.2",
+    "@myrmidon/cadmus-refs-lookup": "^11.0.4",
     "@myrmidon/cadmus-refs-mol-lookup": "^1.0.2",
     "@myrmidon/cadmus-refs-mufi-lookup": "^3.0.2",
     "@myrmidon/cadmus-refs-proper-name": "^11.0.2",
@@ -127,8 +127,8 @@
     "@types/geojson": "^7946.0.16",
     "echarts": "^6.1.0",
     "force-graph": "^1.51.4",
-    "maplibre-gl": "^6.8.0",
-    "marked": "^18.0.12",
+    "maplibre-gl": "^6.9.0",
+    "marked": "^18.0.13",
     "monaco-editor": "^0.47.0",
     "ngx-echarts": "^22.0.0",
     "ngx-markdown": "^22.0.2",
@@ -148,7 +148,7 @@
     "vitest": "^5.0.0"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.63.1"
+    "@rollup/rollup-win32-arm64-msvc": "^4.63.2"
   },
   "pnpm": {
     "overrides": {

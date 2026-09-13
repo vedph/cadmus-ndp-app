@@ -48,8 +48,8 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-profile-editor@1.0.0'
   - '@myrmidon/cadmus-profile-import@1.0.0'
   - '@myrmidon/cadmus-refs-asserted-chronotope@12.0.0 || 12.0.2'
-  - '@myrmidon/cadmus-refs-asserted-ids@11.0.0 || 11.0.3'
-  - '@myrmidon/cadmus-refs-assertion@11.0.0 || 11.0.2'
+  - '@myrmidon/cadmus-refs-asserted-ids@11.0.0 || 11.0.3 || 11.0.5'
+  - '@myrmidon/cadmus-refs-assertion@11.0.0 || 11.0.2 || 11.0.5'
   - '@myrmidon/cadmus-refs-biblissima-lookup@11.0.0 || 11.0.2'
   - '@myrmidon/cadmus-refs-citation@2.0.0 || 2.0.2'
   - '@myrmidon/cadmus-refs-decorated-counts@10.0.0 || 10.0.2'
@@ -57,7 +57,7 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-refs-doc-references@11.0.0 || 11.0.2'
   - '@myrmidon/cadmus-refs-external-ids@11.0.0 || 11.0.2'
   - '@myrmidon/cadmus-refs-historical-date@10.0.0 || 10.0.2'
-  - '@myrmidon/cadmus-refs-lookup@11.0.0 || 11.0.2'
+  - '@myrmidon/cadmus-refs-lookup@11.0.0 || 11.0.2 || 11.0.4'
   - '@myrmidon/cadmus-refs-mol-lookup@1.0.0 || 1.0.2'
   - '@myrmidon/cadmus-refs-mufi-lookup@3.0.0 || 3.0.2'
   - '@myrmidon/cadmus-refs-proper-name@11.0.0 || 11.0.2'
@@ -104,4 +104,4 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-part-geo-pg@11.0.4'
   - maplibre-gl@6.7.0 || 6.8.0
   - '@myrmidon/cadmus-refs-iconclass-lookup@0.0.3'
-  - marked@18.0.12
+  - marked@18.0.12 || 18.0.13

@@ -1,5 +1,8 @@
 # History
 
+## 2.0.0
+
+- 2026-09-13: updated packages (fixes in brick references).
 - 2026-09-11: ⚠️ migrated tests from Karma to ViTest and implemented them. Bugs found and fixed while writing tests:
   - autoInstallPeers/pnpm phantom zone.js breaking Vitest for every library (infra-level).
   - repeated `editedIndex` desync bug in moveXUp/moveXDown across 6 different components (notable-word-forms, print-fonts, cod-fr-layout, cod-fr-quire-labels, cod-fr-rulings, print-fig-plan × 2, fig-plan-item-label-editor, fig-plan-impl-item-editor) — reordering the item being edited left the index pointing at the wrong entry, so a subsequent save could silently overwrite the wrong record.
