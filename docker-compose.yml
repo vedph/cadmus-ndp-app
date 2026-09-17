@@ -76,6 +76,8 @@ services:
       - 4200:80
     depends_on:
       - cadmus-ndp-api
+    # volumes:
+    #  - ./env.js:/usr/share/nginx/html/env.js
     networks:
       - cadmus-ndp-network
 
