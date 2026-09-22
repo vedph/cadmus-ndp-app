@@ -31,6 +31,7 @@ import { COD_DECORATIONS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-de
 import { COD_EDITS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-edits';
 import { COD_HANDS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-hands';
 import { COD_LAYOUTS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-layouts';
+import { COD_LOCATION_RANGES_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-location-ranges';
 import { COD_MATERIAL_DSC_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-material-dsc';
 import { COD_SHEET_LABELS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-sheet-labels';
 import { COD_SHELFMARKS_PART_TYPEID } from '@myrmidon/cadmus-part-codicology-shelfmarks';
@@ -146,6 +147,9 @@ export const PART_EDITOR_KEYS: PartEditorKeys = {
     part: CODICOLOGY,
   },
   [COD_LAYOUTS_PART_TYPEID]: {
+    part: CODICOLOGY,
+  },
+  [COD_LOCATION_RANGES_PART_TYPEID]: {
     part: CODICOLOGY,
   },
   [COD_MATERIAL_DSC_PART_TYPEID]: {

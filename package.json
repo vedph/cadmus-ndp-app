@@ -24,7 +24,7 @@
     "build-lib": "pnpm run build-lbl && pnpm run build-lay && pnpm run build-rul && pnpm run build-sup && pnpm run build-fnt && pnpm run build-fpg && pnpm run build-fip && pnpm run build-bpg && pnpm run build-drw && pnpm run build-dpg && pnpm run build-nwf && pnpm run build-tpp && pnpm run build-npg"
   },
   "private": true,
-  "packageManager": "pnpm@12.4.1",
+  "packageManager": "pnpm@12.5.1",
   "dependencies": {
     "3d-force-graph": "^1.80.0",
     "@angular/animations": "^22.0.1",
@@ -64,8 +64,9 @@
     "@myrmidon/cadmus-part-codicology-edits": "^15.0.0",
     "@myrmidon/cadmus-part-codicology-hands": "^15.0.0",
     "@myrmidon/cadmus-part-codicology-layouts": "^15.0.0",
+    "@myrmidon/cadmus-part-codicology-location-ranges": "^0.0.1",
     "@myrmidon/cadmus-part-codicology-material-dsc": "^15.0.0",
-    "@myrmidon/cadmus-part-codicology-pg": "^15.0.0",
+    "@myrmidon/cadmus-part-codicology-pg": "^15.0.1",
     "@myrmidon/cadmus-part-codicology-sheet-labels": "^15.0.0",
     "@myrmidon/cadmus-part-codicology-shelfmarks": "^15.0.0",
     "@myrmidon/cadmus-part-codicology-watermarks": "^15.0.0",
@@ -73,7 +74,7 @@
     "@myrmidon/cadmus-part-epigraphy-pg": "^15.0.0",
     "@myrmidon/cadmus-part-epigraphy-support-frr": "^13.0.0",
     "@myrmidon/cadmus-part-general-pg": "^18.0.1",
-    "@myrmidon/cadmus-part-general-ui": "^18.0.2",
+    "@myrmidon/cadmus-part-general-ui": "^18.0.3",
     "@myrmidon/cadmus-part-geo-asserted-locations": "^12.1.4",
     "@myrmidon/cadmus-part-geo-asserted-toponyms": "^11.1.4",
     "@myrmidon/cadmus-part-geo-pg": "^11.0.4",
@@ -127,8 +128,8 @@
     "@types/geojson": "^7946.0.16",
     "echarts": "^6.1.0",
     "force-graph": "^1.51.4",
-    "maplibre-gl": "^6.9.0",
-    "marked": "^18.0.13",
+    "maplibre-gl": "^6.10.0",
+    "marked": "^18.0.14",
     "monaco-editor": "^0.47.0",
     "ngx-echarts": "^22.0.0",
     "ngx-markdown": "^22.0.2",
@@ -145,10 +146,10 @@
     "jsdom": "^30.0.1",
     "ng-packagr": "^22.0.2",
     "typescript": "~6.0.3",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.63.2"
+    "@rollup/rollup-win32-arm64-msvc": "^4.63.4"
   },
   "pnpm": {
     "overrides": {

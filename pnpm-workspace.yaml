@@ -10,7 +10,7 @@ allowBuilds:
   lmdb: true
   msgpackr-extract: true
 minimumReleaseAgeExclude:
-  - '@myrmidon/cadmus-part-general-ui@16.1.7 || 17.0.0 || 18.0.1'
+  - '@myrmidon/cadmus-part-general-ui@16.1.7 || 17.0.0 || 18.0.1 || 18.0.3'
   - '@myrmidon/cadmus-thesaurus-store@0.1.5 || 1.0.0'
   - '@myrmidon/paged-data-browsers@5.2.3 || 6.0.0'
   - '@vitest/expect@4.1.7'
@@ -86,7 +86,7 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-part-codicology-hands@15.0.0'
   - '@myrmidon/cadmus-part-codicology-layouts@15.0.0'
   - '@myrmidon/cadmus-part-codicology-material-dsc@15.0.0'
-  - '@myrmidon/cadmus-part-codicology-pg@15.0.0'
+  - '@myrmidon/cadmus-part-codicology-pg@15.0.0 || 15.0.1'
   - '@myrmidon/cadmus-part-codicology-sheet-labels@15.0.0'
   - '@myrmidon/cadmus-part-codicology-shelfmarks@15.0.0'
   - '@myrmidon/cadmus-part-codicology-watermarks@15.0.0'
@@ -104,4 +104,5 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-part-geo-pg@11.0.4'
   - maplibre-gl@6.7.0 || 6.8.0
   - '@myrmidon/cadmus-refs-iconclass-lookup@0.0.3'
-  - marked@18.0.12 || 18.0.13
+  - marked@18.0.12 || 18.0.13 || 18.0.14
+  - '@myrmidon/cadmus-part-codicology-location-ranges@0.0.1'
