@@ -1,5 +1,7 @@
 # History
 
+## 2.0.1
+
 - 2026-09-22:
   - 🆕 added `@myrmidon/cadmus-part-codicology-location-ranges`.
   - updated packages.
