@@ -1,5 +1,9 @@
 # History
 
+## 2.0.2
+
+- 2026-09-23: updated packages (fixes and improvements in codicology).
+
 ## 2.0.1
 
 - 2026-09-22:
