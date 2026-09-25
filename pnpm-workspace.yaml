@@ -87,7 +87,7 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-part-codicology-layouts@15.0.0 || 15.0.1'
   - '@myrmidon/cadmus-part-codicology-material-dsc@15.0.0 || 15.0.2'
   - '@myrmidon/cadmus-part-codicology-pg@15.0.0 || 15.0.1 || 15.0.2'
-  - '@myrmidon/cadmus-part-codicology-sheet-labels@15.0.0 || 15.0.1'
+  - '@myrmidon/cadmus-part-codicology-sheet-labels@15.0.0 || 15.0.1 || 15.0.2'
   - '@myrmidon/cadmus-part-codicology-shelfmarks@15.0.0 || 15.0.1'
   - '@myrmidon/cadmus-part-codicology-watermarks@15.0.0 || 15.0.2'
   - '@myrmidon/cadmus-part-epigraphy-formula-patterns@14.0.0'

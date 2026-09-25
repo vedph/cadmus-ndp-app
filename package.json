@@ -1,6 +1,6 @@
 {
   "name": "cadmus-ndp-app",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -67,7 +67,7 @@
     "@myrmidon/cadmus-part-codicology-location-ranges": "^0.0.2",
     "@myrmidon/cadmus-part-codicology-material-dsc": "^15.0.2",
     "@myrmidon/cadmus-part-codicology-pg": "^15.0.2",
-    "@myrmidon/cadmus-part-codicology-sheet-labels": "^15.0.1",
+    "@myrmidon/cadmus-part-codicology-sheet-labels": "^15.0.2",
     "@myrmidon/cadmus-part-codicology-shelfmarks": "^15.0.1",
     "@myrmidon/cadmus-part-codicology-watermarks": "^15.0.2",
     "@myrmidon/cadmus-part-epigraphy-formula-patterns": "^14.0.0",
