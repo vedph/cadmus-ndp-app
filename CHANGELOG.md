@@ -1,5 +1,7 @@
 # History
 
+- 2026-09-25: updated Angular and packages.
+
 ## 2.0.2
 
 - 2026-09-23: updated packages (fixes and improvements in codicology).
