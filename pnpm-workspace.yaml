@@ -106,3 +106,4 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-refs-iconclass-lookup@0.0.3'
   - marked@18.0.12 || 18.0.13 || 18.0.14
   - '@myrmidon/cadmus-part-codicology-location-ranges@0.0.1 || 0.0.2'
+  - '@myrmidon/cod-layout-view@2.0.3'
