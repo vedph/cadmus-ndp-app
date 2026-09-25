@@ -24,7 +24,7 @@ minimumReleaseAgeExclude:
   - vitest@4.1.7
   - '@myrmidon/auth-jwt-admin@9.0.0'
   - '@myrmidon/auth-jwt-login@9.0.0'
-  - '@myrmidon/cadmus-api@15.0.0 || 15.0.1'
+  - '@myrmidon/cadmus-api@15.0.0 || 15.0.1 || 15.0.3'
   - '@myrmidon/cadmus-cod-location@10.0.0 || 10.0.2 || 10.0.3'
   - '@myrmidon/cadmus-core@13.0.0'
   - '@myrmidon/cadmus-flags-pg@16.0.0'
@@ -34,7 +34,7 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-graph-pg@16.0.0'
   - '@myrmidon/cadmus-graph-ui@16.0.0'
   - '@myrmidon/cadmus-item-editor@17.0.0 || 17.0.1 || 18.0.0'
-  - '@myrmidon/cadmus-item-list@17.0.0'
+  - '@myrmidon/cadmus-item-list@17.0.0 || 17.0.3'
   - '@myrmidon/cadmus-item-search@17.0.0'
   - '@myrmidon/cadmus-mat-physical-grid@10.0.0 || 10.0.2'
   - '@myrmidon/cadmus-mat-physical-size@10.0.0 || 10.0.2'
