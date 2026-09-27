@@ -23,8 +23,7 @@
   // proxy
   window.__env.proxyUrl = "http://localhost:5172/api/proxy";
   // URL template for help pages
-  window.__env.helpUrlTemplate =
-    "https://fedhlab.github.io/cadmus-ndp-help/{typeId}{separator}{roleId}{separator}{frRoleId}.html";
+  window.__env.helpUrlTemplate = "https://fedhlab.github.io/cadmus-ndp-help/reference/{typeId}{separator}{roleId}{separator}{frRoleId}.html";
   // value of {separator} (optional, default: __)
   window.__env.helpUrlSeparator = "__";
   // false to skip checking page availability (optional, default: true)
