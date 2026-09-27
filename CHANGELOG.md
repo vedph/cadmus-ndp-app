@@ -1,5 +1,7 @@
 # History
 
+- 2026-09-27: added mock help parameters to `env.js`.
+
 ## 2.0.4
 
 - 2026-09-27: 🆕 added help to part editors.
