@@ -30,6 +30,7 @@ import {
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent,
 } from '@myrmidon/cadmus-ui';
 
 import {
@@ -68,6 +69,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     FlagSetComponent,
     CloseSaveButtonsComponent,
     PhysicalMeasurementSetComponent,
+    HelpLinkComponent,
 ],
   templateUrl: './drawing-tech-part.component.html',
   styleUrl: './drawing-tech-part.component.css',

@@ -34,6 +34,7 @@ import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent
 } from '@myrmidon/cadmus-ui';
 import {
   EditedObject,
@@ -76,6 +77,7 @@ type SettingRequest = { typeId: string; roleId: string | undefined } | null;
     EllipsisPipe,
     FlatLookupPipe,
     CloseSaveButtonsComponent,
+    HelpLinkComponent,
   ],
   templateUrl: './text-passages-part.component.html',
   styleUrl: './text-passages-part.component.css',

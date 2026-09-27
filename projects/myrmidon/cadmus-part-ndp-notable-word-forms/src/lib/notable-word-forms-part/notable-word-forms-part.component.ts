@@ -13,6 +13,7 @@ import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent
 } from '@myrmidon/cadmus-ui';
 import {
   EditedObject,
@@ -76,6 +77,7 @@ interface NotableWordFormsPartSettings {
     FlatLookupPipe,
     CloseSaveButtonsComponent,
     NotableWordFormEditorComponent,
+    HelpLinkComponent,
   ],
   templateUrl: './notable-word-forms-part.component.html',
   styleUrl: './notable-word-forms-part.component.css',

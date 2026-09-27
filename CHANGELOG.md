@@ -1,5 +1,11 @@
 # History
 
+## 2.0.4
+
+- 2026-09-27: 🆕 added help to part editors.
+
+## 2.0.3
+
 - 2026-09-25: updated Angular and packages.
 
 ## 2.0.2

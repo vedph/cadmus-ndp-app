@@ -29,6 +29,7 @@ import {
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent,
 } from '@myrmidon/cadmus-ui';
 
 import {
@@ -60,6 +61,7 @@ import { CodFrRulingEditorComponent } from '../cod-fr-ruling-editor/cod-fr-rulin
     // cadmus
     CloseSaveButtonsComponent,
     CodFrRulingEditorComponent,
+    HelpLinkComponent,
   ],
   templateUrl: './cod-fr-rulings-part.component.html',
   styleUrls: ['./cod-fr-rulings-part.component.css'],

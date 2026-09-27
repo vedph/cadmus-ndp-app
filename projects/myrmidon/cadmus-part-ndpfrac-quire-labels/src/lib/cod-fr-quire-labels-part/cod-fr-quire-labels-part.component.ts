@@ -33,6 +33,7 @@ import {
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent,
 } from '@myrmidon/cadmus-ui';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
@@ -72,6 +73,7 @@ interface CodFrQuireLabelsPartSettings {
     // cadmus
     CloseSaveButtonsComponent,
     CodFrQuireLabelEditorComponent,
+    HelpLinkComponent
   ],
   templateUrl: './cod-fr-quire-labels-part.component.html',
   styleUrl: './cod-fr-quire-labels-part.component.css',

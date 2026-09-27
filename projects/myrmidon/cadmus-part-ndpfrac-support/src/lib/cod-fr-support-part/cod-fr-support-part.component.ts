@@ -35,6 +35,7 @@ import {
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent,
 } from '@myrmidon/cadmus-ui';
 
 import {
@@ -68,6 +69,7 @@ import '@myrmidon/cod-layout-view';
     PhysicalGridLocationComponent,
     // cadmus
     CloseSaveButtonsComponent,
+    HelpLinkComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './cod-fr-support-part.component.html',

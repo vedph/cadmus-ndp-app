@@ -26,6 +26,7 @@ import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent
 } from '@myrmidon/cadmus-ui';
 import {
   EditedObject,
@@ -74,6 +75,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     FlatLookupPipe,
     FlagSetComponent,
     CloseSaveButtonsComponent,
+    HelpLinkComponent,
     FigPlanImplItemEditorComponent,
   ],
   templateUrl: './print-fig-plan-impl-part.component.html',

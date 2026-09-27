@@ -27,6 +27,7 @@ import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent,
 } from '@myrmidon/cadmus-ui';
 import {
   EditedObject,
@@ -69,6 +70,7 @@ interface PrintFontsPartSettings {
     CloseSaveButtonsComponent,
     PrintFontEditorComponent,
     FlatLookupPipe,
+    HelpLinkComponent
   ],
   templateUrl: './print-fonts-part.component.html',
   styleUrl: './print-fonts-part.component.css',

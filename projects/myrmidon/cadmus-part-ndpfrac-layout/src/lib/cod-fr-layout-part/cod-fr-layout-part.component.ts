@@ -28,6 +28,7 @@ import {
 import {
   CloseSaveButtonsComponent,
   ModelEditorComponentBase,
+  HelpLinkComponent,
 } from '@myrmidon/cadmus-ui';
 import { PhysicalDimension } from '@myrmidon/cadmus-mat-physical-size';
 import {
@@ -82,6 +83,7 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     CodLayoutFormulaComponent,
     DecoratedCountsComponent,
     CloseSaveButtonsComponent,
+    HelpLinkComponent
   ],
   templateUrl: './cod-fr-layout-part.component.html',
   styleUrl: './cod-fr-layout-part.component.css',
