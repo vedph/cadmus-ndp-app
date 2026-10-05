@@ -13,6 +13,11 @@ import {
   PrintFigPlanImplPart,
 } from '../print-fig-plan-impl-part';
 
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
+
 describe('PrintFigPlanImplPartComponent', () => {
   let component: PrintFigPlanImplPartComponent;
   let fixture: ComponentFixture<PrintFigPlanImplPartComponent>;
@@ -147,13 +152,13 @@ describe('PrintFigPlanImplPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.description.setValue('a description');
+      component.form.description().value.set('a description');
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.description.value).toBeNull();
+      expect(component.form.description().value()).toBe('');
     });
 
     it('should populate all controls from part data', async () => {
@@ -172,20 +177,23 @@ describe('PrintFigPlanImplPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.complete.value).toBe(true);
-      expect(component.techniques.value).toEqual(['t1']);
-      expect(component.features.value).toEqual(['f1']);
-      expect(component.description.value).toBe('a description');
-      expect(component.items.value).toEqual(items);
-      expect(component.form.pristine).toBe(true);
+      expect(component.form.complete().value()).toBe(true);
+      expect(json(component.form.techniques().value())).toEqual(['t1']);
+      expect(json(component.form.features().value())).toEqual(['f1']);
+      expect(component.form.description().value()).toBe('a description');
+      expect(json(component.form.items().value())).toEqual(items);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should default complete to false when isComplete is falsy', async () => {
-      fixture.componentRef.setInput('data', makeData({ isComplete: undefined }));
+      fixture.componentRef.setInput(
+        'data',
+        makeData({ isComplete: undefined }),
+      );
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.complete.value).toBe(false);
+      expect(component.form.complete().value()).toBe(false);
     });
   });
 
@@ -195,10 +203,10 @@ describe('PrintFigPlanImplPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.complete.setValue(true);
+      component.form.complete().value.set(true);
       component.onTechniqueCheckedIdsChange(['t1']);
       component.onFeatureCheckedIdsChange(['f1']);
-      component.description.setValue('  a description  ');
+      component.form.description().value.set('  a description  ');
       component.saveItem(makeItem('e1'));
 
       const value = (component as any).getValue() as PrintFigPlanImplPart;
@@ -277,24 +285,27 @@ describe('PrintFigPlanImplPartComponent', () => {
   describe('saveItem', () => {
     it('should append a new item when editedIndex is -1', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1')]);
+      component.form.items().value.set([makeItem('e1')]);
       component.addItem();
 
       component.saveItem(makeItem('e2'));
 
-      expect(component.items.value).toEqual([makeItem('e1'), makeItem('e2')]);
-      expect(component.items.dirty).toBe(true);
+      expect(json(component.form.items().value())).toEqual([
+        makeItem('e1'),
+        makeItem('e2'),
+      ]);
+      expect(component.form.items().dirty()).toBe(true);
       expect(component.editedIndex()).toBe(-1);
     });
 
     it('should replace the item at editedIndex when editing an existing one', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e2'), 1);
 
       component.saveItem({ eid: 'e2', type: 'type-b' });
 
-      expect(component.items.value).toEqual([
+      expect(json(component.form.items().value())).toEqual([
         makeItem('e1'),
         { eid: 'e2', type: 'type-b' },
       ]);
@@ -305,27 +316,27 @@ describe('PrintFigPlanImplPartComponent', () => {
     it('should remove the item when the user confirms', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
 
       component.deleteItem(0);
 
-      expect(component.items.value).toEqual([makeItem('e2')]);
+      expect(json(component.form.items().value())).toEqual([makeItem('e2')]);
     });
 
     it('should not remove the item when the user cancels', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(false));
-      component.items.setValue([makeItem('e1')]);
+      component.form.items().value.set([makeItem('e1')]);
 
       component.deleteItem(0);
 
-      expect(component.items.value).toEqual([makeItem('e1')]);
+      expect(json(component.form.items().value())).toEqual([makeItem('e1')]);
     });
 
     it('should close the editor when deleting the currently edited item', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.items.setValue([makeItem('e1')]);
+      component.form.items().value.set([makeItem('e1')]);
       component.editItem(makeItem('e1'), 0);
 
       component.deleteItem(0);
@@ -342,28 +353,31 @@ describe('PrintFigPlanImplPartComponent', () => {
     it('should do nothing when index is 0', () => {
       fixture.detectChanges();
       const items = [makeItem('e1'), makeItem('e2')];
-      component.items.setValue(items);
+      component.form.items().value.set(items);
 
       component.moveItemUp(0);
 
-      expect(component.items.value).toEqual(items);
-      expect(component.items.dirty).toBe(false);
+      expect(json(component.form.items().value())).toEqual(items);
+      expect(component.form.items().dirty()).toBe(false);
     });
 
     it('should swap the item with the previous one and keep editedIndex tracking it', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e2'), 1);
 
       component.moveItemUp(1);
 
-      expect(component.items.value).toEqual([makeItem('e2'), makeItem('e1')]);
+      expect(json(component.form.items().value())).toEqual([
+        makeItem('e2'),
+        makeItem('e1'),
+      ]);
       expect(component.editedIndex()).toBe(0);
     });
 
     it('should keep editedIndex tracking the displaced item', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e1'), 0);
 
       component.moveItemUp(1);
@@ -376,33 +390,43 @@ describe('PrintFigPlanImplPartComponent', () => {
     it('should do nothing when index is the last one', () => {
       fixture.detectChanges();
       const items = [makeItem('e1'), makeItem('e2')];
-      component.items.setValue(items);
+      component.form.items().value.set(items);
 
       component.moveItemDown(1);
 
-      expect(component.items.value).toEqual(items);
-      expect(component.items.dirty).toBe(false);
+      expect(json(component.form.items().value())).toEqual(items);
+      expect(component.form.items().dirty()).toBe(false);
     });
 
     it('should swap the item with the next one and keep editedIndex tracking it', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e1'), 0);
 
       component.moveItemDown(0);
 
-      expect(component.items.value).toEqual([makeItem('e2'), makeItem('e1')]);
+      expect(json(component.form.items().value())).toEqual([
+        makeItem('e2'),
+        makeItem('e1'),
+      ]);
       expect(component.editedIndex()).toBe(1);
     });
 
     it('should keep editedIndex tracking the displaced item', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e2'), 1);
 
       component.moveItemDown(0);
 
       expect(component.editedIndex()).toBe(0);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
     });
   });
 });

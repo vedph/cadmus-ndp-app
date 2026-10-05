@@ -11,6 +11,11 @@ import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { CodFrQuireLabelEditorComponent } from './cod-fr-quire-label-editor.component';
 import { CodFrQuireLabel } from '../cod-fr-quire-labels-part';
 
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
+
 @Component({
   selector: 'cadmus-refs-asserted-composite-id',
   template: '',
@@ -82,18 +87,18 @@ describe('CodFrQuireLabelEditorComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid with no types or positions', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with at least one type and one position', () => {
       fixture.detectChanges();
       component.onTypeCheckedIdsChange(['type-a']);
       component.onPositionCheckedIdsChange(['pos-a']);
-      expect(component.form.valid).toBe(true);
+      expect(component.form().valid()).toBe(true);
     });
   });
 
-  describe('updateForm (via label model effect)', () => {
+  describe('binding the model (via label model effect)', () => {
     it('should reset the form when label is undefined', () => {
       fixture.componentRef.setInput('label', {
         types: ['type-a'],
@@ -104,12 +109,14 @@ describe('CodFrQuireLabelEditorComponent', () => {
       fixture.componentRef.setInput('label', undefined);
       fixture.detectChanges();
 
-      expect(component.types.value).toEqual([]);
-      expect(component.positions.value).toEqual([]);
+      expect(json(component.form.types().value())).toEqual([]);
+      expect(json(component.form.positions().value())).toEqual([]);
     });
 
     it('should populate all controls from the data', () => {
-      const handId: AssertedCompositeId = { target: { gid: 'g1', label: 'L1' } };
+      const handId: AssertedCompositeId = {
+        target: { gid: 'g1', label: 'L1' },
+      };
       const label: CodFrQuireLabel = {
         types: ['type-a'],
         positions: ['pos-a'],
@@ -122,13 +129,13 @@ describe('CodFrQuireLabelEditorComponent', () => {
       fixture.componentRef.setInput('label', label);
       fixture.detectChanges();
 
-      expect(component.types.value).toEqual(['type-a']);
-      expect(component.positions.value).toEqual(['pos-a']);
-      expect(component.text.value).toBe('a text');
-      expect(component.handId.value).toEqual(handId);
-      expect(component.ink.value).toBe('black');
-      expect(component.note.value).toBe('a note');
-      expect(component.form.pristine).toBe(true);
+      expect(json(component.form.types().value())).toEqual(['type-a']);
+      expect(json(component.form.positions().value())).toEqual(['pos-a']);
+      expect(component.form.text().value()).toBe('a text');
+      expect(json(component.form.handId().value())).toEqual(handId);
+      expect(component.form.ink().value()).toBe('black');
+      expect(component.form.note().value()).toBe('a note');
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should default optional fields when absent', () => {
@@ -138,10 +145,10 @@ describe('CodFrQuireLabelEditorComponent', () => {
       } as CodFrQuireLabel);
       fixture.detectChanges();
 
-      expect(component.text.value).toBeNull();
-      expect(component.handId.value).toBeNull();
-      expect(component.ink.value).toBeNull();
-      expect(component.note.value).toBeNull();
+      expect(component.form.text().value()).toBe('');
+      expect(component.form.handId().value()).toBeNull();
+      expect(component.form.ink().value()).toBe('');
+      expect(component.form.note().value()).toBe('');
     });
   });
 
@@ -149,23 +156,25 @@ describe('CodFrQuireLabelEditorComponent', () => {
     it('onTypeCheckedIdsChange should update types and mark dirty', () => {
       fixture.detectChanges();
       component.onTypeCheckedIdsChange(['type-a']);
-      expect(component.types.value).toEqual(['type-a']);
-      expect(component.types.dirty).toBe(true);
+      expect(json(component.form.types().value())).toEqual(['type-a']);
+      expect(component.form.types().dirty()).toBe(true);
     });
 
     it('onPositionCheckedIdsChange should update positions and mark dirty', () => {
       fixture.detectChanges();
       component.onPositionCheckedIdsChange(['pos-a']);
-      expect(component.positions.value).toEqual(['pos-a']);
-      expect(component.positions.dirty).toBe(true);
+      expect(json(component.form.positions().value())).toEqual(['pos-a']);
+      expect(component.form.positions().dirty()).toBe(true);
     });
 
     it('onHandIdChange should update handId and mark dirty', () => {
       fixture.detectChanges();
-      const handId: AssertedCompositeId = { target: { gid: 'g1', label: 'L1' } };
+      const handId: AssertedCompositeId = {
+        target: { gid: 'g1', label: 'L1' },
+      };
       component.onHandIdChange(handId);
-      expect(component.handId.value).toEqual(handId);
-      expect(component.handId.dirty).toBe(true);
+      expect(json(component.form.handId().value())).toEqual(handId);
+      expect(component.form.handId().dirty()).toBe(true);
     });
   });
 
@@ -176,17 +185,17 @@ describe('CodFrQuireLabelEditorComponent', () => {
       component.save();
 
       expect(component.label()).toBeUndefined();
-      expect(component.types.touched).toBe(true);
-      expect(component.positions.touched).toBe(true);
+      expect(component.form.types().touched()).toBe(true);
+      expect(component.form.positions().touched()).toBe(true);
     });
 
     it('should build and set trimmed, minimal data when valid', () => {
       fixture.detectChanges();
       component.onTypeCheckedIdsChange(['type-a']);
       component.onPositionCheckedIdsChange(['pos-a']);
-      component.text.setValue('  a text  ');
-      component.ink.setValue('  black  ');
-      component.note.setValue('  a note  ');
+      component.form.text().value.set('  a text  ');
+      component.form.ink().value.set('  black  ');
+      component.form.note().value.set('  a note  ');
 
       component.save();
 
@@ -204,7 +213,9 @@ describe('CodFrQuireLabelEditorComponent', () => {
       fixture.detectChanges();
       component.onTypeCheckedIdsChange(['type-a']);
       component.onPositionCheckedIdsChange(['pos-a']);
-      const handId: AssertedCompositeId = { target: { gid: 'g1', label: 'L1' } };
+      const handId: AssertedCompositeId = {
+        target: { gid: 'g1', label: 'L1' },
+      };
       component.onHandIdChange(handId);
 
       component.save();
@@ -219,7 +230,7 @@ describe('CodFrQuireLabelEditorComponent', () => {
 
       component.save();
 
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should keep the form dirty when saving with pristine=false', () => {
@@ -229,7 +240,7 @@ describe('CodFrQuireLabelEditorComponent', () => {
 
       component.save(false);
 
-      expect(component.form.pristine).toBe(false);
+      expect(component.form().dirty()).toBe(true);
       expect(component.label()).toBeTruthy();
     });
   });
@@ -243,6 +254,61 @@ describe('CodFrQuireLabelEditorComponent', () => {
       component.cancel();
 
       expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('child echoes and Enter', () => {
+    const LABEL = {
+      types: ['t1'],
+      positions: ['p1'],
+      text: 'abc',
+      handId: { target: { gid: 'g1', label: 'L1' } },
+    } as CodFrQuireLabel;
+
+    function pressEnter(): void {
+      const input: HTMLInputElement =
+        fixture.nativeElement.querySelector('input[matInput]');
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Enter',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    }
+
+    beforeEach(async () => {
+      fixture.componentRef.setInput('label', structuredClone(LABEL));
+      fixture.detectChanges();
+      await fixture.whenStable();
+    });
+
+    it('should stay pristine when children echo their bound values', () => {
+      component.onTypeCheckedIdsChange(['t1']);
+      component.onPositionCheckedIdsChange(['p1']);
+      component.onHandIdChange({ target: { gid: 'g1', label: 'L1' } });
+
+      expect(component.form().dirty()).toBe(false);
+    });
+
+    it('should not save on Enter when pristine', () => {
+      const spy = vi.spyOn(component, 'save');
+      pressEnter();
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('should save on Enter when valid and dirty', () => {
+      component.form.text().value.set('abd');
+      component.form.text().markAsDirty();
+      pressEnter();
+      expect(component.label()?.text).toBe('abd');
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
     });
   });
 });

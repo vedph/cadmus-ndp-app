@@ -22,7 +22,9 @@ import { TextPassage } from '../text-passages-part';
 class MockCompactCitationComponent {
   public readonly schemeKeys = input<string[]>();
   public readonly citation = input<Citation | CitationSpan | undefined>();
-  public readonly citationChange = output<Citation | CitationSpan | undefined>();
+  public readonly citationChange = output<
+    Citation | CitationSpan | undefined
+  >();
 }
 
 @Component({
@@ -75,11 +77,9 @@ describe('TextPassageEditorComponent', () => {
   });
 
   function getCompactCitationDebugEl() {
-    return fixture.debugElement.query(By.directive(MockCompactCitationComponent));
-  }
-
-  function getFreeCitationInput(): HTMLInputElement | null {
-    return fixture.nativeElement.querySelector('input[formcontrolname]');
+    return fixture.debugElement.query(
+      By.directive(MockCompactCitationComponent),
+    );
   }
 
   it('should create', () => {
@@ -133,7 +133,7 @@ describe('TextPassageEditorComponent', () => {
     });
   });
 
-  describe('updateForm (via data model effect)', () => {
+  describe('binding the data model', () => {
     it('should reset the form when data is undefined', async () => {
       vi.spyOn(citService, 'parse').mockReturnValue({
         schemeId: 'dc',
@@ -145,13 +145,14 @@ describe('TextPassageEditorComponent', () => {
       } as TextPassage);
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(component.tag.value).toBe('leftover');
+      expect(component.form.tag().value()).toBe('leftover');
 
       fixture.componentRef.setInput('data', undefined);
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.tag.value).toBeNull();
+      expect(component.form.tag().value()).toBe('');
+      expect(component.form.citation().value()).toBeNull();
     });
 
     it('should parse a single citation when citation text has no " - "', async () => {
@@ -166,7 +167,7 @@ describe('TextPassageEditorComponent', () => {
 
       expect(parseSpy).toHaveBeenCalledWith('If. I 1', 'dc');
       expect(parseSpanSpy).not.toHaveBeenCalled();
-      expect(component.citation.value).toEqual(parsed);
+      expect(component.form.citation().value()).toEqual(parsed);
     });
 
     it('should parse a citation span when citation text contains " - "', async () => {
@@ -185,20 +186,20 @@ describe('TextPassageEditorComponent', () => {
 
       expect(parseSpanSpy).toHaveBeenCalledWith('If. I 1 - If. I 10', 'dc');
       expect(parseSpy).not.toHaveBeenCalled();
-      expect(component.citation.value).toEqual(span);
+      expect(component.form.citation().value()).toEqual(span);
     });
 
-    it('should set the free citation control when citSchemeKey is falsy', async () => {
+    it('should set the free citation field when citSchemeKey is falsy', async () => {
       fixture.componentRef.setInput('citSchemeKey', null);
       const data: TextPassage = { citation: 'p. 12' };
       fixture.componentRef.setInput('data', data);
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.freeCitation.value).toBe('p. 12');
+      expect(component.form.freeCitation().value()).toBe('p. 12');
     });
 
-    it('should set tag, text and note controls from data', async () => {
+    it('should set tag, text and note fields from data', async () => {
       const data: TextPassage = {
         citation: 'If. I 1',
         tag: 'my-tag',
@@ -214,12 +215,12 @@ describe('TextPassageEditorComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.tag.value).toBe('my-tag');
-      expect(component.text.value).toBe('some text');
-      expect(component.note.value).toBe('some note');
+      expect(component.form.tag().value()).toBe('my-tag');
+      expect(component.form.text().value()).toBe('some text');
+      expect(component.form.note().value()).toBe('some note');
     });
 
-    it('should map data.features ids to matching featureEntries and drop unknown ids', async () => {
+    it('should show only the data.features ids matching featureEntries', async () => {
       fixture.componentRef.setInput('featureEntries', FEATURE_ENTRIES);
       const data: TextPassage = {
         citation: 'If. I 1',
@@ -234,7 +235,7 @@ describe('TextPassageEditorComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.features.value).toEqual([FEATURE_ENTRIES[0]]);
+      expect(component.featurePickerEntries()).toEqual([FEATURE_ENTRIES[0]]);
     });
 
     it('should set an empty features array when data.features is undefined', async () => {
@@ -248,7 +249,8 @@ describe('TextPassageEditorComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.features.value).toEqual([]);
+      expect(component.form.features().value()).toEqual([]);
+      expect(component.featurePickerEntries()).toEqual([]);
     });
 
     it('should mark the form as pristine after loading data', async () => {
@@ -262,42 +264,43 @@ describe('TextPassageEditorComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
   });
 
   describe('onCitationChange', () => {
-    it('should update the citation control and mark it dirty', () => {
+    it('should update the citation field and mark it dirty', () => {
       fixture.detectChanges();
       const citation: Citation = { schemeId: 'dc', steps: [] };
 
       component.onCitationChange(citation);
 
-      expect(component.citation.value).toEqual(citation);
-      expect(component.citation.dirty).toBe(true);
+      expect(component.form.citation().value()).toEqual(citation);
+      expect(component.form.citation().dirty()).toBe(true);
     });
   });
 
   describe('onFeaturesChange', () => {
-    it('should update the features control and mark it dirty', () => {
+    it('should update the features field and mark it dirty', () => {
       fixture.detectChanges();
 
       component.onFeaturesChange([FEATURE_ENTRIES[1]]);
 
-      expect(component.features.value).toEqual([FEATURE_ENTRIES[1]]);
-      expect(component.features.dirty).toBe(true);
+      expect(component.form.features().value()).toEqual(['feat-b']);
+      expect(component.form.features().dirty()).toBe(true);
     });
   });
 
   describe('save', () => {
-    it('should not update data and should touch all controls when the form is invalid', () => {
+    it('should not update data and should touch all fields when the form is invalid', () => {
       fixture.detectChanges();
 
       component.save();
 
       expect(component.data()).toBeUndefined();
-      expect(component.citation.touched).toBe(true);
-      expect(component.freeCitation.touched).toBe(true);
+      expect(component.form.citation().touched()).toBe(true);
+      expect(component.form.freeCitation().touched()).toBe(true);
+      expect(component.form().getError('atLeastOneRequired')).toBeTruthy();
     });
 
     it('should build data from the form and update the model when valid (scheme mode)', () => {
@@ -306,9 +309,9 @@ describe('TextPassageEditorComponent', () => {
       vi.spyOn(citService, 'toString').mockReturnValue('If. I 1');
 
       component.onCitationChange(citation);
-      component.tag.setValue('my-tag');
-      component.text.setValue('some text');
-      component.note.setValue('some note');
+      component.form.tag().value.set('my-tag');
+      component.form.text().value.set('some text');
+      component.form.note().value.set('some note');
 
       component.save();
 
@@ -321,12 +324,12 @@ describe('TextPassageEditorComponent', () => {
       });
     });
 
-    it('should build data using the free citation control when citSchemeKey is falsy', () => {
+    it('should build data using the free citation field when citSchemeKey is falsy', () => {
       fixture.componentRef.setInput('citSchemeKey', null);
       fixture.detectChanges();
 
-      component.freeCitation.setValue('p. 12');
-      component.freeCitation.markAsDirty();
+      component.form.freeCitation().value.set(' p. 12 ');
+      component.form.freeCitation().markAsDirty();
 
       component.save();
 
@@ -359,7 +362,7 @@ describe('TextPassageEditorComponent', () => {
 
       component.save();
 
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should keep the form dirty when saving with pristine=false', () => {
@@ -369,8 +372,69 @@ describe('TextPassageEditorComponent', () => {
 
       component.save(false);
 
-      expect(component.form.pristine).toBe(false);
+      expect(component.form().dirty()).toBe(true);
       expect(component.data()).toBeTruthy();
+    });
+  });
+
+  describe('child echoes', () => {
+    it('should stay pristine when the citation editor echoes the bound citation', async () => {
+      const parsed: Citation = { schemeId: 'dc', steps: [] };
+      vi.spyOn(citService, 'parse').mockReturnValue(parsed);
+      fixture.componentRef.setInput('data', { citation: 'If. I 1' });
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      component.onCitationChange({ schemeId: 'dc', steps: [] });
+      component.onFeaturesChange([]);
+
+      expect(component.form().dirty()).toBe(false);
+    });
+
+    it('should keep the edits when featureEntries change', async () => {
+      vi.spyOn(citService, 'parse').mockReturnValue({
+        schemeId: 'dc',
+        steps: [],
+      });
+      fixture.componentRef.setInput('data', { citation: 'If. I 1' });
+      fixture.detectChanges();
+      await fixture.whenStable();
+      component.form.text().value.set('edited');
+
+      fixture.componentRef.setInput('featureEntries', FEATURE_ENTRIES);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.form.text().value()).toBe('edited');
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+
+    it('should save on Enter in a text input when valid and dirty', async () => {
+      fixture.componentRef.setInput('citSchemeKey', null);
+      fixture.componentRef.setInput('data', { citation: 'p. 12' });
+      fixture.detectChanges();
+      await fixture.whenStable();
+      component.form.freeCitation().value.set('p. 13');
+      component.form.freeCitation().markAsDirty();
+      fixture.detectChanges();
+
+      const input: HTMLInputElement =
+        fixture.nativeElement.querySelector('input[matInput]');
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Enter',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+
+      expect(component.data()?.citation).toBe('p. 13');
     });
   });
 

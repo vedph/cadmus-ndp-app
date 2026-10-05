@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgControl } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
@@ -7,6 +6,11 @@ import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { CodFrRulingEditorComponent } from './cod-fr-ruling-editor.component';
 import { CodFrRuling } from '../cod-fr-rulings-part';
+
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
 
 describe('CodFrRulingEditorComponent', () => {
   let component: CodFrRulingEditorComponent;
@@ -57,10 +61,12 @@ describe('CodFrRulingEditorComponent', () => {
       fixture.detectChanges();
 
       expect(component.featureFlags().length).toBe(0);
-      // there must be an <input> actually bound to the note FormControl
+      // there must be an <input> actually bound to the note field
+      component.form.note().value.set('note probe');
+      fixture.detectChanges();
       const inputs = fixture.debugElement.queryAll(By.css('input'));
       const boundToNote = inputs.some(
-        (el) => el.injector.get(NgControl, null)?.control === component.note,
+        (el) => (el.nativeElement as HTMLInputElement).value === 'note probe',
       );
       expect(boundToNote).toBe(true);
     });
@@ -76,35 +82,35 @@ describe('CodFrRulingEditorComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid with no features', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with at least one feature', () => {
       fixture.detectChanges();
       component.onFeatureCheckedIdsChange(['feat-a']);
-      expect(component.form.valid).toBe(true);
+      expect(component.form().valid()).toBe(true);
     });
 
     it('should be invalid when system exceeds 100 characters', () => {
       fixture.detectChanges();
-      component.system.setValue('x'.repeat(101));
-      expect(component.system.invalid).toBe(true);
+      component.form.system().value.set('x'.repeat(101));
+      expect(component.form.system().invalid()).toBe(true);
     });
 
     it('should be invalid when type exceeds 100 characters', () => {
       fixture.detectChanges();
-      component.type.setValue('x'.repeat(101));
-      expect(component.type.invalid).toBe(true);
+      component.form.type().value.set('x'.repeat(101));
+      expect(component.form.type().invalid()).toBe(true);
     });
 
     it('should be invalid when note exceeds 500 characters', () => {
       fixture.detectChanges();
-      component.note.setValue('x'.repeat(501));
-      expect(component.note.invalid).toBe(true);
+      component.form.note().value.set('x'.repeat(501));
+      expect(component.form.note().invalid()).toBe(true);
     });
   });
 
-  describe('updateForm (via ruling model effect)', () => {
+  describe('binding the model (via ruling model effect)', () => {
     it('should reset the form when ruling is undefined', () => {
       fixture.componentRef.setInput('ruling', {
         features: ['feat-a'],
@@ -114,7 +120,7 @@ describe('CodFrRulingEditorComponent', () => {
       fixture.componentRef.setInput('ruling', undefined);
       fixture.detectChanges();
 
-      expect(component.features.value).toEqual([]);
+      expect(json(component.form.features().value())).toEqual([]);
     });
 
     it('should populate all controls from the data', () => {
@@ -128,11 +134,11 @@ describe('CodFrRulingEditorComponent', () => {
       fixture.componentRef.setInput('ruling', ruling);
       fixture.detectChanges();
 
-      expect(component.features.value).toEqual(['feat-a']);
-      expect(component.system.value).toBe('sys1');
-      expect(component.type.value).toBe('type1');
-      expect(component.note.value).toBe('a note');
-      expect(component.form.pristine).toBe(true);
+      expect(json(component.form.features().value())).toEqual(['feat-a']);
+      expect(component.form.system().value()).toBe('sys1');
+      expect(component.form.type().value()).toBe('type1');
+      expect(component.form.note().value()).toBe('a note');
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should default optional fields when absent', () => {
@@ -141,9 +147,9 @@ describe('CodFrRulingEditorComponent', () => {
       } as CodFrRuling);
       fixture.detectChanges();
 
-      expect(component.system.value).toBeNull();
-      expect(component.type.value).toBeNull();
-      expect(component.note.value).toBeNull();
+      expect(component.form.system().value()).toBe('');
+      expect(component.form.type().value()).toBe('');
+      expect(component.form.note().value()).toBe('');
     });
   });
 
@@ -151,8 +157,8 @@ describe('CodFrRulingEditorComponent', () => {
     it('should update features and mark dirty', () => {
       fixture.detectChanges();
       component.onFeatureCheckedIdsChange(['feat-a']);
-      expect(component.features.value).toEqual(['feat-a']);
-      expect(component.features.dirty).toBe(true);
+      expect(json(component.form.features().value())).toEqual(['feat-a']);
+      expect(component.form.features().dirty()).toBe(true);
     });
   });
 
@@ -163,15 +169,15 @@ describe('CodFrRulingEditorComponent', () => {
       component.save();
 
       expect(component.ruling()).toBeUndefined();
-      expect(component.features.touched).toBe(true);
+      expect(component.form.features().touched()).toBe(true);
     });
 
     it('should build and set trimmed, minimal data when valid', () => {
       fixture.detectChanges();
       component.onFeatureCheckedIdsChange(['feat-a']);
-      component.system.setValue('  sys1  ');
-      component.type.setValue('  type1  ');
-      component.note.setValue('  a note  ');
+      component.form.system().value.set('  sys1  ');
+      component.form.type().value.set('  type1  ');
+      component.form.note().value.set('  a note  ');
 
       component.save();
 
@@ -189,7 +195,7 @@ describe('CodFrRulingEditorComponent', () => {
 
       component.save();
 
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should keep the form dirty when saving with pristine=false', () => {
@@ -198,7 +204,7 @@ describe('CodFrRulingEditorComponent', () => {
 
       component.save(false);
 
-      expect(component.form.pristine).toBe(false);
+      expect(component.form().dirty()).toBe(true);
       expect(component.ruling()).toBeTruthy();
     });
   });
@@ -212,6 +218,54 @@ describe('CodFrRulingEditorComponent', () => {
       component.cancel();
 
       expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('child echoes and Enter', () => {
+    function pressEnter(): void {
+      const input: HTMLInputElement =
+        fixture.nativeElement.querySelector('input[matInput]');
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Enter',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    }
+
+    beforeEach(async () => {
+      fixture.componentRef.setInput('ruling', {
+        features: ['f1'],
+        system: 'sys',
+      });
+      fixture.detectChanges();
+      await fixture.whenStable();
+    });
+
+    it('should stay pristine when the flag set echoes its bound value', () => {
+      component.onFeatureCheckedIdsChange(['f1']);
+      expect(component.form().dirty()).toBe(false);
+    });
+
+    it('should not save on Enter when pristine', () => {
+      const spy = vi.spyOn(component, 'save');
+      pressEnter();
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('should save on Enter when valid and dirty', () => {
+      component.form.system().value.set(' sys2 ');
+      component.form.system().markAsDirty();
+      pressEnter();
+      expect(component.ruling()?.system).toBe('sys2');
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
     });
   });
 });

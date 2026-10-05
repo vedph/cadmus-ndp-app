@@ -15,6 +15,11 @@ import { EditedObject, PartIdentity, ThesauriSet } from '@myrmidon/cadmus-core';
 import { CodFrSupportPartComponent } from './cod-fr-support-part.component';
 import { CodFrSupportPart } from '../cod-fr-support-part';
 
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
+
 @Component({
   selector: 'cadmus-mat-physical-grid-location',
   template: '',
@@ -101,19 +106,19 @@ describe('CodFrSupportPartComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid without a location', () => {
       fixture.detectChanges();
-      expect(component.location.invalid).toBe(true);
+      expect(component.form.location().invalid()).toBe(true);
     });
 
     it('should be invalid when material exceeds 100 characters', () => {
       fixture.detectChanges();
-      component.material.setValue('x'.repeat(101));
-      expect(component.material.invalid).toBe(true);
+      component.form.material().value.set('x'.repeat(101));
+      expect(component.form.material().invalid()).toBe(true);
     });
 
     it('should be invalid when container exceeds 100 characters', () => {
       fixture.detectChanges();
-      component.container.setValue('x'.repeat(101));
-      expect(component.container.invalid).toBe(true);
+      component.form.container().value.set('x'.repeat(101));
+      expect(component.form.container().invalid()).toBe(true);
     });
   });
 
@@ -154,13 +159,13 @@ describe('CodFrSupportPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.material.setValue('parchment');
+      component.form.material().value.set('parchment');
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.material.value).toBe('');
+      expect(component.form.material().value()).toBe('');
     });
 
     it('should populate simple controls from part data', async () => {
@@ -176,11 +181,11 @@ describe('CodFrSupportPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.material.value).toBe('paper');
-      expect(component.container.value).toBe('box 2');
-      expect(component.reuse.value).toBe('palimpsest');
-      expect(component.supposedReuse.value).toBe('maybe');
-      expect(component.form.pristine).toBe(true);
+      expect(component.form.material().value()).toBe('paper');
+      expect(component.form.container().value()).toBe('box 2');
+      expect(component.form.reuse().value()).toBe('palimpsest');
+      expect(component.form.supposedReuse().value()).toBe('maybe');
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should parse a valid location string into a grid location', async () => {
@@ -195,7 +200,7 @@ describe('CodFrSupportPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.location.value).toEqual(
+      expect(json(component.form.location().value())).toEqual(
         coordsService.parsePhysicalGridCoords(text, 3, 3, true),
       );
     });
@@ -216,7 +221,7 @@ describe('CodFrSupportPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.material.value).toBe('default-mat');
+      expect(component.form.material().value()).toBe('default-mat');
     });
   });
 
@@ -231,8 +236,8 @@ describe('CodFrSupportPartComponent', () => {
 
       component.onLocationChange(location);
 
-      expect(component.location.value).toEqual(location);
-      expect(component.location.dirty).toBe(true);
+      expect(json(component.form.location().value())).toEqual(location);
+      expect(component.form.location().dirty()).toBe(true);
     });
   });
 
@@ -242,16 +247,16 @@ describe('CodFrSupportPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.material.setValue('paper');
+      component.form.material().value.set('paper');
       const location: PhysicalGridLocation = {
         rows: 3,
         columns: 3,
         coords: [{ row: 1, column: 1 }],
       };
       component.onLocationChange(location);
-      component.container.setValue('  box 2  ');
-      component.reuse.setValue('  palimpsest  ');
-      component.supposedReuse.setValue('  maybe  ');
+      component.form.container().value.set('  box 2  ');
+      component.form.reuse().value.set('  palimpsest  ');
+      component.form.supposedReuse().value.set('  maybe  ');
 
       const value = (component as any).getValue() as CodFrSupportPart;
 
@@ -268,13 +273,70 @@ describe('CodFrSupportPartComponent', () => {
       fixture.componentRef.setInput('data', makeData({}));
       fixture.detectChanges();
       await fixture.whenStable();
-      component.material.setValue('paper');
+      component.form.material().value.set('paper');
 
       const value = (component as any).getValue() as CodFrSupportPart;
 
       expect(value.location).toBe('');
       expect(value.reuse).toBeUndefined();
       expect(value.supposedReuse).toBeUndefined();
+    });
+  });
+
+  describe('draft and dirty state', () => {
+    const THESAURI: ThesauriSet = {
+      'cod-fr-support-materials': {
+        id: 'cod-fr-support-materials',
+        entries: [
+          { id: 'paper', value: 'paper' },
+          { id: 'parchment', value: 'parchment' },
+        ],
+      },
+    };
+
+    it('should default an empty material to the first entry, pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput(
+        'data',
+        makeData({ material: '', location: 'a1' }, THESAURI),
+      );
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.form.material().value()).toBe('paper');
+      expect(component.isDirty()).toBe(false);
+    });
+
+    it('should not default the material of a new part', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', {
+        value: undefined,
+        thesauri: THESAURI,
+      });
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.form.material().value()).toBe('');
+    });
+
+    it('should stay pristine when the grid echoes its bound location', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData({ location: 'a1' }));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const location = component.form.location().value();
+      expect(location).toBeTruthy();
+
+      component.onLocationChange(structuredClone(location));
+
+      expect(component.isDirty()).toBe(false);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
     });
   });
 });

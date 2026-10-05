@@ -4,19 +4,19 @@ import {
   computed,
   effect,
   input,
+  linkedSignal,
   model,
   output,
-  Signal,
+  untracked,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { toSignal } from '@angular/core/rxjs-interop';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  disabled,
+  form,
+  FormField,
+  maxLength,
+  min,
+  required,
+} from '@angular/forms/signals';
 
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
@@ -42,13 +42,84 @@ import {
   EditOperationSetComponent,
 } from '@myrmidon/cadmus-part-philology-ui';
 import { ThesaurusEntriesPickerComponent } from '@myrmidon/cadmus-thesaurus-store';
+import {
+  copyFormValue,
+  isImplicitSubmission,
+  setFieldFromChild,
+} from '@myrmidon/cadmus-ui';
 
 import { NotableWordForm } from '../notable-word-forms-part';
 
+/**
+ * The editable draft behind the form.
+ */
+interface NotableWordFormControls {
+  eid: string;
+  value: string;
+  language: string;
+  rank: number | null;
+  // tag IDs: the picker's entries are derived from them
+  tags: string[];
+  note: string;
+  referenceForm: string;
+  // class instances: they are not deep-copied
+  operations: EditOperation[];
+  isValueTarget: boolean;
+  references: DocReference[];
+  links: AssertedCompositeId[];
+}
+
+/**
+ * Notable word form -> draft.
+ */
+function toDraft(form?: NotableWordForm | null): NotableWordFormControls {
+  return {
+    eid: form?.eid || '',
+    value: form?.value || '',
+    language: form?.language || '',
+    rank: form?.rank || 0,
+    tags: [...(form?.tags || [])],
+    note: form?.note || '',
+    referenceForm: form?.referenceForm || '',
+    operations:
+      form?.operations?.map((s) => EditOperation.parseOperation(s)) || [],
+    isValueTarget: form?.isValueTarget || false,
+    references: copyFormValue(form?.references || []),
+    links: copyFormValue(form?.links || []),
+  };
+}
+
+/**
+ * Draft -> notable word form.
+ */
+function toModel(draft: NotableWordFormControls): NotableWordForm {
+  return {
+    eid: draft.eid.trim() || undefined,
+    value: draft.value.trim(),
+    language: draft.language.trim() || undefined,
+    rank: draft.rank || undefined,
+    tags: draft.tags.length ? [...draft.tags] : undefined,
+    note: draft.note.trim() || undefined,
+    referenceForm: draft.referenceForm.trim() || undefined,
+    operations: draft.operations.length
+      ? draft.operations.map((op) => op.toString())
+      : undefined,
+    isValueTarget: draft.isValueTarget ? true : undefined,
+    references: draft.references.length
+      ? copyFormValue(draft.references)
+      : undefined,
+    links: draft.links.length ? copyFormValue(draft.links) : undefined,
+  };
+}
+
+/**
+ * Notable word form editor. This is a manual-save editor: the edited
+ * form is emitted only when the user saves it.
+ */
 @Component({
   selector: 'cadmus-notable-word-form-editor',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatCheckbox,
     MatError,
     MatFormField,
@@ -71,28 +142,11 @@ import { NotableWordForm } from '../notable-word-forms-part';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotableWordFormEditorComponent {
-  // signals tracking form control values (initialized in constructor)
-  private readonly _valueSignal: Signal<string>;
-  private readonly _referenceFormSignal: Signal<string | null>;
-  private readonly _isValueTargetSignal: Signal<boolean>;
-  private readonly _operationsSignal: Signal<EditOperation[]>;
-
+  /**
+   * The notable word form being edited.
+   */
   public readonly form = model<NotableWordForm | undefined>();
   public readonly cancelEdit = output();
-
-  /**
-   * The source text for transformation via operations.
-   * This is referenceForm when isValueTarget is true (ref → value), or
-   * value when isValueTarget is false (value → ref).
-   */
-  public readonly sourceText: Signal<string | undefined>;
-
-  /**
-   * The target text for transformation via operations.
-   * This is value when isValueTarget is true (ref → value), or
-   * referenceForm when isValueTarget is false (value → ref).
-   */
-  public readonly targetText: Signal<string | undefined>;
 
   // notable-word-forms-languages
   public readonly langEntries = input<ThesaurusEntry[] | undefined>();
@@ -121,202 +175,98 @@ export class NotableWordFormEditorComponent {
     LookupProviderOptions | undefined
   >();
 
-  public value: FormControl<string>;
-  public language: FormControl<string | null>;
-  public rank: FormControl<number>;
-  public tags: FormControl<ThesaurusEntry[]>;
-  public note: FormControl<string | null>;
-  public referenceForm: FormControl<string | null>;
-  public operations: FormControl<EditOperation[]>;
-  public isValueTarget: FormControl<boolean>;
-  public references: FormControl<DocReference[]>;
-  public links: FormControl<AssertedCompositeId[]>;
-  public formCtl: FormGroup;
+  // the draft is rebuilt from each new bound form
+  private readonly _draft = linkedSignal(() => toDraft(this.form()));
 
-  constructor(formBuilder: FormBuilder) {
-    // form
-    this.value = formBuilder.control('', {
-      validators: [Validators.required, Validators.maxLength(500)],
-      nonNullable: true,
+  /**
+   * The editor's form (named so because `form` is the edited model).
+   */
+  public readonly formCtl = form(this._draft, (p) => {
+    maxLength(p.eid, 100);
+    required(p.value);
+    maxLength(p.value, 500);
+    maxLength(p.language, 50);
+    min(p.rank, 0);
+    maxLength(p.note, 2000);
+    maxLength(p.referenceForm, 500);
+    // value and reference form are fixed once there are operations
+    disabled(p.value, {
+      when: ({ valueOf }) => valueOf(p.operations).length > 0,
     });
-    this.language = formBuilder.control(null, Validators.maxLength(50));
-    this.rank = formBuilder.control(0, { nonNullable: true });
-    this.tags = formBuilder.control([], { nonNullable: true });
-    this.note = formBuilder.control(null, Validators.maxLength(2000));
-    this.referenceForm = formBuilder.control(null, Validators.maxLength(500));
-    this.operations = formBuilder.control([], { nonNullable: true });
-    this.isValueTarget = formBuilder.control(false, { nonNullable: true });
-    this.references = formBuilder.control([], { nonNullable: true });
-    this.links = formBuilder.control([], { nonNullable: true });
-
-    this.formCtl = formBuilder.group({
-      value: this.value,
-      language: this.language,
-      rank: this.rank,
-      tags: this.tags,
-      note: this.note,
-      referenceForm: this.referenceForm,
-      operations: this.operations,
-      isValueTarget: this.isValueTarget,
-      references: this.references,
-      links: this.links,
+    disabled(p.referenceForm, {
+      when: ({ valueOf }) => valueOf(p.operations).length > 0,
     });
+  });
 
-    // create signals from form control value changes
-    this._valueSignal = toSignal(
-      this.value.valueChanges.pipe(takeUntilDestroyed()),
-      {
-        initialValue: this.value.value,
-      },
-    );
-    this._referenceFormSignal = toSignal(
-      this.referenceForm.valueChanges.pipe(takeUntilDestroyed()),
-      {
-        initialValue: this.referenceForm.value,
-      },
-    );
-    this._isValueTargetSignal = toSignal(
-      this.isValueTarget.valueChanges.pipe(takeUntilDestroyed()),
-      {
-        initialValue: this.isValueTarget.value,
-      },
-    );
-    this._operationsSignal = toSignal(
-      this.operations.valueChanges.pipe(takeUntilDestroyed()),
-      {
-        initialValue: this.operations.value,
-      },
-    );
+  /**
+   * The picked tag entries, from the draft's tag IDs.
+   */
+  public readonly tagPickerEntries = computed<ThesaurusEntry[]>(() => {
+    const entries = this.tagEntries();
+    return this.formCtl
+      .tags()
+      .value()
+      .map((id) => entries?.find((e) => e.id === id) || { id, value: id });
+  });
 
-    // create computed signals for source and target text
-    this.sourceText = computed<string | undefined>(() => {
-      const refForm = this._referenceFormSignal();
-      const val = this._valueSignal();
-      if (!refForm || !val) return undefined;
-      const result = this._isValueTargetSignal()
-        ? refForm || val
-        : val || refForm;
-      return result;
-    });
+  /**
+   * The source text for transformation via operations.
+   * This is referenceForm when isValueTarget is true (ref → value), or
+   * value when isValueTarget is false (value → ref).
+   */
+  public readonly sourceText = computed<string | undefined>(() => {
+    const refForm = this.formCtl.referenceForm().value();
+    const val = this.formCtl.value().value();
+    if (!refForm || !val) return undefined;
+    return this.formCtl.isValueTarget().value() ? refForm : val;
+  });
 
-    this.targetText = computed<string | undefined>(() => {
-      const refForm = this._referenceFormSignal();
-      const val = this._valueSignal();
-      if (!refForm || !val) return undefined;
-      const result = this._isValueTargetSignal() ? val : refForm || val;
-      return result;
-    });
+  /**
+   * The target text for transformation via operations.
+   * This is value when isValueTarget is true (ref → value), or
+   * referenceForm when isValueTarget is false (value → ref).
+   */
+  public readonly targetText = computed<string | undefined>(() => {
+    const refForm = this.formCtl.referenceForm().value();
+    const val = this.formCtl.value().value();
+    if (!refForm || !val) return undefined;
+    return this.formCtl.isValueTarget().value() ? val : refForm;
+  });
 
-    // when model changes, update form
+  constructor() {
+    // when the draft mirrors the bound form, there are no unsaved edits
     effect(() => {
-      const form = this.form();
-      this.updateForm(form);
-    });
-
-    // disable value and referenceForm when operations are present
-    effect(() => {
-      const ops = this._operationsSignal();
-      if (ops && ops.length > 0) {
-        // disable both controls when operations exist
-        this.value.disable({ emitEvent: false });
-        this.referenceForm.disable({ emitEvent: false });
-      } else {
-        // enable both controls when no operations
-        this.value.enable({ emitEvent: false });
-        this.referenceForm.enable({ emitEvent: false });
-      }
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.formCtl().reset();
+        }
+      });
     });
   }
 
-  private mapIdsToEntries(
-    ids: string[],
-    entries: ThesaurusEntry[] | undefined,
-  ): ThesaurusEntry[] {
-    if (!entries) return ids.map((id) => ({ id, value: id }));
-    return ids.map(
-      (id) => entries.find((e) => e.id === id) || { id, value: id },
-    );
-  }
-
-  private updateForm(form: NotableWordForm | undefined | null): void {
-    if (!form) {
-      this.formCtl.reset();
-      // ensure controls are enabled when form is reset
-      this.value.enable({ emitEvent: false });
-      this.referenceForm.enable({ emitEvent: false });
-    } else {
-      const parsedOperations =
-        form.operations?.map((s) => EditOperation.parseOperation(s)) || [];
-
-      this.value.setValue(form.value);
-      this.language.setValue(form.language || null);
-      this.rank.setValue(form.rank || 0);
-      this.tags.setValue(
-        this.mapIdsToEntries(form.tags || [], this.tagEntries()),
-      );
-      this.note.setValue(form.note || null);
-      this.referenceForm.setValue(form.referenceForm || null);
-      this.operations.setValue(parsedOperations);
-      this.isValueTarget.setValue(form.isValueTarget || false);
-      this.references.setValue(form.references || []);
-      this.links.setValue(form.links || []);
-
-      // disable/enable controls based on operations presence
-      if (parsedOperations.length > 0) {
-        this.value.disable({ emitEvent: false });
-        this.referenceForm.disable({ emitEvent: false });
-      } else {
-        this.value.enable({ emitEvent: false });
-        this.referenceForm.enable({ emitEvent: false });
-      }
-
-      this.formCtl.markAsPristine();
-    }
+  /** True when the draft still mirrors the bound form. */
+  private isDraftInSync(draft: NotableWordFormControls): boolean {
+    return JSON.stringify(draft) === JSON.stringify(toDraft(this.form()));
   }
 
   public onTagEntriesChange(entries: ThesaurusEntry[]): void {
-    this.tags.setValue(entries);
-    this.tags.markAsDirty();
-    this.tags.updateValueAndValidity();
+    setFieldFromChild(
+      this.formCtl.tags,
+      (entries || []).map((e) => e.id),
+    );
   }
 
   public onOperationsChange(operations: EditOperation[]): void {
-    this.operations.setValue(operations);
-    this.operations.markAsDirty();
-    this.operations.updateValueAndValidity();
+    setFieldFromChild(this.formCtl.operations, operations || []);
   }
 
   public onReferencesChange(references: DocReference[]): void {
-    this.references.setValue(references);
-    this.references.markAsDirty();
-    this.references.updateValueAndValidity();
+    setFieldFromChild(this.formCtl.references, copyFormValue(references || []));
   }
 
   public onLinksChange(links: AssertedCompositeId[]): void {
-    this.links.setValue(links);
-    this.links.markAsDirty();
-    this.links.updateValueAndValidity();
-  }
-
-  private getForm(): NotableWordForm {
-    return {
-      value: this.value.value.trim(),
-      language: this.language.value || undefined,
-      rank: this.rank.value || undefined,
-      tags: this.tags.value.length
-        ? this.tags.value.map((e) => e.id)
-        : undefined,
-      note: this.note.value?.trim() || undefined,
-      referenceForm: this.referenceForm.value?.trim() || undefined,
-      operations: this.operations.value.length
-        ? this.operations.value.map((op) => op.toString())
-        : undefined,
-      isValueTarget: this.isValueTarget.value ? true : undefined,
-      references: this.references.value.length
-        ? this.references.value
-        : undefined,
-      links: this.links.value.length ? this.links.value : undefined,
-    };
+    setFieldFromChild(this.formCtl.links, copyFormValue(links || []));
   }
 
   public cancel(): void {
@@ -324,25 +274,37 @@ export class NotableWordFormEditorComponent {
   }
 
   /**
-   * Saves the current form data by updating the `data` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
+   * Handle Enter: in a text input, save as the save button would, when it
+   * is enabled. This replaces the implicit submission of a form, which
+   * targeted only the innermost form.
+   * @param event The keydown event.
    */
-  public save(pristine = true): void {
-    if (this.formCtl.invalid) {
-      // show validation errors
-      this.formCtl.markAllAsTouched();
+  public onEnterKey(event: Event): void {
+    if (!isImplicitSubmission(event)) {
       return;
     }
+    // consume Enter even when not saving, so that it does not reach an
+    // enclosing editor, which would save itself instead
+    event.preventDefault();
+    if (this.formCtl().valid() && this.formCtl().dirty()) {
+      this.save();
+    }
+  }
 
-    const form = this.getForm();
-    this.form.set(form);
-
+  /**
+   * Save the draft into the `form` model signal.
+   * @param pristine If true (default), the form's interaction state is
+   * cleared after saving.
+   */
+  public save(pristine = true): void {
+    if (this.formCtl().invalid()) {
+      // show validation errors
+      this.formCtl().markAsTouched();
+      return;
+    }
+    this.form.set(toModel(this._draft()));
     if (pristine) {
-      this.formCtl.markAsPristine();
+      this.formCtl().reset();
     }
   }
 }

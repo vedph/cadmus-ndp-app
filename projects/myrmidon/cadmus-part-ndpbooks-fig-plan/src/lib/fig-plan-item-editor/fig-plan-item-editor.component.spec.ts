@@ -19,7 +19,9 @@ import { FigPlanItem } from '../print-fig-plan-part';
 })
 class MockCompactCitationComponent {
   public readonly citation = input<Citation | CitationSpan | undefined>();
-  public readonly citationChange = output<Citation | CitationSpan | undefined>();
+  public readonly citationChange = output<
+    Citation | CitationSpan | undefined
+  >();
 }
 
 describe('FigPlanItemEditorComponent', () => {
@@ -53,30 +55,30 @@ describe('FigPlanItemEditorComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid without eid and type', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with eid and type set', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
-      expect(component.form.valid).toBe(true);
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
+      expect(component.form().valid()).toBe(true);
     });
 
     it('should be invalid when eid exceeds 100 characters', () => {
       fixture.detectChanges();
-      component.eid.setValue('x'.repeat(101));
-      expect(component.eid.invalid).toBe(true);
+      component.form.eid().value.set('x'.repeat(101));
+      expect(component.form.eid().invalid()).toBe(true);
     });
 
     it('should be invalid when citation exceeds 1000 characters', () => {
       fixture.detectChanges();
-      component.citation?.setValue('x'.repeat(1001));
-      expect(component.citation?.invalid).toBe(true);
+      component.form.citation().value.set('x'.repeat(1001));
+      expect(component.form.citation().invalid()).toBe(true);
     });
   });
 
-  describe('updateForm (via item model effect)', () => {
+  describe('binding the model (via item model effect)', () => {
     it('should reset the form and clear editedCit when item is undefined', () => {
       fixture.componentRef.setInput('item', {
         eid: 'e1',
@@ -87,7 +89,7 @@ describe('FigPlanItemEditorComponent', () => {
       fixture.componentRef.setInput('item', undefined);
       fixture.detectChanges();
 
-      expect(component.eid.value).toBe('');
+      expect(component.form.eid().value()).toBe('');
       expect(component.editedCit()).toBeUndefined();
     });
 
@@ -99,10 +101,10 @@ describe('FigPlanItemEditorComponent', () => {
       } as FigPlanItem);
       fixture.detectChanges();
 
-      expect(component.eid.value).toBe('e1');
-      expect(component.type.value).toBe('type-a');
-      expect(component.citation?.value).toBe('If. I 1');
-      expect(component.form.pristine).toBe(true);
+      expect(component.form.eid().value()).toBe('e1');
+      expect(component.form.type().value()).toBe('type-a');
+      expect(component.form.citation().value()).toBe('If. I 1');
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should parse a single citation when it has no " - "', () => {
@@ -153,11 +155,11 @@ describe('FigPlanItemEditorComponent', () => {
   describe('onCitationChange', () => {
     it('should clear the citation control when passed undefined', () => {
       fixture.detectChanges();
-      component.citation?.setValue('If. I 1');
+      component.form.citation().value.set('If. I 1');
 
       component.onCitationChange(undefined);
 
-      expect(component.citation?.value).toBeNull();
+      expect(component.form.citation().value()).toBe('');
     });
 
     it('should render a single citation via toString', () => {
@@ -166,8 +168,8 @@ describe('FigPlanItemEditorComponent', () => {
 
       component.onCitationChange({ schemeId: 'dc', steps: [] });
 
-      expect(component.citation?.value).toBe('If. I 1');
-      expect(component.citation?.dirty).toBe(true);
+      expect(component.form.citation().value()).toBe('If. I 1');
+      expect(component.form.citation().dirty()).toBe(true);
     });
 
     it('should render a citation span as "a - b"', () => {
@@ -183,7 +185,7 @@ describe('FigPlanItemEditorComponent', () => {
       component.onCitationChange(span);
 
       expect(toStringSpy).toHaveBeenCalled();
-      expect(component.citation?.value).toBe('A - B');
+      expect(component.form.citation().value()).toBe('A - B');
     });
 
     it('should render a citation span with only "a" as "a - a"', () => {
@@ -193,7 +195,7 @@ describe('FigPlanItemEditorComponent', () => {
       const span: CitationSpan = { a: { schemeId: 'dc', steps: [] } };
       component.onCitationChange(span);
 
-      expect(component.citation?.value).toBe('A - A');
+      expect(component.form.citation().value()).toBe('A - A');
     });
   });
 
@@ -204,14 +206,14 @@ describe('FigPlanItemEditorComponent', () => {
       component.save();
 
       expect(component.item()).toBeUndefined();
-      expect(component.eid.touched).toBe(true);
+      expect(component.form.eid().touched()).toBe(true);
     });
 
     it('should build and set data when valid', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
-      component.citation?.setValue('If. I 1');
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
+      component.form.citation().value.set('If. I 1');
 
       component.save();
 
@@ -224,23 +226,23 @@ describe('FigPlanItemEditorComponent', () => {
 
     it('should mark the form pristine by default after saving', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
 
       component.save();
 
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should keep the form dirty when saving with pristine=false', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
-      component.eid.markAsDirty();
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
+      component.form.eid().markAsDirty();
 
       component.save(false);
 
-      expect(component.form.pristine).toBe(false);
+      expect(component.form().dirty()).toBe(true);
       expect(component.item()).toBeTruthy();
     });
   });
@@ -254,6 +256,13 @@ describe('FigPlanItemEditorComponent', () => {
       component.cancel();
 
       expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
     });
   });
 });

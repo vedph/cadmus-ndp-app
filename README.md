@@ -16,7 +16,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 🐋 Quick Docker image build:
 
-1. `pnpm run build-lib`
+1. `pnpm run build:libs` (or `pnpm build:libs <lib>...` to build these libraries and all those depending on them)
 2. update version in `env.js` and `ng build --configuration=production`
 3. `docker build . -t vedph2020/cadmus-ndp-app:2.0.4 -t vedph2020/cadmus-ndp-app:latest` (replace with the current version).
 

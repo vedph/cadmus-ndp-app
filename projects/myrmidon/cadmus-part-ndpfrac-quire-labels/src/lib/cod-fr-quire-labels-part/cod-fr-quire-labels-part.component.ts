@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,23 +17,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import {
-  deepCopy,
-  FlatLookupPipe,
-  NgxToolsValidators,
-} from '@myrmidon/ngx-tools';
+import { FlatLookupPipe, NgxToolsSignalValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 
-import {
-  ThesauriSet,
-  ThesaurusEntry,
-  EditedObject,
-} from '@myrmidon/cadmus-core';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import {
   CloseSaveButtonsComponent,
-  ModelEditorComponentBase,
   HelpLinkComponent,
+  ModelEditorComponentBase,
+  copyFormValue,
 } from '@myrmidon/cadmus-ui';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
@@ -48,6 +40,17 @@ interface CodFrQuireLabelsPartSettings {
   lookupProviderOptions?: LookupProviderOptions;
 }
 
+interface CodFrQuireLabelsPartControls {
+  labels: CodFrQuireLabel[];
+}
+
+function toDraft(
+  part?: CodFrQuireLabelsPart | null,
+): CodFrQuireLabelsPartControls {
+  // copy: the form tags the objects in its arrays
+  return { labels: copyFormValue(part?.labels || []) };
+}
+
 /**
  * CodFrQuireLabelsPart editor component.
  * Thesauri: doc-reference-types, doc-reference-tags, assertion-tags,
@@ -59,7 +62,6 @@ interface CodFrQuireLabelsPartSettings {
   selector: 'cadmus-cod-fr-quire-labels-part',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
@@ -73,48 +75,49 @@ interface CodFrQuireLabelsPartSettings {
     // cadmus
     CloseSaveButtonsComponent,
     CodFrQuireLabelEditorComponent,
-    HelpLinkComponent
+    HelpLinkComponent,
   ],
   templateUrl: './cod-fr-quire-labels-part.component.html',
   styleUrl: './cod-fr-quire-labels-part.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodFrQuireLabelsPartComponent
-  extends ModelEditorComponentBase<CodFrQuireLabelsPart>
-  implements OnInit
-{
+export class CodFrQuireLabelsPartComponent extends ModelEditorComponentBase<CodFrQuireLabelsPart> {
+  private readonly _dialogService = inject(DialogService);
+
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<CodFrQuireLabel | undefined>(undefined);
 
   // doc-reference-types
-  public readonly refTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly refTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-types']?.entries,
   );
   // doc-reference-tags
-  public readonly refTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly refTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-tags']?.entries,
   );
   // assertion-tags
-  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly assTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['assertion-tags']?.entries,
   );
   // external-id-tags
-  public readonly idTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly idTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['external-id-tags']?.entries,
   );
   // external-id-scopes
-  public readonly idScopeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly idScopeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['external-id-scopes']?.entries,
   );
   // cod-fr-quire-label-types
-  public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly typeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-quire-label-types']?.entries,
+  );
   // cod-fr-quire-label-positions
-  public readonly positionEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly positionEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-quire-label-positions']?.entries,
   );
   // asserted-id-features
-  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly idFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-features']?.entries,
   );
 
   // lookup options depending on role
@@ -122,118 +125,28 @@ export class CodFrQuireLabelsPartComponent
     LookupProviderOptions | undefined
   >(undefined);
 
-  public labels: FormControl<CodFrQuireLabel[]>;
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    // at least 1 entry
+    NgxToolsSignalValidators.strictMinLength(p.labels, 1);
+  });
 
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService,
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.labels = formBuilder.control([], {
-      // at least 1 entry
-      validators: NgxToolsValidators.strictMinLengthValidator(1),
-      nonNullable: true,
-    });
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      entries: this.labels,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'doc-reference-types';
-    if (this.hasThesaurus(key)) {
-      this.refTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.refTypeEntries.set(undefined);
-    }
-    key = 'doc-reference-tags';
-    if (this.hasThesaurus(key)) {
-      this.refTagEntries.set(thesauri[key].entries);
-    } else {
-      this.refTagEntries.set(undefined);
-    }
-    key = 'assertion-tags';
-    if (this.hasThesaurus(key)) {
-      this.assTagEntries.set(thesauri[key].entries);
-    } else {
-      this.assTagEntries.set(undefined);
-    }
-    key = 'external-id-tags';
-    if (this.hasThesaurus(key)) {
-      this.idTagEntries.set(thesauri[key].entries);
-    } else {
-      this.idTagEntries.set(undefined);
-    }
-    key = 'external-id-scopes';
-    if (this.hasThesaurus(key)) {
-      this.idScopeEntries.set(thesauri[key].entries);
-    } else {
-      this.idScopeEntries.set(undefined);
-    }
-    key = 'cod-fr-quire-label-types';
-    if (this.hasThesaurus(key)) {
-      this.typeEntries.set(thesauri[key].entries);
-    } else {
-      this.typeEntries.set(undefined);
-    }
-    key = 'cod-fr-quire-label-positions';
-    if (this.hasThesaurus(key)) {
-      this.positionEntries.set(thesauri[key].entries);
-    } else {
-      this.positionEntries.set(undefined);
-    }
-    key = 'asserted-id-features';
-    if (this.hasThesaurus(key)) {
-      this.idFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.idFeatureEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: CodFrQuireLabelsPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    this.labels.setValue(part.labels || []);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(
-    data?: EditedObject<CodFrQuireLabelsPart>,
-  ): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-    // settings
-    this._appRepository
-      ?.getSettingFor<CodFrQuireLabelsPartSettings>(
-        COD_FR_QUIRE_LABELS_PART_TYPEID,
-        this.identity()?.roleId || undefined,
-      )
-      .then((settings) => {
-        const options = settings?.lookupProviderOptions;
-        this.lookupProviderOptions.set(options || undefined);
-      });
-    // form
-    this.updateForm(data?.value);
+  constructor() {
+    super();
+    this.initSettings<CodFrQuireLabelsPartSettings>(
+      COD_FR_QUIRE_LABELS_PART_TYPEID,
+      (settings) =>
+        this.lookupProviderOptions.set(
+          settings?.lookupProviderOptions || undefined,
+        ),
+    );
   }
 
   protected getValue(): CodFrQuireLabelsPart {
-    let part = this.getEditedPart(
+    const part = this.getEditedPart(
       COD_FR_QUIRE_LABELS_PART_TYPEID,
     ) as CodFrQuireLabelsPart;
-    part.labels = this.labels.value || [];
+    part.labels = copyFormValue(this._draft().labels);
     return part;
   }
 
@@ -247,7 +160,7 @@ export class CodFrQuireLabelsPartComponent
 
   public editLabel(entry: CodFrQuireLabel, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(deepCopy(entry));
+    this.edited.set(structuredClone(entry));
   }
 
   public closeLabel(): void {
@@ -256,15 +169,14 @@ export class CodFrQuireLabelsPartComponent
   }
 
   public saveLabel(entry: CodFrQuireLabel): void {
-    const entries = [...this.labels.value];
+    const entries = [...this.form.labels().value()];
     if (this.editedIndex() === -1) {
       entries.push(entry);
     } else {
       entries.splice(this.editedIndex(), 1, entry);
     }
-    this.labels.setValue(entries);
-    this.labels.markAsDirty();
-    this.labels.updateValueAndValidity();
+    this.form.labels().value.set(entries);
+    this.form.labels().markAsDirty();
     this.closeLabel();
   }
 
@@ -276,11 +188,10 @@ export class CodFrQuireLabelsPartComponent
           if (this.editedIndex() === index) {
             this.closeLabel();
           }
-          const entries = [...this.labels.value];
+          const entries = [...this.form.labels().value()];
           entries.splice(index, 1);
-          this.labels.setValue(entries);
-          this.labels.markAsDirty();
-          this.labels.updateValueAndValidity();
+          this.form.labels().value.set(entries);
+          this.form.labels().markAsDirty();
         }
       });
   }
@@ -289,13 +200,12 @@ export class CodFrQuireLabelsPartComponent
     if (index < 1) {
       return;
     }
-    const entry = this.labels.value[index];
-    const entries = [...this.labels.value];
+    const entries = [...this.form.labels().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index - 1, 0, entry);
-    this.labels.setValue(entries);
-    this.labels.markAsDirty();
-    this.labels.updateValueAndValidity();
+    this.form.labels().value.set(entries);
+    this.form.labels().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index - 1);
@@ -305,16 +215,15 @@ export class CodFrQuireLabelsPartComponent
   }
 
   public moveLabelDown(index: number): void {
-    if (index + 1 >= this.labels.value.length) {
+    if (index + 1 >= this.form.labels().value().length) {
       return;
     }
-    const entry = this.labels.value[index];
-    const entries = [...this.labels.value];
+    const entries = [...this.form.labels().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index + 1, 0, entry);
-    this.labels.setValue(entries);
-    this.labels.markAsDirty();
-    this.labels.updateValueAndValidity();
+    this.form.labels().value.set(entries);
+    this.form.labels().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index + 1);

@@ -1,15 +1,20 @@
-<form [formGroup]="form" (submit)="save()">
+<!-- no <form> here: this editor can be nested; Enter in a text input
+     saves it via onEnterKey -->
+<div (keydown.enter)="onEnterKey($event)">
   <div class="form-row">
     <!-- type (bound) -->
     @if (typeEntries()?.length) {
       <mat-form-field>
         <mat-label>type</mat-label>
-        <mat-select [formControl]="type">
+        <mat-select [formField]="form.type">
           @for (e of typeEntries(); track e.id) {
             <mat-option [value]="e.id">{{ e.value }}</mat-option>
           }
         </mat-select>
-        @if ($any(type).errors?.required && (type.dirty || type.touched)) {
+        @if (
+          form.type().getError('required') &&
+          (form.type().dirty() || form.type().touched())
+        ) {
           <mat-error>type required</mat-error>
         }
       </mat-form-field>
@@ -17,11 +22,17 @@
       <!-- type (free) -->
       <mat-form-field>
         <mat-label>type</mat-label>
-        <input matInput [formControl]="type" />
-        @if ($any(type).errors?.required && (type.dirty || type.touched)) {
+        <input matInput [formField]="form.type" />
+        @if (
+          form.type().getError('required') &&
+          (form.type().dirty() || form.type().touched())
+        ) {
           <mat-error>type required</mat-error>
         }
-        @if ($any(type).errors?.maxLength && (type.dirty || type.touched)) {
+        @if (
+          form.type().getError('maxLength') &&
+          (form.type().dirty() || form.type().touched())
+        ) {
           <mat-error>type too long</mat-error>
         }
       </mat-form-field>
@@ -30,11 +41,17 @@
     <!-- value -->
     <mat-form-field>
       <mat-label>value</mat-label>
-      <input matInput [formControl]="value" />
-      @if ($any(value).errors?.required && (value.dirty || value.touched)) {
+      <input matInput [formField]="form.value" />
+      @if (
+        form.value().getError('required') &&
+        (form.value().dirty() || form.value().touched())
+      ) {
         <mat-error>value required</mat-error>
       }
-      @if ($any(value).errors?.maxLength && (value.dirty || value.touched)) {
+      @if (
+        form.value().getError('maxLength') &&
+        (form.value().dirty() || form.value().touched())
+      ) {
         <mat-error>value too long</mat-error>
       }
     </mat-form-field>
@@ -46,7 +63,7 @@
       <legend>language(s)</legend>
       <cadmus-ui-flag-set
         [flags]="languageFlags()"
-        [checkedIds]="languages.value"
+        [checkedIds]="form.languages().value()"
         (checkedIdsChange)="onLanguageIdsChange($event!)"
       />
     </fieldset>
@@ -56,8 +73,11 @@
   <div>
     <mat-form-field class="long-text">
       <mat-label>note</mat-label>
-      <textarea matInput [formControl]="note"></textarea>
-      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+      <textarea matInput [formField]="form.note"></textarea>
+      @if (
+        form.note().getError('maxLength') &&
+        (form.note().dirty() || form.note().touched())
+      ) {
         <mat-error>note too long</mat-error>
       }
     </mat-form-field>
@@ -68,7 +88,7 @@
     <mat-expansion-panel-header>
       <mat-panel-title>fonts</mat-panel-title>
       <mat-panel-description>
-        {{ fonts.value.length }}
+        {{ form.fonts().value().length }}
       </mat-panel-description>
     </mat-expansion-panel-header>
     <div>
@@ -76,7 +96,7 @@
         <mat-icon>add_circle</mat-icon> font
       </button>
     </div>
-    @if (fonts.value.length) {
+    @if (form.fonts().value().length) {
       <table>
         <thead>
           <tr>
@@ -88,7 +108,7 @@
         </thead>
         <tbody>
           @for (
-            font of fonts.value;
+            font of form.fonts().value();
             track font;
             let i = $index;
             let first = $first;
@@ -148,8 +168,8 @@
                           section
                             | flatLookup
                               : layoutSectionEntries()
-                              : "id"
-                              : "value"
+                              : 'id'
+                              : 'value'
                         }}
                         @if (!last) {
                           <span>, </span>
@@ -181,7 +201,7 @@
             [lookupProviderOptions]="lookupProviderOptions()"
             [font]="edited()"
             (fontChange)="saveFont($event!)"
-            (editorClose)="closeFont()"
+            (cancelEdit)="closeFont()"
           />
         </mat-expansion-panel>
       </fieldset>
@@ -199,12 +219,13 @@
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
+      (click)="save()"
       mat-icon-button
       matTooltip="Accept changes"
-      [disabled]="form.invalid || form.pristine"
+      [disabled]="form().invalid() || !form().dirty()"
     >
       <mat-icon class="mat-primary">check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>

@@ -1,62 +1,84 @@
-<form [formGroup]="formCtl" (submit)="save()">
+<!-- no <form> here: this editor is nested in the part editor; Enter in a
+     text input saves it via onEnterKey -->
+<div (keydown.enter)="onEnterKey($event)">
   <mat-tab-group>
     <!-- GENERAL -->
     <mat-tab label="General">
       <div class="form-row">
+        <!-- eid -->
+        <mat-form-field>
+          <mat-label>EID</mat-label>
+          <input matInput [formField]="formCtl.eid" />
+          @if (
+            formCtl.eid().getError('maxLength') &&
+            (formCtl.eid().dirty() || formCtl.eid().touched())
+          ) {
+            <mat-error>EID too long</mat-error>
+          }
+        </mat-form-field>
+
         <!-- value -->
         <mat-form-field>
           <mat-label>value</mat-label>
-          <input matInput [formControl]="value" />
-          @if ($any(value).errors?.required && (value.dirty || value.touched)) {
-          <mat-error>value required</mat-error>
-          } @if ($any(value).errors?.maxLength && (value.dirty ||
-          value.touched)) {
-          <mat-error>value too long</mat-error>
+          <input matInput [formField]="formCtl.value" />
+          @if (
+            formCtl.value().getError('required') &&
+            (formCtl.value().dirty() || formCtl.value().touched())
+          ) {
+            <mat-error>value required</mat-error>
+          }
+          @if (
+            formCtl.value().getError('maxLength') &&
+            (formCtl.value().dirty() || formCtl.value().touched())
+          ) {
+            <mat-error>value too long</mat-error>
           }
         </mat-form-field>
 
         <!-- language (bound) -->
         @if (langEntries()?.length) {
-        <mat-form-field>
-          <mat-label>language</mat-label>
-          <mat-select [formControl]="language">
-            @for (e of langEntries(); track e.id) {
-            <mat-option [value]="e.id">{{ e.value }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field>
+            <mat-label>language</mat-label>
+            <mat-select [formField]="formCtl.language">
+              @for (e of langEntries(); track e.id) {
+                <mat-option [value]="e.id">{{ e.value }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         } @else {
-        <!-- language (free) -->
-        <mat-form-field>
-          <mat-label>language</mat-label>
-          <input matInput [formControl]="language" />
-          @if ($any(language).errors?.maxLength && (language.dirty ||
-          language.touched)) {
-          <mat-error>language too long</mat-error>
-          }
-        </mat-form-field>
+          <!-- language (free) -->
+          <mat-form-field>
+            <mat-label>language</mat-label>
+            <input matInput [formField]="formCtl.language" />
+            @if (
+              formCtl.language().getError('maxLength') &&
+              (formCtl.language().dirty() || formCtl.language().touched())
+            ) {
+              <mat-error>language too long</mat-error>
+            }
+          </mat-form-field>
         }
 
         <!-- rank -->
         <mat-form-field class="nr">
           <mat-label>rank</mat-label>
-          <input matInput type="number" [formControl]="rank" min="0" />
+          <input matInput type="number" [formField]="formCtl.rank" />
         </mat-form-field>
       </div>
 
       <!-- tags -->
       <div>
         @if (tagEntries()?.length) {
-        <div>
-          <fieldset>
-            <legend>tags</legend>
-            <cadmus-thesaurus-entries-picker
-              [availableEntries]="tagEntries()!"
-              [entries]="tags.value"
-              (entriesChange)="onTagEntriesChange($event!)"
-            />
-          </fieldset>
-        </div>
+          <div>
+            <fieldset>
+              <legend>tags</legend>
+              <cadmus-thesaurus-entries-picker
+                [availableEntries]="tagEntries()!"
+                [entries]="tagPickerEntries()"
+                (entriesChange)="onTagEntriesChange($event!)"
+              />
+            </fieldset>
+          </div>
         }
       </div>
 
@@ -64,9 +86,12 @@
       <div class="mt-16">
         <mat-form-field class="long-text">
           <mat-label>note</mat-label>
-          <textarea matInput [formControl]="note" rows="3"></textarea>
-          @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
-          <mat-error>note too long</mat-error>
+          <textarea matInput [formField]="formCtl.note" rows="3"></textarea>
+          @if (
+            formCtl.note().getError('maxLength') &&
+            (formCtl.note().dirty() || formCtl.note().touched())
+          ) {
+            <mat-error>note too long</mat-error>
           }
         </mat-form-field>
       </div>
@@ -78,15 +103,20 @@
         <!-- referenceForm -->
         <mat-form-field>
           <mat-label>ref. form</mat-label>
-          <input matInput [formControl]="referenceForm" />
-          @if ($any(referenceForm).errors?.maxLength && (referenceForm.dirty ||
-          referenceForm.touched)) {
-          <mat-error>reference form too long</mat-error>
+          <input matInput [formField]="formCtl.referenceForm" />
+          @if (
+            formCtl.referenceForm().getError('maxLength') &&
+            (formCtl.referenceForm().dirty() ||
+              formCtl.referenceForm().touched())
+          ) {
+            <mat-error>reference form too long</mat-error>
           }
         </mat-form-field>
 
         <!-- isValueTarget -->
-        <mat-checkbox [formControl]="isValueTarget"> ref → value </mat-checkbox>
+        <mat-checkbox [formField]="formCtl.isValueTarget">
+          ref → value
+        </mat-checkbox>
       </div>
 
       <!-- operations -->
@@ -98,7 +128,7 @@
             [targetText]="targetText() || ''"
             [tagEntries]="tagEntries()"
             [opTagEntries]="opTagEntries()"
-            [operations]="operations.value"
+            [operations]="formCtl.operations().value()"
             (operationsChange)="onOperationsChange($event!)"
           />
         </fieldset>
@@ -112,7 +142,7 @@
         <cadmus-refs-lookup-doc-references
           [tagEntries]="refTagEntries()"
           [typeEntries]="refTypeEntries()"
-          [references]="references.value"
+          [references]="formCtl.references().value()"
           (referencesChange)="onReferencesChange($event)"
         />
       </div>
@@ -122,12 +152,12 @@
         <cadmus-refs-asserted-composite-ids
           [idTagEntries]="linkTagEntries()"
           [assTagEntries]="linkAssTagEntries()"
-          [refTagEntries]="refTagEntries()"
+          [refTagEntries]="linkDocRefTagEntries()"
           [idScopeEntries]="linkScopeEntries()"
-          [refTypeEntries]="refTypeEntries()"
+          [refTypeEntries]="linkDocRefTypeEntries()"
           [featureEntries]="idFeatureEntries()"
           [lookupProviderOptions]="lookupProviderOptions()"
-          [ids]="links.value"
+          [ids]="formCtl.links().value()"
           (idsChange)="onLinksChange($event)"
         />
       </div>
@@ -145,12 +175,13 @@
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
       mat-icon-button
       matTooltip="Accept changes"
-      [disabled]="formCtl.invalid || formCtl.pristine"
+      [disabled]="formCtl().invalid() || !formCtl().dirty()"
+      (click)="save()"
     >
       <mat-icon class="mat-primary">check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>

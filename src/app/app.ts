@@ -6,6 +6,7 @@ import {
   computed,
   ChangeDetectionStrategy,
   inject,
+  signal,
 } from '@angular/core';
 import { Thesaurus, ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { Router, RouterModule } from '@angular/router';
@@ -66,16 +67,20 @@ import { DC_SCHEME } from './cit-schemes';
     ThemeToggleComponent,
   ],
   templateUrl: './app.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './app.scss',
 })
 export class App implements OnInit, OnDestroy {
   private readonly _subs: Subscription[] = [];
 
-  public user?: User;
-  public logged?: boolean;
-  public itemBrowsers?: ThesaurusEntry[];
-  public version: string;
+  // signals, so that changes made while the view is being checked (e.g. on
+  // login) schedule a new check rather than raising NG0100 (zoneless app)
+  public readonly user = signal<User | undefined>(undefined);
+  public readonly logged = signal<boolean>(false);
+  public readonly itemBrowsers = signal<ThesaurusEntry[] | undefined>(
+    undefined,
+  );
+  public readonly version = signal<string>('');
 
   readonly branding = computed(() => {
     switch (this._env.get('branding')) {
@@ -105,7 +110,7 @@ export class App implements OnInit, OnDestroy {
     private _router: Router,
     private _env: EnvService,
   ) {
-    this.version = this._env.get('version') || '';
+    this.version.set(this._env.get('version') || '');
 
     const storage = inject(RamStorageService);
 
@@ -243,14 +248,14 @@ export class App implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.user = this._authService.currentUserValue || undefined;
-    this.logged = this.user !== null;
+    this.user.set(this._authService.currentUserValue || undefined);
+    this.logged.set(this._authService.isAuthenticated(true));
 
     // when the user logs in or out, reload the app data
     this._subs.push(
       this._authService.currentUser$.subscribe((user: User | null) => {
-        this.logged = this._authService.isAuthenticated(true);
-        this.user = user || undefined;
+        this.logged.set(this._authService.isAuthenticated(true));
+        this.user.set(user || undefined);
         if (user) {
           console.log('User logged in: ', user);
           this._appRepository.load();
@@ -264,7 +269,7 @@ export class App implements OnInit, OnDestroy {
     this._subs.push(
       this._appRepository.itemBrowserThesaurus$.subscribe(
         (thesaurus: Thesaurus | undefined) => {
-          this.itemBrowsers = thesaurus ? thesaurus.entries : undefined;
+          this.itemBrowsers.set(thesaurus ? thesaurus.entries : undefined);
         },
       ),
     );
@@ -279,7 +284,7 @@ export class App implements OnInit, OnDestroy {
   }
 
   public logout(): void {
-    if (!this.logged) {
+    if (!this.logged()) {
       return;
     }
     this._authService

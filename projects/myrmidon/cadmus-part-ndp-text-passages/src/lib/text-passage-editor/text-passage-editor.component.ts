@@ -1,19 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
+  inject,
   input,
+  linkedSignal,
   model,
   output,
+  untracked,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { form, FormField, maxLength } from '@angular/forms/signals';
 
 // material
 import { MatButtonModule } from '@angular/material/button';
@@ -32,9 +30,55 @@ import {
 } from '@myrmidon/cadmus-refs-citation';
 import { ThesaurusEntriesPickerComponent } from '@myrmidon/cadmus-thesaurus-store';
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import { NgxToolsSignalValidators } from '@myrmidon/ngx-tools';
+import { isImplicitSubmission, setFieldFromChild } from '@myrmidon/cadmus-ui';
 
 import { TextPassage } from '../text-passages-part';
-import { NgxToolsValidators } from '@myrmidon/ngx-tools';
+
+/**
+ * The editable draft behind the form.
+ */
+interface TextPassageControls {
+  // used when there is a citation scheme
+  citation: Citation | CitationSpan | null;
+  // used when there is no citation scheme
+  freeCitation: string;
+  tag: string;
+  // feature IDs: the picker's entries are derived from them
+  features: string[];
+  text: string;
+  note: string;
+}
+
+/**
+ * Text passage -> draft.
+ * @param data The text passage.
+ * @param schemeKey The citation scheme key, or null/undefined for a free
+ * text citation.
+ * @param citService The citation scheme service used to parse citations.
+ */
+function toDraft(
+  data: TextPassage | undefined | null,
+  schemeKey: string | undefined | null,
+  citService: CitSchemeService,
+): TextPassageControls {
+  let citation: Citation | CitationSpan | null = null;
+  if (data && schemeKey) {
+    // parse as single citation or span
+    citation =
+      (data.citation.includes(' - ')
+        ? citService.parseSpan(data.citation, schemeKey)
+        : citService.parse(data.citation, schemeKey)) || null;
+  }
+  return {
+    citation,
+    freeCitation: !schemeKey ? data?.citation || '' : '',
+    tag: data?.tag || '',
+    features: [...(data?.features || [])],
+    text: data?.text || '',
+    note: data?.note || '',
+  };
+}
 
 /**
  * Editor for a single text passage.
@@ -43,7 +87,7 @@ import { NgxToolsValidators } from '@myrmidon/ngx-tools';
   selector: 'cadmus-text-passage-editor',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -59,6 +103,8 @@ import { NgxToolsValidators } from '@myrmidon/ngx-tools';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextPassageEditorComponent {
+  private readonly _citService = inject(CitSchemeService);
+
   /**
    * The text passage to edit. This implies a dataChange event when the user
    * saves the form.
@@ -81,117 +127,80 @@ export class TextPassageEditorComponent {
   // text-passage-features
   public readonly featureEntries = input<ThesaurusEntry[] | undefined>();
 
-  public citation: FormControl<Citation | CitationSpan | null>;
-  public freeCitation: FormControl<string | null>;
-  public tag: FormControl<string | null>;
-  public features: FormControl<ThesaurusEntry[]>;
-  public text: FormControl<string | null>;
-  public note: FormControl<string | null>;
-  public form: FormGroup;
+  // the draft is rebuilt from each new passage or citation scheme
+  private readonly _draft = linkedSignal(() =>
+    toDraft(this.data(), this.citSchemeKey(), this._citService),
+  );
 
-  constructor(
-    formBuilder: FormBuilder,
-    private _citService: CitSchemeService,
-  ) {
-    // form
-    this.citation = formBuilder.control<Citation | CitationSpan | null>(null);
-    this.freeCitation = formBuilder.control<string | null>(null, {
-      validators: Validators.maxLength(100),
-    });
-    this.tag = formBuilder.control<string | null>(null, {
-      validators: Validators.maxLength(100),
-    });
-    this.features = formBuilder.control<ThesaurusEntry[]>([], {
-      nonNullable: true,
-    });
-    this.text = formBuilder.control<string | null>(null, {
-      validators: Validators.maxLength(5000),
-    });
-    this.note = formBuilder.control<string | null>(null, {
-      validators: Validators.maxLength(5000),
-    });
-    this.form = formBuilder.group(
-      {
-        citation: this.citation,
-        freeCitation: this.freeCitation,
-        tag: this.tag,
-        features: this.features,
-        text: this.text,
-        note: this.note,
-      },
-      {
-        validators: [
-          NgxToolsValidators.atLeastOneRequired(['citation', 'freeCitation']),
-        ],
-      },
-    );
+  public readonly form = form(this._draft, (p) => {
+    maxLength(p.freeCitation, 100);
+    maxLength(p.tag, 100);
+    maxLength(p.text, 5000);
+    maxLength(p.note, 5000);
+    NgxToolsSignalValidators.atLeastOneRequired(p, [
+      p.citation,
+      p.freeCitation,
+    ]);
+  });
 
-    // when model changes, update form
+  /**
+   * The picked feature entries, from the draft's feature IDs. Only IDs
+   * found in the features thesaurus are shown.
+   */
+  public readonly featurePickerEntries = computed<ThesaurusEntry[]>(() => {
+    const entries = this.featureEntries();
+    return this.form
+      .features()
+      .value()
+      .map((id) => entries?.find((e) => e.id === id))
+      .filter((e): e is ThesaurusEntry => !!e);
+  });
+
+  constructor() {
+    // when the draft mirrors the bound passage, there are no unsaved edits
     effect(() => {
-      const data = this.data();
-      this.updateForm(data);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
-  private updateForm(data: TextPassage | undefined | null): void {
-    if (!data) {
-      this.form.reset();
-    } else {
-      if (this.citSchemeKey()) {
-        // parse as single citation or span
-        if (data.citation.includes(' - ')) {
-          this.citation.setValue(
-            this._citService.parseSpan(data.citation, this.citSchemeKey()!) ||
-              null,
-          );
-        } else {
-          this.citation.setValue(
-            this._citService.parse(data.citation, this.citSchemeKey()!) || null,
-          );
-        }
-      } else {
-        this.freeCitation.setValue(data.citation || null);
-      }
-
-      this.tag.setValue(data.tag || null);
-      this.features.setValue(
-        data.features
-          ? data.features
-              .map((f) => this.featureEntries()?.find((e) => e.id === f)!)
-              .filter((e) => !!e) || []
-          : [],
-      );
-      this.text.setValue(data.text || null);
-      this.note.setValue(data.note || null);
-      this.form.markAsPristine();
-    }
+  /** True when the draft still mirrors the bound passage. */
+  private isDraftInSync(draft: TextPassageControls): boolean {
+    return (
+      JSON.stringify(draft) ===
+      JSON.stringify(
+        toDraft(this.data(), this.citSchemeKey(), this._citService),
+      )
+    );
   }
 
   public onCitationChange(citation: Citation | CitationSpan | null): void {
-    this.citation.setValue(citation);
-    this.citation.markAsDirty();
-    this.citation.updateValueAndValidity();
+    setFieldFromChild(this.form.citation, citation || null);
   }
 
   public onFeaturesChange(entries: ThesaurusEntry[]): void {
-    this.features.setValue(entries);
-    this.features.markAsDirty();
-    this.features.updateValueAndValidity();
+    setFieldFromChild(
+      this.form.features,
+      (entries || []).map((e) => e.id),
+    );
   }
 
   private getData(): TextPassage {
+    const draft = this._draft();
     return {
       citation: this.citSchemeKey()
-        ? this.citation.value
-          ? this._citService.toString(this.citation.value!)
+        ? draft.citation
+          ? this._citService.toString(draft.citation)
           : ''
-        : this.freeCitation.value || '',
-      tag: this.tag.value || undefined,
-      features: this.features.value?.length
-        ? this.features.value.map((e) => e.id)
-        : undefined,
-      text: this.text.value || undefined,
-      note: this.note.value || undefined,
+        : draft.freeCitation.trim(),
+      tag: draft.tag.trim() || undefined,
+      features: draft.features.length ? [...draft.features] : undefined,
+      text: draft.text.trim() || undefined,
+      note: draft.note.trim() || undefined,
     };
   }
 
@@ -200,25 +209,39 @@ export class TextPassageEditorComponent {
   }
 
   /**
+   * Handle Enter: in a text input, save as the save button would, when it
+   * is enabled. This replaces the implicit submission of a form, which
+   * targeted only the innermost form.
+   * @param event The keydown event.
+   */
+  public onEnterKey(event: Event): void {
+    if (!isImplicitSubmission(event)) {
+      return;
+    }
+    // consume Enter even when not saving, so that it does not reach an
+    // enclosing editor, which would save itself instead
+    event.preventDefault();
+    if (this.form().valid() && this.form().dirty()) {
+      this.save();
+    }
+  }
+
+  /**
    * Saves the current form data by updating the `data` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
+   * @param pristine If true (default), the form's interaction state is
+   * cleared after saving.
    */
   public save(pristine = true): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
       // show validation errors
-      this.form.markAllAsTouched();
+      this.form().markAsTouched();
       return;
     }
 
-    const data = this.getData();
-    this.data.set(data);
+    this.data.set(this.getData());
 
     if (pristine) {
-      this.form.markAsPristine();
+      this.form().reset();
     }
   }
 }

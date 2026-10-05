@@ -15,6 +15,11 @@ import { EditedObject, PartIdentity, ThesauriSet } from '@myrmidon/cadmus-core';
 import { PrintFigPlanPartComponent } from './print-fig-plan-part.component';
 import { FigPlanItem, PrintFigPlanPart } from '../print-fig-plan-part';
 
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
+
 @Component({
   selector: 'cadmus-refs-asserted-composite-ids',
   template: '',
@@ -31,6 +36,24 @@ class MockAssertedCompositeIdsComponent {
   public readonly canSwitchMode = input<boolean>();
   public readonly canEditTarget = input<boolean>();
   public readonly idsChange = output<AssertedCompositeId[]>();
+}
+
+// the Discard button of a nested editor, not of editors nested inside it
+function discardButtonOf(host: HTMLElement): HTMLButtonElement {
+  const owner = (e: Element): Element | null => {
+    let p = e.parentElement;
+    while (p && !p.tagName.startsWith('CADMUS-')) {
+      p = p.parentElement;
+    }
+    return p;
+  };
+  const button = Array.from(
+    host.querySelectorAll<HTMLButtonElement>(
+      'button[mattooltip="Discard changes"]',
+    ),
+  ).find((b) => owner(b) === host);
+  expect(button).toBeTruthy();
+  return button!;
 }
 
 describe('PrintFigPlanPartComponent', () => {
@@ -144,8 +167,8 @@ describe('PrintFigPlanPartComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid when description exceeds 1000 characters', () => {
       fixture.detectChanges();
-      component.description.setValue('x'.repeat(1001));
-      expect(component.description.invalid).toBe(true);
+      component.form.description().value.set('x'.repeat(1001));
+      expect(component.form.description().invalid()).toBe(true);
     });
   });
 
@@ -173,13 +196,13 @@ describe('PrintFigPlanPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.description.setValue('a description');
+      component.form.description().value.set('a description');
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.description.value).toBeNull();
+      expect(component.form.description().value()).toBe('');
     });
 
     it('should populate all controls from part data', async () => {
@@ -201,12 +224,12 @@ describe('PrintFigPlanPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.artistIds.value).toEqual(artistIds);
-      expect(component.techniques.value).toEqual(['t1']);
-      expect(component.features.value).toEqual(['f1']);
-      expect(component.description.value).toBe('a description');
-      expect(component.items.value).toEqual(items);
-      expect(component.form.pristine).toBe(true);
+      expect(json(component.form.artistIds().value())).toEqual(artistIds);
+      expect(json(component.form.techniques().value())).toEqual(['t1']);
+      expect(json(component.form.features().value())).toEqual(['f1']);
+      expect(component.form.description().value()).toBe('a description');
+      expect(json(component.form.items().value())).toEqual(items);
+      expect(component.form().dirty()).toBe(false);
     });
   });
 
@@ -219,14 +242,12 @@ describe('PrintFigPlanPartComponent', () => {
       component.onArtistIdsChange([{ target: { gid: 'g1', label: 'L1' } }]);
       component.onTechniqueCheckedIdsChange(['t1']);
       component.onFeatureCheckedIdsChange(['f1']);
-      component.description.setValue('  a description  ');
+      component.form.description().value.set('  a description  ');
       component.saveItem(makeItem('e1'));
 
       const value = (component as any).getValue() as PrintFigPlanPart;
 
-      expect(value.artistIds).toEqual([
-        { target: { gid: 'g1', label: 'L1' } },
-      ]);
+      expect(value.artistIds).toEqual([{ target: { gid: 'g1', label: 'L1' } }]);
       expect(value.techniques).toEqual(['t1']);
       expect(value.features).toEqual(['f1']);
       expect(value.description).toBe('a description');
@@ -250,12 +271,18 @@ describe('PrintFigPlanPartComponent', () => {
 
   describe('addItem / editItem / closeItem', () => {
     it('addItem should default the type to the first planTypeEntries id', () => {
-      fixture.componentRef.setInput('data', makeData({}, {
-        'fig-plan-types': {
-          id: 'fig-plan-types',
-          entries: [{ id: 'type-x', value: 'Type X' }],
-        },
-      }));
+      fixture.componentRef.setInput(
+        'data',
+        makeData(
+          {},
+          {
+            'fig-plan-types': {
+              id: 'fig-plan-types',
+              entries: [{ id: 'type-x', value: 'Type X' }],
+            },
+          },
+        ),
+      );
       fixture.detectChanges();
 
       component.addItem();
@@ -297,24 +324,27 @@ describe('PrintFigPlanPartComponent', () => {
   describe('saveItem', () => {
     it('should append a new item when editedIndex is -1', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1')]);
+      component.form.items().value.set([makeItem('e1')]);
       component.addItem();
 
       component.saveItem(makeItem('e2'));
 
-      expect(component.items.value).toEqual([makeItem('e1'), makeItem('e2')]);
-      expect(component.items.dirty).toBe(true);
+      expect(json(component.form.items().value())).toEqual([
+        makeItem('e1'),
+        makeItem('e2'),
+      ]);
+      expect(component.form.items().dirty()).toBe(true);
       expect(component.editedIndex()).toBe(-1);
     });
 
     it('should replace the item at editedIndex when editing an existing one', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e2'), 1);
 
       component.saveItem({ eid: 'e2', type: 'type-b' });
 
-      expect(component.items.value).toEqual([
+      expect(json(component.form.items().value())).toEqual([
         makeItem('e1'),
         { eid: 'e2', type: 'type-b' },
       ]);
@@ -325,27 +355,27 @@ describe('PrintFigPlanPartComponent', () => {
     it('should remove the item when the user confirms', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
 
       component.deleteItem(0);
 
-      expect(component.items.value).toEqual([makeItem('e2')]);
+      expect(json(component.form.items().value())).toEqual([makeItem('e2')]);
     });
 
     it('should not remove the item when the user cancels', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(false));
-      component.items.setValue([makeItem('e1')]);
+      component.form.items().value.set([makeItem('e1')]);
 
       component.deleteItem(0);
 
-      expect(component.items.value).toEqual([makeItem('e1')]);
+      expect(json(component.form.items().value())).toEqual([makeItem('e1')]);
     });
 
     it('should close the editor when deleting the currently edited item', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.items.setValue([makeItem('e1')]);
+      component.form.items().value.set([makeItem('e1')]);
       component.editItem(makeItem('e1'), 0);
 
       component.deleteItem(0);
@@ -362,28 +392,31 @@ describe('PrintFigPlanPartComponent', () => {
     it('should do nothing when index is 0', () => {
       fixture.detectChanges();
       const items = [makeItem('e1'), makeItem('e2')];
-      component.items.setValue(items);
+      component.form.items().value.set(items);
 
       component.moveItemUp(0);
 
-      expect(component.items.value).toEqual(items);
-      expect(component.items.dirty).toBe(false);
+      expect(json(component.form.items().value())).toEqual(items);
+      expect(component.form.items().dirty()).toBe(false);
     });
 
     it('should swap the item with the previous one and keep editedIndex tracking it', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e2'), 1);
 
       component.moveItemUp(1);
 
-      expect(component.items.value).toEqual([makeItem('e2'), makeItem('e1')]);
+      expect(json(component.form.items().value())).toEqual([
+        makeItem('e2'),
+        makeItem('e1'),
+      ]);
       expect(component.editedIndex()).toBe(0);
     });
 
     it('should keep editedIndex tracking the displaced item', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e1'), 0);
 
       component.moveItemUp(1);
@@ -396,33 +429,118 @@ describe('PrintFigPlanPartComponent', () => {
     it('should do nothing when index is the last one', () => {
       fixture.detectChanges();
       const items = [makeItem('e1'), makeItem('e2')];
-      component.items.setValue(items);
+      component.form.items().value.set(items);
 
       component.moveItemDown(1);
 
-      expect(component.items.value).toEqual(items);
-      expect(component.items.dirty).toBe(false);
+      expect(json(component.form.items().value())).toEqual(items);
+      expect(component.form.items().dirty()).toBe(false);
     });
 
     it('should swap the item with the next one and keep editedIndex tracking it', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e1'), 0);
 
       component.moveItemDown(0);
 
-      expect(component.items.value).toEqual([makeItem('e2'), makeItem('e1')]);
+      expect(json(component.form.items().value())).toEqual([
+        makeItem('e2'),
+        makeItem('e1'),
+      ]);
       expect(component.editedIndex()).toBe(1);
     });
 
     it('should keep editedIndex tracking the displaced item', () => {
       fixture.detectChanges();
-      component.items.setValue([makeItem('e1'), makeItem('e2')]);
+      component.form.items().value.set([makeItem('e1'), makeItem('e2')]);
       component.editItem(makeItem('e2'), 1);
 
       component.moveItemDown(0);
 
       expect(component.editedIndex()).toBe(0);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+
+    it('should show the description in its textarea, pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData({ description: 'desc' }));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const textarea: HTMLTextAreaElement =
+        fixture.nativeElement.querySelector('textarea');
+      expect(textarea).toBeTruthy();
+      expect(textarea.value).toBe('desc');
+      expect(component.isDirty()).toBe(false);
+    });
+
+    it('should save the description typed in its textarea', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData({ description: 'desc' }));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const textarea: HTMLTextAreaElement =
+        fixture.nativeElement.querySelector('textarea');
+      textarea.value = '  new desc  ';
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      fixture.detectChanges();
+      expect(component.isDirty()).toBe(true);
+
+      component.save();
+
+      expect(component.data()!.value!.description).toBe('new desc');
+    });
+
+    it('should flag a too long description', async () => {
+      fixture.detectChanges();
+      const textarea: HTMLTextAreaElement =
+        fixture.nativeElement.querySelector('textarea');
+      textarea.value = 'x'.repeat(1001);
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      textarea.dispatchEvent(new Event('blur'));
+      fixture.detectChanges();
+
+      expect(component.form.description().getError('maxLength')).toBeTruthy();
+      expect(fixture.nativeElement.textContent).toContain(
+        'description too long',
+      );
+    });
+
+    it('should close the item editor on its Discard button', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput(
+        'data',
+        makeData({ items: [makeItem('e1')] }),
+      );
+      fixture.detectChanges();
+      await fixture.whenStable();
+      component.editItem(component.form.items().value()[0], 0);
+      // the item editor is in the items tab
+      const tab = Array.from<HTMLElement>(
+        fixture.nativeElement.querySelectorAll('[role=tab]'),
+      ).find((t) => /items/i.test(t.textContent || ''))!;
+      tab.click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const host: HTMLElement = fixture.nativeElement.querySelector(
+        'cadmus-fig-plan-item-editor',
+      );
+      expect(host).toBeTruthy();
+
+      discardButtonOf(host).click();
+      fixture.detectChanges();
+
+      expect(component.edited()).toBeUndefined();
+      expect(component.editedIndex()).toBe(-1);
     });
   });
 });

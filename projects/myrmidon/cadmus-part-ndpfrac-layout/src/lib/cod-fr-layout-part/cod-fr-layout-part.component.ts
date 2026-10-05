@@ -1,12 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  linkedSignal,
+} from '@angular/core';
+import { FormField, maxLength, min, required } from '@angular/forms/signals';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,16 +17,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
-import {
-  ThesauriSet,
-  ThesaurusEntry,
-  EditedObject,
-} from '@myrmidon/cadmus-core';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import {
   CloseSaveButtonsComponent,
-  ModelEditorComponentBase,
+  copyFormValue,
   HelpLinkComponent,
+  ModelEditorComponentBase,
+  setFieldFromChild,
 } from '@myrmidon/cadmus-ui';
 import { PhysicalDimension } from '@myrmidon/cadmus-mat-physical-size';
 import {
@@ -59,6 +54,38 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   };
 }
 
+interface CodFrLayoutPartControls {
+  formula: string;
+  dimensions: PhysicalDimension[];
+  pricking: string;
+  columnCount: number | null;
+  features: string[];
+  counts: DecoratedCount[];
+  note: string;
+}
+
+function toDraft(part?: CodFrLayoutPart | null): CodFrLayoutPartControls {
+  return {
+    formula: part?.formula || '',
+    dimensions: copyFormValue(part?.dimensions || []),
+    pricking: part?.pricking || '',
+    columnCount: part?.columnCount || 0,
+    features: [...(part?.features || [])],
+    counts: copyFormValue(part?.counts || []),
+    note: part?.note || '',
+  };
+}
+
+function toFormulaData(
+  part?: CodFrLayoutPart | null,
+): CodLayoutFormulaWithDimensions {
+  return {
+    prefix: (part?.formula?.split(' ')[0] as 'IT' | 'BO') || 'BO',
+    formula: part?.formula || '',
+    dimensions: copyFormValue(part?.dimensions || []),
+  };
+}
+
 /**
  * CodFrLayout part editor component.
  * Thesauri: cod-fr-layout-prickings, decorated-count-ids,
@@ -68,8 +95,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 @Component({
   selector: 'cadmus-cod-fr-layout-part',
   imports: [
+    FormField,
     CommonModule,
-    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
     MatExpansionModule,
@@ -83,207 +110,89 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
     CodLayoutFormulaComponent,
     DecoratedCountsComponent,
     CloseSaveButtonsComponent,
-    HelpLinkComponent
+    HelpLinkComponent,
   ],
   templateUrl: './cod-fr-layout-part.component.html',
   styleUrl: './cod-fr-layout-part.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodFrLayoutPartComponent
-  extends ModelEditorComponentBase<CodFrLayoutPart>
-  implements OnInit
-{
-  public formula: FormControl<string>;
-  public dimensions: FormControl<PhysicalDimension[]>;
-  public pricking: FormControl<string>;
-  public columnCount: FormControl<number>;
-  public features: FormControl<string[]>;
-  public counts: FormControl<DecoratedCount[]>;
-  public note: FormControl<string | null>;
-
-  public readonly formulaData = signal<CodLayoutFormulaWithDimensions>({
-    prefix: 'BO',
-    formula: '',
-    dimensions: [],
-  });
+export class CodFrLayoutPartComponent extends ModelEditorComponentBase<CodFrLayoutPart> {
+  // the data of the formula editor: derived from the bound part, and replaced
+  // by what the formula editor emits, so that it is not reset by its own changes
+  public readonly formulaData = linkedSignal<CodLayoutFormulaWithDimensions>(
+    () => toFormulaData(this.data()?.value),
+  );
 
   // cod-fr-layout-features
-  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly featureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-layout-features']?.entries,
+  );
   // cod-fr-layout-prickings
-  public readonly prickingEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly prickingEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-layout-prickings']?.entries,
+  );
   // decorated-count-ids
-  public readonly countIdEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly countIdEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['decorated-count-ids']?.entries,
+  );
   // decorated-count-tags
-  public readonly countTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly countTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['decorated-count-tags']?.entries,
+  );
   // physical-size-units
-  public readonly unitEntries = signal<ThesaurusEntry[]>(DEFAULT_UNITS);
+  public readonly unitEntries = computed<ThesaurusEntry[]>(
+    () =>
+      this.data()?.thesauri?.['physical-size-units']?.entries || DEFAULT_UNITS,
+  );
   // physical-size-dim-tags
-  public dimTagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly dimTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['physical-size-dim-tags']?.entries,
+  );
 
   // flags mapped from thesaurus entries
   public featureFlags = computed<Flag[]>(
-    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || [],
   );
 
-  constructor(authService: AuthJwtService, formBuilder: FormBuilder) {
-    super(authService, formBuilder);
-    // form
-    this.formula = formBuilder.control('', {
-      validators: Validators.required,
-      nonNullable: true,
-    });
-    this.dimensions = formBuilder.control<PhysicalDimension[]>([], {
-      nonNullable: true,
-    });
-    this.pricking = formBuilder.control<string>(
-      this.prickingEntries()?.[0]?.id || '',
-      {
-        validators: Validators.maxLength(100),
-        nonNullable: true,
-      }
-    );
-    this.features = formBuilder.control([], { nonNullable: true });
-    this.columnCount = formBuilder.control<number>(0, {
-      validators: Validators.min(1),
-      nonNullable: true,
-    });
-    this.counts = formBuilder.control<DecoratedCount[]>([], {
-      nonNullable: true,
-    });
-    this.note = formBuilder.control<string | null>(null, {
-      validators: Validators.maxLength(1000),
-    });
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      formula: this.formula,
-      dimensions: this.dimensions,
-      pricking: this.pricking,
-      columnCount: this.columnCount,
-      counts: this.counts,
-      note: this.note,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'cod-fr-layout-features';
-    if (this.hasThesaurus(key)) {
-      this.featureEntries.set(thesauri[key].entries);
-    } else {
-      this.featureEntries.set(undefined);
-    }
-    key = 'cod-fr-layout-prickings';
-    if (this.hasThesaurus(key)) {
-      this.prickingEntries.set(thesauri[key].entries);
-    } else {
-      this.prickingEntries.set(undefined);
-    }
-    key = 'decorated-count-ids';
-    if (this.hasThesaurus(key)) {
-      this.countIdEntries.set(thesauri[key].entries);
-    } else {
-      this.countIdEntries.set(undefined);
-    }
-    key = 'decorated-count-tags';
-    if (this.hasThesaurus(key)) {
-      this.countTagEntries.set(thesauri[key].entries);
-    } else {
-      this.countTagEntries.set(undefined);
-    }
-    key = 'physical-size-units';
-    if (this.hasThesaurus(key)) {
-      this.unitEntries.set(thesauri[key].entries || DEFAULT_UNITS);
-    } else {
-      this.unitEntries.set(DEFAULT_UNITS);
-    }
-    key = 'physical-size-dim-tags';
-    if (this.hasThesaurus(key)) {
-      this.dimTagEntries.set(thesauri[key].entries);
-    } else {
-      this.dimTagEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: CodFrLayoutPart | null): void {
-    if (!part) {
-      this.form.reset();
-      this.formulaData.set({
-        prefix: 'BO',
-        formula: '',
-        dimensions: [],
-      });
-      return;
-    }
-
-    this.formula.setValue(part.formula || '');
-    this.dimensions.setValue(part.dimensions || []);
-    this.pricking.setValue(part.pricking || '');
-    this.columnCount.setValue(part.columnCount || 0);
-    this.features.setValue(part.features || []);
-    this.counts.setValue(part.counts || []);
-    this.note.setValue(part.note || null);
-
-    this.formulaData.set({
-      prefix: (part.formula?.split(' ')[0] as 'IT' | 'BO') || 'BO',
-      formula: part.formula || '',
-      dimensions: part.dimensions || [],
-    });
-
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<CodFrLayoutPart>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-
-    // form
-    this.updateForm(data?.value);
-  }
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    required(p.formula);
+    maxLength(p.pricking, 100);
+    min(p.columnCount, 1);
+    maxLength(p.note, 1000);
+  });
 
   protected getValue(): CodFrLayoutPart {
-    let part = this.getEditedPart(COD_FR_LAYOUT_PART_TYPEID) as CodFrLayoutPart;
-    part.formula = this.formula.value.trim();
-    part.dimensions = this.dimensions.value?.length
-      ? this.dimensions.value
+    const part = this.getEditedPart(
+      COD_FR_LAYOUT_PART_TYPEID,
+    ) as CodFrLayoutPart;
+    const draft = this._draft();
+    part.formula = draft.formula.trim();
+    part.dimensions = draft.dimensions.length
+      ? copyFormValue(draft.dimensions)
       : undefined;
-    part.pricking = this.pricking.value?.trim() || undefined;
-    part.columnCount = this.columnCount.value || 0;
-    part.features = this.features.value?.length
-      ? this.features.value
-      : undefined;
-    part.counts = this.counts.value?.length ? this.counts.value : undefined;
-    part.note = this.note.value?.trim() || undefined;
+    part.pricking = draft.pricking.trim() || undefined;
+    part.columnCount = draft.columnCount || 0;
+    part.features = draft.features.length ? [...draft.features] : undefined;
+    part.counts = draft.counts.length ? copyFormValue(draft.counts) : undefined;
+    part.note = draft.note.trim() || undefined;
     return part;
   }
 
   public onFeatureCheckedIdsChange(ids: string[]): void {
-    this.features.setValue(ids);
-    this.features.markAsDirty();
-    this.features.updateValueAndValidity();
+    setFieldFromChild(this.form.features, [...(ids || [])]);
   }
 
   public onCountsChange(counts: DecoratedCount[]): void {
-    this.counts.setValue(counts);
-    this.counts.markAsDirty();
-    this.counts.updateValueAndValidity();
+    setFieldFromChild(this.form.counts, copyFormValue(counts || []));
   }
 
   public onFormulaDataChange(data: CodLayoutFormulaWithDimensions): void {
     this.formulaData.set(data);
-
-    this.formula.setValue(data.formula);
-    this.formula.markAsDirty();
-    this.formula.updateValueAndValidity();
-
-    this.dimensions.setValue(data.dimensions || []);
-    this.dimensions.markAsDirty();
-    this.dimensions.updateValueAndValidity();
+    setFieldFromChild(this.form.formula, data.formula || '');
+    setFieldFromChild(
+      this.form.dimensions,
+      copyFormValue(data.dimensions || []),
+    );
   }
 }

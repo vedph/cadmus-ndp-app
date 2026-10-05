@@ -1,12 +1,16 @@
-import { ChangeDetectionStrategy, Component, effect, input, model, output, signal } from '@angular/core';
-
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  model,
+  output,
+  untracked,
+} from '@angular/core';
+import { form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -24,8 +28,40 @@ import {
   CitSchemeService,
   CompactCitationComponent,
 } from '@myrmidon/cadmus-refs-citation';
+import { isImplicitSubmission, setFieldFromChild } from '@myrmidon/cadmus-ui';
 
 import { FigPlanItem } from '../print-fig-plan-part';
+
+/**
+ * The editable draft behind the form.
+ */
+interface FigPlanItemControls {
+  eid: string;
+  type: string;
+  citation: string;
+}
+
+/**
+ * Item -> draft.
+ */
+function toDraft(item?: FigPlanItem | null): FigPlanItemControls {
+  return {
+    eid: item?.eid || '',
+    type: item?.type || '',
+    citation: item?.citation || '',
+  };
+}
+
+/**
+ * Draft -> item.
+ */
+function toModel(draft: FigPlanItemControls): FigPlanItem {
+  return {
+    eid: draft.eid.trim(),
+    type: draft.type.trim(),
+    citation: draft.citation.trim() || undefined,
+  };
+}
 
 /**
  * Editor for a figure plan item.
@@ -33,7 +69,7 @@ import { FigPlanItem } from '../print-fig-plan-part';
 @Component({
   selector: 'cadmus-fig-plan-item-editor',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
@@ -42,101 +78,77 @@ import { FigPlanItem } from '../print-fig-plan-part';
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
-    CompactCitationComponent
-],
+    CompactCitationComponent,
+  ],
   templateUrl: './fig-plan-item-editor.component.html',
   styleUrl: './fig-plan-item-editor.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FigPlanItemEditorComponent {
+  private readonly _citService = inject(CitSchemeService);
+
   public readonly item = model<FigPlanItem | undefined>();
   public readonly cancelEdit = output();
 
   public readonly typeEntries = input<ThesaurusEntry[]>();
-  public readonly editedCit = signal<Citation | CitationSpan | undefined>(
-    undefined
+
+  // the citation passed to the citation editor: it is parsed from the bound
+  // item only, so that the editor is not reset by its own changes
+  public readonly editedCit = computed<Citation | CitationSpan | undefined>(
+    () => {
+      const citation = this.item()?.citation;
+      if (!citation) {
+        return undefined;
+      }
+      // parse citation, whether it's a span or a single one
+      return (
+        (citation.includes(' - ')
+          ? this._citService.parseSpan(citation, 'dc')
+          : this._citService.parse(citation, 'dc')) || undefined
+      );
+    },
   );
 
-  public eid: FormControl<string>;
-  public type: FormControl<string>;
-  public citation?: FormControl<string | null>;
-  public form: FormGroup;
+  // the draft is rebuilt from each new bound item
+  private readonly _draft = linkedSignal(() => toDraft(this.item()));
+  public readonly form = form(this._draft, (p) => {
+    required(p.eid);
+    maxLength(p.eid, 100);
+    required(p.type);
+    maxLength(p.type, 100);
+    maxLength(p.citation, 1000);
+  });
 
-  constructor(formBuilder: FormBuilder, private _citService: CitSchemeService) {
-    this.eid = formBuilder.control<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
-    });
-    this.type = formBuilder.control<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
-    });
-    this.citation = formBuilder.control<string | null>(null, {
-      validators: [Validators.maxLength(1000)],
-    });
-    this.form = formBuilder.group({
-      eid: this.eid,
-      type: this.type,
-      citation: this.citation,
-    });
-
-    // when model changes, update form
+  constructor() {
+    // when the draft mirrors the bound item, there are no unsaved edits
     effect(() => {
-      const data = this.item();
-      this.updateForm(data);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
-  private updateForm(item: FigPlanItem | undefined | null): void {
-    if (!item) {
-      this.editedCit.set(undefined);
-      this.form.reset();
-    } else {
-      this.eid.setValue(item.eid, { emitEvent: false });
-      this.type.setValue(item.type, { emitEvent: false });
-      this.citation?.setValue(item.citation || null, { emitEvent: false });
-      // parse citation, whether it's a span or a single one
-      if (item.citation) {
-        this.editedCit.set(
-          item.citation.includes(' - ')
-            ? this._citService.parseSpan(item.citation, 'dc')
-            : this._citService.parse(item.citation, 'dc')
-        );
-      } else {
-        this.editedCit.set(undefined);
-      }
-    }
-
-    this.form.markAsPristine();
+  /** True when the draft still mirrors the bound item. */
+  private isDraftInSync(draft: FigPlanItemControls): boolean {
+    return JSON.stringify(draft) === JSON.stringify(toDraft(this.item()));
   }
 
   public onCitationChange(citation: Citation | CitationSpan | undefined): void {
-    if (!citation) {
-      this.citation?.setValue(null);
-    } else {
+    let text = '';
+    if (citation) {
       if ((citation as CitationSpan)?.a) {
         const span = citation as CitationSpan;
-        this.citation?.setValue(
-          `${this._citService.toString(span.a)} - ${this._citService.toString(
-            span.b || span.a
-          )}`
-        );
+        text = `${this._citService.toString(span.a)} - ${this._citService.toString(
+          span.b || span.a,
+        )}`;
       } else {
-        this.citation?.setValue(
-          this._citService.toString(citation as Citation)
-        );
+        text = this._citService.toString(citation as Citation);
       }
     }
-    this.citation?.updateValueAndValidity();
-    this.citation?.markAsDirty();
-  }
-
-  private getItem(): FigPlanItem {
-    return {
-      eid: this.eid.value,
-      type: this.type.value,
-      citation: this.citation?.value ?? undefined,
-    };
+    setFieldFromChild(this.form.citation, text);
   }
 
   public cancel(): void {
@@ -144,25 +156,39 @@ export class FigPlanItemEditorComponent {
   }
 
   /**
+   * Handle Enter: in a text input, save as the save button would, when it
+   * is enabled. This replaces the implicit submission of a form, which
+   * targeted only the innermost form.
+   * @param event The keydown event.
+   */
+  public onEnterKey(event: Event): void {
+    if (!isImplicitSubmission(event)) {
+      return;
+    }
+    // consume Enter even when not saving, so that it does not reach an
+    // enclosing editor, which would save itself instead
+    event.preventDefault();
+    if (this.form().valid() && this.form().dirty()) {
+      this.save();
+    }
+  }
+
+  /**
    * Saves the current form data by updating the `item` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
+   * @param pristine If true (default), the form's interaction state is
+   * cleared after saving.
    */
   public save(pristine = true): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
       // show validation errors
-      this.form.markAllAsTouched();
+      this.form().markAsTouched();
       return;
     }
 
-    const item = this.getItem();
-    this.item.set(item);
+    this.item.set(toModel(this._draft()));
 
     if (pristine) {
-      this.form.markAsPristine();
+      this.form().reset();
     }
   }
 }

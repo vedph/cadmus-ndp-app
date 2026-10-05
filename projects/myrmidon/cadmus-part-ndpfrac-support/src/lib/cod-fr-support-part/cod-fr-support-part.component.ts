@@ -1,13 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+} from '@angular/core';
+import { FormField, maxLength, required } from '@angular/forms/signals';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,22 +19,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import {
   PhysicalGridCoordsService,
   PhysicalGridLocation,
   PhysicalGridLocationComponent,
 } from '@myrmidon/cadmus-mat-physical-grid';
 
-import {
-  ThesauriSet,
-  ThesaurusEntry,
-  EditedObject,
-} from '@myrmidon/cadmus-core';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import {
   CloseSaveButtonsComponent,
-  ModelEditorComponentBase,
   HelpLinkComponent,
+  ModelEditorComponentBase,
+  setFieldFromChild,
 } from '@myrmidon/cadmus-ui';
 
 import {
@@ -46,6 +41,51 @@ import {
 // import the custom element
 import '@myrmidon/cod-layout-view';
 
+interface CodFrSupportPartControls {
+  material: string;
+  location: PhysicalGridLocation | null;
+  container: string;
+  reuse: string;
+  supposedReuse: string;
+}
+
+/**
+ * Part -> draft.
+ * @param part The part.
+ * @param materialEntries The materials thesaurus entries: when the part has
+ * no material, the first one is used.
+ * @param coords The service used to parse the location.
+ */
+function toDraft(
+  part: CodFrSupportPart | null | undefined,
+  materialEntries: ThesaurusEntry[] | undefined,
+  coords: PhysicalGridCoordsService,
+): CodFrSupportPartControls {
+  if (!part) {
+    return {
+      material: '',
+      location: null,
+      container: '',
+      reuse: '',
+      supposedReuse: '',
+    };
+  }
+  return {
+    material: part.material || materialEntries?.[0]?.id || '',
+    // if the location is not valid, it will be set to null
+    location:
+      (coords.parsePhysicalGridCoords(
+        part.location,
+        3,
+        3,
+        true,
+      ) as PhysicalGridLocation) || null,
+    container: part.container || '',
+    reuse: part.reuse || '',
+    supposedReuse: part.supposedReuse || '',
+  };
+}
+
 /**
  * CodFrSupport part editor component.
  * Thesauri: cod-fr-support-materials, cod-fr-support-reuse-types,
@@ -54,8 +94,8 @@ import '@myrmidon/cod-layout-view';
 @Component({
   selector: 'cadmus-cod-fr-support-part',
   imports: [
+    FormField,
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
@@ -76,133 +116,50 @@ import '@myrmidon/cod-layout-view';
   styleUrl: './cod-fr-support-part.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodFrSupportPartComponent
-  extends ModelEditorComponentBase<CodFrSupportPart>
-  implements OnInit
-{
-  public material: FormControl<string>;
-  public location: FormControl<PhysicalGridLocation | null>;
-  public container: FormControl<string>;
-  public reuse: FormControl<string | null>;
-  public supposedReuse: FormControl<string | null>;
+export class CodFrSupportPartComponent extends ModelEditorComponentBase<CodFrSupportPart> {
+  private readonly _coordsService = inject(PhysicalGridCoordsService);
 
   // cod-fr-support-materials
-  public readonly materialEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly materialEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-support-materials']?.entries,
   );
   // cod-fr-support-reuse-types
-  public readonly reuseEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly reuseEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-support-reuse-types']?.entries,
   );
   // cod-fr-support-containers
-  public readonly containerEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly containerEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-support-containers']?.entries,
   );
 
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _coordsService: PhysicalGridCoordsService
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.material = formBuilder.control('', {
-      validators: Validators.maxLength(100),
-      nonNullable: true,
-    });
-    this.location = formBuilder.control(null, Validators.required);
-    this.container = formBuilder.control('', {
-      validators: Validators.maxLength(100),
-      nonNullable: true,
-    });
-    this.reuse = formBuilder.control(null, Validators.maxLength(100));
-    this.supposedReuse = formBuilder.control(null, Validators.maxLength(100));
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      material: this.material,
-      location: this.location,
-      container: this.container,
-      reuse: this.reuse,
-      supposedReuse: this.supposedReuse,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'cod-fr-support-materials';
-    if (this.hasThesaurus(key)) {
-      this.materialEntries.set(thesauri[key].entries);
-    } else {
-      this.materialEntries.set(undefined);
-    }
-    key = 'cod-fr-support-reuse-types';
-    if (this.hasThesaurus(key)) {
-      this.reuseEntries.set(thesauri[key].entries);
-    } else {
-      this.reuseEntries.set(undefined);
-    }
-    key = 'cod-fr-support-containers';
-    if (this.hasThesaurus(key)) {
-      this.containerEntries.set(thesauri[key].entries);
-    } else {
-      this.containerEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: CodFrSupportPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    this.material.setValue(
-      part.material || this.materialEntries()?.[0]?.id || ''
-    );
-    // if the location is not valid, it will be set to null
-    this.location.setValue(
-      (this._coordsService.parsePhysicalGridCoords(
-        part.location,
-        3,
-        3,
-        true
-      ) as PhysicalGridLocation) || null
-    );
-    this.container.setValue(part.container || '');
-    this.reuse.setValue(part.reuse || null);
-    this.supposedReuse.setValue(part.supposedReuse || null);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<CodFrSupportPart>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-
-    // form
-    this.updateForm(data?.value);
-  }
+  // the draft is rebuilt from each new data (including its thesauri)
+  private readonly _draft = linkedSignal(() =>
+    toDraft(this.data()?.value, this.materialEntries(), this._coordsService),
+  );
+  public readonly form = this.createForm(this._draft, (p) => {
+    maxLength(p.material, 100);
+    required(p.location);
+    maxLength(p.container, 100);
+    maxLength(p.reuse, 100);
+    maxLength(p.supposedReuse, 100);
+  });
 
   public onLocationChange(location: PhysicalGridLocation | null): void {
-    this.location.setValue(location);
-    this.location.markAsDirty();
+    setFieldFromChild(this.form.location, location || null);
   }
 
   protected getValue(): CodFrSupportPart {
-    let part = this.getEditedPart(
-      COD_FR_SUPPORT_PART_TYPEID
+    const part = this.getEditedPart(
+      COD_FR_SUPPORT_PART_TYPEID,
     ) as CodFrSupportPart;
-    part.material = this.material.value || '';
-    part.location = this.location.value
-      ? this._coordsService.physicalGridCoordsToString(this.location.value)
+    const draft = this._draft();
+    part.material = draft.material.trim();
+    part.location = draft.location
+      ? this._coordsService.physicalGridCoordsToString(draft.location)
       : '';
-    part.container = this.container.value?.trim() || '';
-    part.reuse = this.reuse.value?.trim() || undefined;
-    part.supposedReuse = this.supposedReuse.value?.trim() || undefined;
+    part.container = draft.container.trim();
+    part.reuse = draft.reuse.trim() || undefined;
+    part.supposedReuse = draft.supposedReuse.trim() || undefined;
     return part;
   }
 }

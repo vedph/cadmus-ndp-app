@@ -14,6 +14,11 @@ import { EditedObject, PartIdentity, ThesauriSet } from '@myrmidon/cadmus-core';
 import { DrawingTechPartComponent } from './drawing-tech-part.component';
 import { DrawingTechPart } from '../drawing-tech-part';
 
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
+
 @Component({
   selector: 'cadmus-mat-physical-measurement-set',
   template: '',
@@ -135,26 +140,26 @@ describe('DrawingTechPartComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid when material is empty', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid when material is set', () => {
       fixture.detectChanges();
-      component.material.setValue('paper');
-      expect(component.form.valid).toBe(true);
+      component.form.material().value.set('paper');
+      expect(component.form().valid()).toBe(true);
     });
 
     it('should be invalid when material exceeds 50 characters', () => {
       fixture.detectChanges();
-      component.material.setValue('x'.repeat(51));
-      expect(component.material.invalid).toBe(true);
+      component.form.material().value.set('x'.repeat(51));
+      expect(component.form.material().invalid()).toBe(true);
     });
 
     it('should be invalid when note exceeds 5000 characters', () => {
       fixture.detectChanges();
-      component.material.setValue('paper');
-      component.note.setValue('x'.repeat(5001));
-      expect(component.note.invalid).toBe(true);
+      component.form.material().value.set('paper');
+      component.form.note().value.set('x'.repeat(5001));
+      expect(component.form.note().invalid()).toBe(true);
     });
   });
 
@@ -167,7 +172,9 @@ describe('DrawingTechPartComponent', () => {
         'data',
         makeData(
           {},
-          { 'drawing-tech-materials': { id: 'drawing-tech-materials', entries } },
+          {
+            'drawing-tech-materials': { id: 'drawing-tech-materials', entries },
+          },
         ),
       );
       fixture.detectChanges();
@@ -192,13 +199,13 @@ describe('DrawingTechPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.material.setValue('paper');
+      component.form.material().value.set('paper');
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.material.value).toBe('');
+      expect(component.form.material().value()).toBe('');
     });
 
     it('should populate all controls from part data', async () => {
@@ -219,13 +226,13 @@ describe('DrawingTechPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.material.value).toBe('papyrus');
-      expect(component.features.value).toEqual(['f1']);
-      expect(component.measures.value).toEqual(measures);
-      expect(component.techniques.value).toEqual(['t1']);
-      expect(component.colors.value).toEqual(['c1']);
-      expect(component.note.value).toBe('a note');
-      expect(component.form.pristine).toBe(true);
+      expect(component.form.material().value()).toBe('papyrus');
+      expect(json(component.form.features().value())).toEqual(['f1']);
+      expect(json(component.form.measures().value())).toEqual(measures);
+      expect(json(component.form.techniques().value())).toEqual(['t1']);
+      expect(json(component.form.colors().value())).toEqual(['c1']);
+      expect(component.form.note().value()).toBe('a note');
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should default optional fields to empty when absent', async () => {
@@ -233,11 +240,11 @@ describe('DrawingTechPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.features.value).toEqual([]);
-      expect(component.measures.value).toEqual([]);
-      expect(component.techniques.value).toEqual([]);
-      expect(component.colors.value).toEqual([]);
-      expect(component.note.value).toBeNull();
+      expect(json(component.form.features().value())).toEqual([]);
+      expect(json(component.form.measures().value())).toEqual([]);
+      expect(json(component.form.techniques().value())).toEqual([]);
+      expect(json(component.form.colors().value())).toEqual([]);
+      expect(component.form.note().value()).toBe('');
     });
   });
 
@@ -247,7 +254,7 @@ describe('DrawingTechPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.material.setValue('papyrus');
+      component.form.material().value.set('papyrus');
       component.onFeatureCheckedIdsChange(['f1']);
       component.onTechniqueCheckedIdsChange(['t1']);
       component.onColorCheckedIdsChange(['c1']);
@@ -255,7 +262,7 @@ describe('DrawingTechPartComponent', () => {
         { tag: 't', name: 'height', value: 1, unit: 'cm' },
       ];
       component.onMeasuresChange(measures);
-      component.note.setValue('  a note  ');
+      component.form.note().value.set('  a note  ');
 
       const value = (component as any).getValue() as DrawingTechPart;
 
@@ -287,22 +294,22 @@ describe('DrawingTechPartComponent', () => {
     it('onFeatureCheckedIdsChange should update features and mark dirty', () => {
       fixture.detectChanges();
       component.onFeatureCheckedIdsChange(['f1']);
-      expect(component.features.value).toEqual(['f1']);
-      expect(component.features.dirty).toBe(true);
+      expect(json(component.form.features().value())).toEqual(['f1']);
+      expect(component.form.features().dirty()).toBe(true);
     });
 
     it('onTechniqueCheckedIdsChange should update techniques and mark dirty', () => {
       fixture.detectChanges();
       component.onTechniqueCheckedIdsChange(['t1']);
-      expect(component.techniques.value).toEqual(['t1']);
-      expect(component.techniques.dirty).toBe(true);
+      expect(json(component.form.techniques().value())).toEqual(['t1']);
+      expect(component.form.techniques().dirty()).toBe(true);
     });
 
     it('onColorCheckedIdsChange should update colors and mark dirty', () => {
       fixture.detectChanges();
       component.onColorCheckedIdsChange(['c1']);
-      expect(component.colors.value).toEqual(['c1']);
-      expect(component.colors.dirty).toBe(true);
+      expect(json(component.form.colors().value())).toEqual(['c1']);
+      expect(component.form.colors().dirty()).toBe(true);
     });
 
     it('onMeasuresChange should update measures and mark dirty', () => {
@@ -311,8 +318,8 @@ describe('DrawingTechPartComponent', () => {
         { tag: 't', name: 'height', value: 1, unit: 'cm' },
       ];
       component.onMeasuresChange(measures);
-      expect(component.measures.value).toEqual(measures);
-      expect(component.measures.dirty).toBe(true);
+      expect(json(component.form.measures().value())).toEqual(measures);
+      expect(component.form.measures().dirty()).toBe(true);
     });
   });
 
@@ -329,12 +336,66 @@ describe('DrawingTechPartComponent', () => {
       fixture.componentRef.setInput('data', makeData({ material: 'paper' }));
       fixture.detectChanges();
       await fixture.whenStable();
-      component.material.setValue('papyrus');
+      component.form.material().value.set('papyrus');
 
       component.save();
 
       expect(component.data()?.value?.material).toBe('papyrus');
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+  });
+
+  describe('dirty state', () => {
+    const MEASURES = [{ name: 'height', value: 10, unit: 'cm' }];
+
+    async function bindSample(): Promise<void> {
+      fixture.detectChanges();
+      fixture.componentRef.setInput(
+        'data',
+        makeData({
+          material: 'paper',
+          features: ['f1'],
+          measures: structuredClone(MEASURES),
+        }),
+      );
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }
+
+    it('should leave a newly bound part pristine', async () => {
+      await bindSample();
+      expect(component.isDirty()).toBe(false);
+    });
+
+    it('should stay pristine when children echo their bound values', async () => {
+      await bindSample();
+
+      component.onFeatureCheckedIdsChange(['f1']);
+      component.onTechniqueCheckedIdsChange([]);
+      component.onColorCheckedIdsChange([]);
+      component.onMeasuresChange(structuredClone(MEASURES) as any);
+
+      expect(component.isDirty()).toBe(false);
+    });
+
+    it('should save measures without the form Symbol tags', async () => {
+      await bindSample();
+      component.form.note().value.set('n');
+      component.form.note().markAsDirty();
+
+      component.save();
+
+      const measures = component.data()!.value!.measures!;
+      expect(measures).toEqual(MEASURES);
+      expect(Object.getOwnPropertySymbols(measures[0])).toEqual([]);
+      expect(component.isDirty()).toBe(false);
     });
   });
 });

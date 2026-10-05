@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from '@angular/core';
+import { FormField, maxLength } from '@angular/forms/signals';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,20 +20,17 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { deepCopy, FlatLookupPipe } from '@myrmidon/ngx-tools';
+import { FlatLookupPipe } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import {
   CloseSaveButtonsComponent,
+  copyFormValue,
+  HelpLinkComponent,
   ModelEditorComponentBase,
-  HelpLinkComponent
+  setFieldFromChild,
 } from '@myrmidon/cadmus-ui';
-import {
-  EditedObject,
-  ThesauriSet,
-  ThesaurusEntry,
-} from '@myrmidon/cadmus-core';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import {
   FigPlanImplItem,
@@ -48,6 +46,26 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   };
 }
 
+interface PrintFigPlanImplPartControls {
+  complete: boolean;
+  techniques: string[];
+  features: string[];
+  description: string;
+  items: FigPlanImplItem[];
+}
+
+function toDraft(
+  part?: PrintFigPlanImplPart | null,
+): PrintFigPlanImplPartControls {
+  return {
+    complete: !!part?.isComplete,
+    techniques: [...(part?.techniques || [])],
+    features: [...(part?.features || [])],
+    description: part?.description || '',
+    items: copyFormValue(part?.items || []),
+  };
+}
+
 /**
  * PrintFigPlanImplPart editor component.
  * Thesauri: fig-plan-types, fig-plan-impl-positions, fig-plan-impl-change-types,
@@ -60,8 +78,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 @Component({
   selector: 'cadmus-print-fig-plan-impl-part',
   imports: [
+    FormField,
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
@@ -82,349 +100,137 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   styleUrl: './print-fig-plan-impl-part.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PrintFigPlanImplPartComponent
-  extends ModelEditorComponentBase<PrintFigPlanImplPart>
-  implements OnInit
-{
+export class PrintFigPlanImplPartComponent extends ModelEditorComponentBase<PrintFigPlanImplPart> {
+  private readonly _dialogService = inject(DialogService);
+
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<FigPlanImplItem | undefined>(undefined);
 
   // fig-plan-techniques
-  public readonly techniqueEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly techniqueEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-techniques']?.entries,
   );
   // fig-plan-impl-features
-  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly featureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-impl-features']?.entries,
   );
 
   // fig-plan-types
-  public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly typeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-types']?.entries,
+  );
   // fig-plan-impl-positions
-  public readonly positionEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly positionEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-impl-positions']?.entries,
   );
   // fig-plan-impl-change-types
-  public readonly changeTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly changeTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-impl-change-types']?.entries,
   );
   // fig-plan-impl-item-features
-  public readonly itemFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly itemFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-impl-item-features']?.entries,
   );
   // fig-plan-impl-matrix-types
-  public readonly matrixTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly matrixTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-impl-matrix-types']?.entries,
   );
   // fig-plan-impl-matrix-states
-  public readonly matrixStateEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly matrixStateEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-impl-matrix-states']?.entries,
   );
 
   // asserted-id-scopes
-  public readonly assIdScopeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly assIdScopeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-scopes']?.entries,
   );
   // asserted-id-tags
-  public readonly assIdTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly assIdTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-tags']?.entries,
   );
   // assertion-tags
-  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly assTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['assertion-tags']?.entries,
   );
   // doc-reference-types
-  public readonly refTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly refTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-types']?.entries,
   );
   // doc-reference-tags
-  public readonly refTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly refTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-tags']?.entries,
   );
 
   // physical-size-units
-  public readonly szUnitEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly szUnitEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['physical-size-units']?.entries,
   );
   // physical-size-tags
-  public readonly szTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly szTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['physical-size-tags']?.entries,
   );
   // physical-size-dim-tags
-  public readonly szDimTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly szDimTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['physical-size-dim-tags']?.entries,
   );
 
   // fig-plan-item-label-types
-  public readonly labelTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly labelTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-item-label-types']?.entries,
   );
   // fig-plan-item-label-languages
-  public readonly labelLangEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly labelLangEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-item-label-languages']?.entries,
   );
 
   // print-font-families
-  public readonly fontFamilyEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly fontFamilyEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['print-font-families']?.entries,
   );
   // print-layout-sections
-  public readonly layoutSectionEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly layoutSectionEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['print-layout-sections']?.entries,
   );
   // print-font-features
-  public readonly fontFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly fontFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['print-font-features']?.entries,
   );
   // asserted-id-features
-  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined
+  public readonly idFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-features']?.entries,
   );
 
   // flags mapped from thesaurus entries
   public techniqueFlags = computed<Flag[]>(
-    () => this.techniqueEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.techniqueEntries()?.map((e) => entryToFlag(e)) || [],
   );
   public featureFlags = computed<Flag[]>(
-    () => this.featureEntries()?.map((e) => entryToFlag(e)) || []
+    () => this.featureEntries()?.map((e) => entryToFlag(e)) || [],
   );
 
-  public complete: FormControl<boolean>;
-  public techniques: FormControl<string[]>;
-  public features: FormControl<string[]>;
-  public description: FormControl<string | null>;
-  public items: FormControl<FigPlanImplItem[]>;
-
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.complete = formBuilder.control<boolean>(false, { nonNullable: true });
-    this.techniques = formBuilder.control<string[]>([], { nonNullable: true });
-    this.features = formBuilder.control<string[]>([], { nonNullable: true });
-    this.description = formBuilder.control<string | null>(null);
-    this.items = formBuilder.control([], {
-      nonNullable: true,
-    });
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      complete: this.complete,
-      techniques: this.techniques,
-      features: this.features,
-      description: this.description,
-      items: this.items,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'fig-plan-techniques';
-    if (this.hasThesaurus(key)) {
-      this.techniqueEntries.set(thesauri[key].entries);
-    } else {
-      this.techniqueEntries.set(undefined);
-    }
-    key = 'fig-plan-impl-features';
-    if (this.hasThesaurus(key)) {
-      this.featureEntries.set(thesauri[key].entries);
-    } else {
-      this.featureEntries.set(undefined);
-    }
-
-    key = 'fig-plan-types';
-    if (this.hasThesaurus(key)) {
-      this.typeEntries.set(thesauri[key].entries);
-    } else {
-      this.typeEntries.set(undefined);
-    }
-    key = 'fig-plan-impl-positions';
-    if (this.hasThesaurus(key)) {
-      this.positionEntries.set(thesauri[key].entries);
-    } else {
-      this.positionEntries.set(undefined);
-    }
-    key = 'fig-plan-impl-change-types';
-    if (this.hasThesaurus(key)) {
-      this.changeTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.changeTypeEntries.set(undefined);
-    }
-    key = 'fig-plan-impl-item-features';
-    if (this.hasThesaurus(key)) {
-      this.itemFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.itemFeatureEntries.set(undefined);
-    }
-    key = 'fig-plan-impl-matrix-types';
-    if (this.hasThesaurus(key)) {
-      this.matrixTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.matrixTypeEntries.set(undefined);
-    }
-    key = 'fig-plan-impl-matrix-states';
-    if (this.hasThesaurus(key)) {
-      this.matrixStateEntries.set(thesauri[key].entries);
-    } else {
-      this.matrixStateEntries.set(undefined);
-    }
-
-    // asserted-id-scopes
-    key = 'asserted-id-scopes';
-    if (this.hasThesaurus(key)) {
-      this.assIdScopeEntries.set(thesauri[key].entries);
-    } else {
-      this.assIdScopeEntries.set(undefined);
-    }
-    // asserted-id-tags
-    key = 'asserted-id-tags';
-    if (this.hasThesaurus(key)) {
-      this.assIdTagEntries.set(thesauri[key].entries);
-    } else {
-      this.assIdTagEntries.set(undefined);
-    }
-    // assertion-tags
-    key = 'assertion-tags';
-    if (this.hasThesaurus(key)) {
-      this.assTagEntries.set(thesauri[key].entries);
-    } else {
-      this.assTagEntries.set(undefined);
-    }
-    // doc-reference-types
-    key = 'doc-reference-types';
-    if (this.hasThesaurus(key)) {
-      this.refTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.refTypeEntries.set(undefined);
-    }
-    // doc-reference-tags
-    key = 'doc-reference-tags';
-    if (this.hasThesaurus(key)) {
-      this.refTagEntries.set(thesauri[key].entries);
-    } else {
-      this.refTagEntries.set(undefined);
-    }
-
-    // physical-size-units
-    key = 'physical-size-units';
-    if (this.hasThesaurus(key)) {
-      this.szUnitEntries.set(thesauri[key].entries);
-    } else {
-      this.szUnitEntries.set(undefined);
-    }
-    // physical-size-tags
-    key = 'physical-size-tags';
-    if (this.hasThesaurus(key)) {
-      this.szTagEntries.set(thesauri[key].entries);
-    } else {
-      this.szTagEntries.set(undefined);
-    }
-    // physical-size-dim-tags
-    key = 'physical-size-dim-tags';
-    if (this.hasThesaurus(key)) {
-      this.szDimTagEntries.set(thesauri[key].entries);
-    } else {
-      this.szDimTagEntries.set(undefined);
-    }
-
-    // fig-plan-item-label-types
-    key = 'fig-plan-item-label-types';
-    if (this.hasThesaurus(key)) {
-      this.labelTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.labelTypeEntries.set(undefined);
-    }
-    // fig-plan-item-label-languages
-    key = 'fig-plan-item-label-languages';
-    if (this.hasThesaurus(key)) {
-      this.labelLangEntries.set(thesauri[key].entries);
-    } else {
-      this.labelLangEntries.set(undefined);
-    }
-
-    // print-font-families
-    key = 'print-font-families';
-    if (this.hasThesaurus(key)) {
-      this.fontFamilyEntries.set(thesauri[key].entries);
-    } else {
-      this.fontFamilyEntries.set(undefined);
-    }
-    // print-layout-sections
-    key = 'print-layout-sections';
-    if (this.hasThesaurus(key)) {
-      this.layoutSectionEntries.set(thesauri[key].entries);
-    } else {
-      this.layoutSectionEntries.set(undefined);
-    }
-    // print-font-features
-    key = 'print-font-features';
-    if (this.hasThesaurus(key)) {
-      this.fontFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.fontFeatureEntries.set(undefined);
-    }
-    // asserted-id-features
-    key = 'asserted-id-features';
-    if (this.hasThesaurus(key)) {
-      this.idFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.idFeatureEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: PrintFigPlanImplPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    this.complete.setValue(part.isComplete ? true : false);
-    this.techniques.setValue(part.techniques || []);
-    this.features.setValue(part.features || []);
-    this.description.setValue(part.description || null);
-    this.items.setValue(part.items || []);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(
-    data?: EditedObject<PrintFigPlanImplPart>
-  ): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-
-    // form
-    this.updateForm(data?.value);
-  }
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    maxLength(p.description, 5000);
+  });
 
   public onTechniqueCheckedIdsChange(ids: string[]): void {
-    this.techniques.setValue(ids);
-    this.techniques.markAsDirty();
-    this.techniques.updateValueAndValidity();
+    setFieldFromChild(this.form.techniques, [...(ids || [])]);
   }
 
   public onFeatureCheckedIdsChange(ids: string[]): void {
-    this.features.setValue(ids);
-    this.features.markAsDirty();
-    this.features.updateValueAndValidity();
+    setFieldFromChild(this.form.features, [...(ids || [])]);
   }
 
   protected getValue(): PrintFigPlanImplPart {
-    let part = this.getEditedPart(
-      PRINT_FIG_PLAN_IMPL_PART_TYPEID
+    const part = this.getEditedPart(
+      PRINT_FIG_PLAN_IMPL_PART_TYPEID,
     ) as PrintFigPlanImplPart;
-    part.isComplete = this.complete.value;
-    part.techniques = this.techniques.value || [];
-    part.features = this.features.value || [];
-    part.description = this.description.value?.trim() || undefined;
-    part.items = this.items.value || [];
+    const draft = this._draft();
+    part.isComplete = draft.complete;
+    part.techniques = [...draft.techniques];
+    part.features = [...draft.features];
+    part.description = draft.description.trim() || undefined;
+    part.items = copyFormValue(draft.items);
     return part;
   }
 
@@ -439,7 +245,8 @@ export class PrintFigPlanImplPartComponent
 
   public editItem(item: FigPlanImplItem, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(deepCopy(item));
+    // structuredClone also drops the form's Symbol tag
+    this.edited.set(structuredClone(item));
   }
 
   public closeItem(): void {
@@ -448,15 +255,14 @@ export class PrintFigPlanImplPartComponent
   }
 
   public saveItem(item: FigPlanImplItem): void {
-    const items = [...this.items.value];
+    const items = [...this.form.items().value()];
     if (this.editedIndex() === -1) {
       items.push(item);
     } else {
       items.splice(this.editedIndex(), 1, item);
     }
-    this.items.setValue(items);
-    this.items.markAsDirty();
-    this.items.updateValueAndValidity();
+    this.form.items().value.set(items);
+    this.form.items().markAsDirty();
     this.closeItem();
   }
 
@@ -468,11 +274,10 @@ export class PrintFigPlanImplPartComponent
           if (this.editedIndex() === index) {
             this.closeItem();
           }
-          const items = [...this.items.value];
+          const items = [...this.form.items().value()];
           items.splice(index, 1);
-          this.items.setValue(items);
-          this.items.markAsDirty();
-          this.items.updateValueAndValidity();
+          this.form.items().value.set(items);
+          this.form.items().markAsDirty();
         }
       });
   }
@@ -481,13 +286,12 @@ export class PrintFigPlanImplPartComponent
     if (index < 1) {
       return;
     }
-    const item = this.items.value[index];
-    const items = [...this.items.value];
+    const items = [...this.form.items().value()];
+    const item = items[index];
     items.splice(index, 1);
     items.splice(index - 1, 0, item);
-    this.items.setValue(items);
-    this.items.markAsDirty();
-    this.items.updateValueAndValidity();
+    this.form.items().value.set(items);
+    this.form.items().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index - 1);
@@ -497,16 +301,15 @@ export class PrintFigPlanImplPartComponent
   }
 
   public moveItemDown(index: number): void {
-    if (index + 1 >= this.items.value.length) {
+    if (index + 1 >= this.form.items().value().length) {
       return;
     }
-    const item = this.items.value[index];
-    const items = [...this.items.value];
+    const items = [...this.form.items().value()];
+    const item = items[index];
     items.splice(index, 1);
     items.splice(index + 1, 0, item);
-    this.items.setValue(items);
-    this.items.markAsDirty();
-    this.items.updateValueAndValidity();
+    this.form.items().value.set(items);
+    this.form.items().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index + 1);

@@ -4,16 +4,12 @@ import {
   computed,
   effect,
   input,
+  linkedSignal,
   model,
   output,
+  untracked,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { form, FormField, maxLength } from '@angular/forms/signals';
 
 // material
 import { MatButtonModule } from '@angular/material/button';
@@ -25,7 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 // myrmidon
-import { NgxToolsValidators } from '@myrmidon/ngx-tools';
+import { NgxToolsSignalValidators } from '@myrmidon/ngx-tools';
 
 // bricks
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
@@ -36,6 +32,7 @@ import {
   AssertedCompositeIdComponent,
 } from '@myrmidon/cadmus-refs-asserted-ids';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
+import { isImplicitSubmission, setFieldFromChild } from '@myrmidon/cadmus-ui';
 
 import { CodFrQuireLabel } from '../cod-fr-quire-labels-part';
 
@@ -46,10 +43,50 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   };
 }
 
+/**
+ * The editable draft behind the form.
+ */
+interface CodFrQuireLabelControls {
+  types: string[];
+  positions: string[];
+  text: string;
+  handId: AssertedCompositeId | null;
+  ink: string;
+  note: string;
+}
+
+/**
+ * Model -> draft.
+ */
+function toDraft(label?: CodFrQuireLabel | null): CodFrQuireLabelControls {
+  return {
+    types: [...(label?.types || [])],
+    positions: [...(label?.positions || [])],
+    text: label?.text || '',
+    handId: label?.handId || null,
+    ink: label?.ink || '',
+    note: label?.note || '',
+  };
+}
+
+/**
+ * Draft -> model.
+ */
+function toModel(v: CodFrQuireLabelControls): CodFrQuireLabel {
+  return {
+    types: [...v.types],
+    positions: [...v.positions],
+    text: v.text.trim() || undefined,
+    handId: v.handId || undefined,
+    ink: v.ink.trim() || undefined,
+    note: v.note.trim() || undefined,
+  };
+}
+
 @Component({
   selector: 'cadmus-cod-fr-quire-label-editor',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -99,92 +136,43 @@ export class CodFrQuireLabelEditorComponent {
     LookupProviderOptions | undefined
   >();
 
-  public types: FormControl<string[]>;
-  public positions: FormControl<string[]>;
-  public text: FormControl<string | null>;
-  public handId: FormControl<AssertedCompositeId | null>;
-  public ink: FormControl<string | null>;
-  public note: FormControl<string | null>;
-  public form: FormGroup;
+  // the draft is rebuilt from each new bound label
+  private readonly _draft = linkedSignal(() => toDraft(this.label()));
+  public readonly form = form(this._draft, (p) => {
+    NgxToolsSignalValidators.strictMinLength(p.types, 1);
+    NgxToolsSignalValidators.strictMinLength(p.positions, 1);
+    maxLength(p.text, 500);
+    maxLength(p.ink, 1000);
+    maxLength(p.note, 1000);
+  });
 
-  constructor(private formBuilder: FormBuilder) {
-    // form
-    this.types = this.formBuilder.control<string[]>([], {
-      nonNullable: true,
-      validators: [NgxToolsValidators.strictMinLengthValidator(1)],
-    });
-    this.positions = this.formBuilder.control<string[]>([], {
-      nonNullable: true,
-      validators: [NgxToolsValidators.strictMinLengthValidator(1)],
-    });
-    this.text = this.formBuilder.control<string | null>(null, {
-      validators: [Validators.maxLength(500)],
-    });
-    this.handId = this.formBuilder.control<AssertedCompositeId | null>(null);
-    this.ink = this.formBuilder.control<string | null>(null, {
-      validators: [Validators.maxLength(1000)],
-    });
-    this.note = this.formBuilder.control<string | null>(null, {
-      validators: [Validators.maxLength(1000)],
-    });
-    this.form = formBuilder.group({
-      types: this.types,
-      positions: this.positions,
-      text: this.text,
-      handId: this.handId,
-      ink: this.ink,
-      note: this.note,
-    });
-
-    // when model changes, update form
+  constructor() {
+    // when the draft mirrors the bound label, there are no unsaved edits
     effect(() => {
-      const data = this.label();
-      this.updateForm(data);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
-  private updateForm(data: CodFrQuireLabel | undefined | null): void {
-    if (!data) {
-      this.form.reset();
-    } else {
-      this.types.setValue(data.types || [], { emitEvent: false });
-      this.positions.setValue(data.positions || [], { emitEvent: false });
-      this.text.setValue(data.text || null, { emitEvent: false });
-      this.handId.setValue(data.handId || null, { emitEvent: false });
-      this.ink.setValue(data.ink || null, { emitEvent: false });
-      this.note.setValue(data.note || null, { emitEvent: false });
-    }
-
-    this.form.markAsPristine();
-  }
-
-  private getData(): CodFrQuireLabel {
-    return {
-      types: this.types.value,
-      positions: this.positions.value,
-      text: this.text.value?.trim() || undefined,
-      handId: this.handId.value || undefined,
-      ink: this.ink.value?.trim() || undefined,
-      note: this.note.value?.trim() || undefined,
-    };
+  /** True when the draft still mirrors the bound label. */
+  private isDraftInSync(draft: CodFrQuireLabelControls): boolean {
+    return JSON.stringify(draft) === JSON.stringify(toDraft(this.label()));
   }
 
   public onTypeCheckedIdsChange(ids: string[]): void {
-    this.types.setValue(ids);
-    this.types.markAsDirty();
-    this.types.updateValueAndValidity();
+    setFieldFromChild(this.form.types, [...(ids || [])]);
   }
 
   public onPositionCheckedIdsChange(ids: string[]): void {
-    this.positions.setValue(ids);
-    this.positions.markAsDirty();
-    this.positions.updateValueAndValidity();
+    setFieldFromChild(this.form.positions, [...(ids || [])]);
   }
 
   public onHandIdChange(id: AssertedCompositeId | null): void {
-    this.handId.setValue(id);
-    this.handId.markAsDirty();
-    this.handId.updateValueAndValidity();
+    setFieldFromChild(this.form.handId, id || null);
   }
 
   public cancel(): void {
@@ -192,25 +180,39 @@ export class CodFrQuireLabelEditorComponent {
   }
 
   /**
-   * Saves the current form data by updating the `data` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
+   * Handle Enter: in a text input, save as the save button would, when it
+   * is enabled. This replaces the implicit submission of a form, which
+   * targeted only the innermost form.
+   * @param event The keydown event.
+   */
+  public onEnterKey(event: Event): void {
+    if (!isImplicitSubmission(event)) {
+      return;
+    }
+    // consume Enter even when not saving, so that it does not reach an
+    // enclosing editor, which would save itself instead
+    event.preventDefault();
+    if (this.form().valid() && this.form().dirty()) {
+      this.save();
+    }
+  }
+
+  /**
+   * Saves the current form data by updating the `label` model signal.
+   * @param pristine If true (default), the form's interaction state is
+   * cleared after saving.
    */
   public save(pristine = true): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
       // show validation errors
-      this.form.markAllAsTouched();
+      this.form().markAsTouched();
       return;
     }
 
-    const data = this.getData();
-    this.label.set(data);
+    this.label.set(toModel(this._draft()));
 
     if (pristine) {
-      this.form.markAsPristine();
+      this.form().reset();
     }
   }
 }

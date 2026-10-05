@@ -3,19 +3,15 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
+  linkedSignal,
   model,
   output,
   signal,
+  untracked,
 } from '@angular/core';
-
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -51,6 +47,11 @@ import {
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
+import {
+  copyFormValue,
+  isImplicitSubmission,
+  setFieldFromChild,
+} from '@myrmidon/cadmus-ui';
 
 import { FigPlanImplItem, FigPlanItemLabel } from '../print-fig-plan-impl-part';
 import { FigPlanItemLabelEditorComponent } from '../fig-plan-item-label-editor/fig-plan-item-label-editor.component';
@@ -63,12 +64,80 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 }
 
 /**
+ * The editable draft behind the form.
+ */
+interface FigPlanImplItemControls {
+  eid: string;
+  type: string;
+  citation: string;
+  location: CodLocationRange[];
+  position: string;
+  changeType: string;
+  iconographyId: AssertedCompositeId | null;
+  features: string[];
+  size: PhysicalSize | null;
+  matrixType: string;
+  matrixState: string;
+  matrixStateDsc: string;
+  labels: FigPlanItemLabel[];
+}
+
+/**
+ * Item -> draft.
+ */
+function toDraft(item?: FigPlanImplItem | null): FigPlanImplItemControls {
+  const location = CodLocationParser.parseLocation(item?.location);
+  return {
+    eid: item?.eid || '',
+    type: item?.type || '',
+    citation: item?.citation || '',
+    location: location ? [{ start: location, end: location }] : [],
+    position: item?.position || '',
+    changeType: item?.changeType || '',
+    iconographyId: item?.iconographyId
+      ? copyFormValue(item.iconographyId)
+      : null,
+    features: [...(item?.features || [])],
+    size: item?.size ? copyFormValue(item.size) : null,
+    matrixType: item?.matrixType || '',
+    matrixState: item?.matrixState || '',
+    matrixStateDsc: item?.matrixStateDsc || '',
+    labels: copyFormValue(item?.labels || []),
+  };
+}
+
+/**
+ * Draft -> item.
+ */
+function toModel(draft: FigPlanImplItemControls): FigPlanImplItem {
+  return {
+    eid: draft.eid.trim(),
+    type: draft.type.trim(),
+    citation: draft.citation.trim() || undefined,
+    location: draft.location.length
+      ? CodLocationParser.locationToString(draft.location[0].start)!
+      : undefined,
+    position: draft.position.trim() || undefined,
+    changeType: draft.changeType.trim() || undefined,
+    iconographyId: draft.iconographyId
+      ? copyFormValue(draft.iconographyId)
+      : undefined,
+    features: draft.features.length ? [...draft.features] : undefined,
+    size: draft.size ? copyFormValue(draft.size) : undefined,
+    matrixType: draft.matrixType.trim() || undefined,
+    matrixState: draft.matrixState.trim() || undefined,
+    matrixStateDsc: draft.matrixStateDsc.trim() || undefined,
+    labels: draft.labels.length ? copyFormValue(draft.labels) : undefined,
+  };
+}
+
+/**
  * Editor for a figurative plan's implementation item.
  */
 @Component({
   selector: 'cadmus-fig-plan-impl-item-editor',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
@@ -90,6 +159,9 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FigPlanImplItemEditorComponent {
+  private readonly _citService = inject(CitSchemeService);
+  private readonly _dialogService = inject(DialogService);
+
   public readonly item = model<FigPlanImplItem | undefined>();
   public readonly cancelEdit = output();
 
@@ -147,168 +219,88 @@ export class FigPlanImplItemEditorComponent {
     () => this.featureEntries()?.map((e) => entryToFlag(e)) || [],
   );
 
-  // the edited citation
-  public readonly editedCit = signal<Citation | CitationSpan | undefined>(
-    undefined,
+  // the citation passed to the citation editor: it is parsed from the bound
+  // item only, so that the editor is not reset by its own changes
+  public readonly editedCit = computed<Citation | CitationSpan | undefined>(
+    () => {
+      const citation = this.item()?.citation;
+      if (!citation) {
+        return undefined;
+      }
+      // parse citation, whether it's a span or a single one
+      return (
+        (citation.includes(' - ')
+          ? this._citService.parseSpan(citation, 'dc')
+          : this._citService.parse(citation, 'dc')) || undefined
+      );
+    },
   );
   // the edited label
   public readonly editedLabel = signal<FigPlanItemLabel | undefined>(undefined);
   // the edited label index
   public readonly editedLabelIndex = signal<number>(-1);
 
-  public eid: FormControl<string>;
-  public type: FormControl<string>;
-  public citation: FormControl<string | null>;
-  public location: FormControl<CodLocationRange[] | null>;
-  public position: FormControl<string | null>;
-  public changeType: FormControl<string | null>;
-  public iconographyId: FormControl<AssertedCompositeId | null>;
-  public features: FormControl<string[]>;
-  public size: FormControl<PhysicalSize | null>;
-  public matrixType: FormControl<string | null>;
-  public matrixState: FormControl<string | null>;
-  public matrixStateDsc: FormControl<string | null>;
-  public labels: FormControl<FigPlanItemLabel[]>;
-  public form: FormGroup;
+  // the draft is rebuilt from each new bound item
+  private readonly _draft = linkedSignal(() => toDraft(this.item()));
+  public readonly form = form(this._draft, (p) => {
+    required(p.eid);
+    maxLength(p.eid, 100);
+    required(p.type);
+    maxLength(p.type, 100);
+    maxLength(p.citation, 1000);
+    maxLength(p.position, 100);
+    maxLength(p.changeType, 100);
+    maxLength(p.matrixType, 100);
+    maxLength(p.matrixState, 100);
+    maxLength(p.matrixStateDsc, 1000);
+  });
 
-  constructor(
-    formBuilder: FormBuilder,
-    private _citService: CitSchemeService,
-    private _dialogService: DialogService,
-  ) {
-    this.eid = formBuilder.control<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
-    });
-    this.type = formBuilder.control<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
-    });
-    this.citation = formBuilder.control<string | null>(null, {
-      validators: [Validators.maxLength(1000)],
-    });
-    this.location = formBuilder.control<CodLocationRange[]>([]);
-    this.position = formBuilder.control<string | null>(null);
-    this.changeType = formBuilder.control<string | null>(null);
-    this.iconographyId = formBuilder.control<AssertedCompositeId | null>(null);
-    this.features = formBuilder.control([], { nonNullable: true });
-    this.size = formBuilder.control<PhysicalSize | null>(null);
-    this.matrixType = formBuilder.control<string | null>(null);
-    this.matrixState = formBuilder.control<string | null>(null);
-    this.matrixStateDsc = formBuilder.control<string | null>(null);
-    this.labels = formBuilder.control<FigPlanItemLabel[]>([], {
-      nonNullable: true,
-    });
-
-    this.form = formBuilder.group({
-      eid: this.eid,
-      type: this.type,
-      citation: this.citation,
-      location: this.location,
-      position: this.position,
-      changeType: this.changeType,
-      iconographyId: this.iconographyId,
-      features: this.features,
-      size: this.size,
-      matrixType: this.matrixType,
-      matrixState: this.matrixState,
-      matrixStateDsc: this.matrixStateDsc,
-      labels: this.labels,
-    });
-
-    // when model changes, update form
+  constructor() {
+    // when the draft mirrors the bound item, there are no unsaved edits
     effect(() => {
-      const data = this.item();
-      this.updateForm(data);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
-  private updateForm(item: FigPlanImplItem | undefined | null): void {
-    if (!item) {
-      this.editedCit.set(undefined);
-      this.form.reset();
-    } else {
-      this.eid.setValue(item.eid, { emitEvent: false });
-      this.type.setValue(item.type, { emitEvent: false });
-      this.citation?.setValue(item.citation || null, { emitEvent: false });
-      // parse citation, whether it's a span or a single one
-      if (item.citation) {
-        this.editedCit.set(
-          item.citation.includes(' - ')
-            ? this._citService.parseSpan(item.citation, 'dc')
-            : this._citService.parse(item.citation, 'dc'),
-        );
-      } else {
-        this.editedCit.set(undefined);
-      }
-      if (item.location) {
-        const location = CodLocationParser.parseLocation(item.location);
-        this.location.setValue(
-          location ? [{ start: location, end: location }] : [],
-          { emitEvent: false },
-        );
-      }
-      this.position.setValue(item.position || null, { emitEvent: false });
-      this.changeType.setValue(item.changeType || null, { emitEvent: false });
-      this.iconographyId.setValue(item.iconographyId || null, {
-        emitEvent: false,
-      });
-      this.features.setValue(item.features || [], { emitEvent: false });
-      this.size.setValue(item.size || null, { emitEvent: false });
-      this.matrixType.setValue(item.matrixType || null, { emitEvent: false });
-      this.matrixState.setValue(item.matrixState || null, { emitEvent: false });
-      this.matrixStateDsc.setValue(item.matrixStateDsc || null, {
-        emitEvent: false,
-      });
-      this.labels.setValue(item.labels || [], { emitEvent: false });
-    }
-
-    this.form.markAsPristine();
+  /** True when the draft still mirrors the bound item. */
+  private isDraftInSync(draft: FigPlanImplItemControls): boolean {
+    return JSON.stringify(draft) === JSON.stringify(toDraft(this.item()));
   }
 
   public onCitationChange(citation: Citation | CitationSpan | undefined): void {
-    if (!citation) {
-      this.citation?.setValue(null);
-    } else {
+    let text = '';
+    if (citation) {
       if ((citation as CitationSpan)?.a) {
         const span = citation as CitationSpan;
-        this.citation?.setValue(
-          `${this._citService.toString(span.a)} - ${this._citService.toString(
-            span.b || span.a,
-          )}`,
-        );
+        text = `${this._citService.toString(span.a)} - ${this._citService.toString(
+          span.b || span.a,
+        )}`;
       } else {
-        this.citation?.setValue(
-          this._citService.toString(citation as Citation),
-        );
+        text = this._citService.toString(citation as Citation);
       }
     }
-    this.citation?.updateValueAndValidity();
-    this.citation?.markAsDirty();
+    setFieldFromChild(this.form.citation, text);
   }
 
   public onLocationChange(location: CodLocationRange[]): void {
-    this.location.setValue(location);
-    this.location.markAsDirty();
-    this.location.updateValueAndValidity();
+    setFieldFromChild(this.form.location, copyFormValue(location || []));
   }
 
   public onIdChange(id: AssertedCompositeId | null): void {
-    this.iconographyId.setValue(id);
-    this.iconographyId.markAsDirty();
-    this.iconographyId.updateValueAndValidity();
+    setFieldFromChild(this.form.iconographyId, id || null);
   }
 
   public onFeatureCheckedIdsChange(ids: string[]): void {
-    this.features.setValue(ids);
-    this.features.markAsDirty();
-    this.features.updateValueAndValidity();
+    setFieldFromChild(this.form.features, [...(ids || [])]);
   }
 
   public onSizeChange(size: PhysicalSize): void {
-    this.size.setValue(size);
-    this.size.markAsDirty();
-    this.size.updateValueAndValidity();
+    setFieldFromChild(this.form.size, size || null);
   }
 
   //#region labels
@@ -321,6 +313,7 @@ export class FigPlanImplItemEditorComponent {
 
   public editLabel(label: FigPlanItemLabel, index: number): void {
     this.editedLabelIndex.set(index);
+    // structuredClone also drops the form's Symbol tag
     this.editedLabel.set(structuredClone(label));
   }
 
@@ -330,15 +323,14 @@ export class FigPlanImplItemEditorComponent {
   }
 
   public saveLabel(label: FigPlanItemLabel): void {
-    const entries = [...this.labels.value];
+    const entries = [...this.form.labels().value()];
     if (this.editedLabelIndex() === -1) {
       entries.push(label);
     } else {
       entries.splice(this.editedLabelIndex(), 1, label);
     }
-    this.labels.setValue(entries);
-    this.labels.markAsDirty();
-    this.labels.updateValueAndValidity();
+    this.form.labels().value.set(entries);
+    this.form.labels().markAsDirty();
     this.closeLabel();
   }
 
@@ -350,11 +342,10 @@ export class FigPlanImplItemEditorComponent {
           if (this.editedLabelIndex() === index) {
             this.closeLabel();
           }
-          const entries = [...this.labels.value];
+          const entries = [...this.form.labels().value()];
           entries.splice(index, 1);
-          this.labels.setValue(entries);
-          this.labels.markAsDirty();
-          this.labels.updateValueAndValidity();
+          this.form.labels().value.set(entries);
+          this.form.labels().markAsDirty();
         }
       });
   }
@@ -363,13 +354,12 @@ export class FigPlanImplItemEditorComponent {
     if (index < 1) {
       return;
     }
-    const entry = this.labels.value[index];
-    const entries = [...this.labels.value];
+    const entries = [...this.form.labels().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index - 1, 0, entry);
-    this.labels.setValue(entries);
-    this.labels.markAsDirty();
-    this.labels.updateValueAndValidity();
+    this.form.labels().value.set(entries);
+    this.form.labels().markAsDirty();
     // keep editedLabelIndex in sync
     if (this.editedLabelIndex() === index) {
       this.editedLabelIndex.set(index - 1);
@@ -379,16 +369,15 @@ export class FigPlanImplItemEditorComponent {
   }
 
   public moveLabelDown(index: number): void {
-    if (index + 1 >= this.labels.value.length) {
+    if (index + 1 >= this.form.labels().value().length) {
       return;
     }
-    const entry = this.labels.value[index];
-    const entries = [...this.labels.value];
+    const entries = [...this.form.labels().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index + 1, 0, entry);
-    this.labels.setValue(entries);
-    this.labels.markAsDirty();
-    this.labels.updateValueAndValidity();
+    this.form.labels().value.set(entries);
+    this.form.labels().markAsDirty();
     // keep editedLabelIndex in sync
     if (this.editedLabelIndex() === index) {
       this.editedLabelIndex.set(index + 1);
@@ -398,50 +387,44 @@ export class FigPlanImplItemEditorComponent {
   }
   //#endregion
 
-  private getItem(): FigPlanImplItem {
-    return {
-      eid: this.eid.value,
-      type: this.type.value,
-      citation: this.citation?.value ?? undefined,
-      location: this.location.value?.length
-        ? CodLocationParser.locationToString(this.location.value[0].start)!
-        : undefined,
-      position: this.position.value || undefined,
-      changeType: this.changeType.value || undefined,
-      iconographyId: this.iconographyId.value || undefined,
-      features: this.features.value.length ? this.features.value : undefined,
-      size: this.size.value || undefined,
-      matrixType: this.matrixType.value || undefined,
-      matrixState: this.matrixState.value || undefined,
-      matrixStateDsc: this.matrixStateDsc.value?.trim() || undefined,
-      labels: this.labels.value.length ? this.labels.value : undefined,
-    };
-  }
-
   public cancel(): void {
     this.cancelEdit.emit();
   }
 
   /**
+   * Handle Enter: in a text input, save as the save button would, when it
+   * is enabled. This replaces the implicit submission of a form, which
+   * targeted only the innermost form.
+   * @param event The keydown event.
+   */
+  public onEnterKey(event: Event): void {
+    if (!isImplicitSubmission(event)) {
+      return;
+    }
+    // consume Enter even when not saving, so that it does not reach an
+    // enclosing editor, which would save itself instead
+    event.preventDefault();
+    if (this.form().valid() && this.form().dirty()) {
+      this.save();
+    }
+  }
+
+  /**
    * Saves the current form data by updating the `item` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
+   * @param pristine If true (default), the form's interaction state is
+   * cleared after saving.
    */
   public save(pristine = true): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
       // show validation errors
-      this.form.markAllAsTouched();
+      this.form().markAsTouched();
       return;
     }
 
-    const item = this.getItem();
-    this.item.set(item);
+    this.item.set(toModel(this._draft()));
 
     if (pristine) {
-      this.form.markAsPristine();
+      this.form().reset();
     }
   }
 }

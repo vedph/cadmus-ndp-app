@@ -44,6 +44,19 @@ describe('CodFrQuireLabelsPartComponent', () => {
     return { types: ['t1'], positions: ['p1'], text };
   }
 
+  // the form tags the objects in its arrays with a Symbol: compare plain copies
+  function json<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function setEntries(entries: CodFrQuireLabel[]): void {
+    component.form.labels().value.set(entries);
+  }
+
+  function entries(): CodFrQuireLabel[] {
+    return json(component.form.labels().value());
+  }
+
   function makeData(
     labels: CodFrQuireLabel[],
     thesauri?: ThesauriSet,
@@ -98,16 +111,16 @@ describe('CodFrQuireLabelsPartComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('buildForm / validity', () => {
+  describe('form validity', () => {
     it('should be invalid with no labels', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with at least one label', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a')]);
-      expect(component.form.valid).toBe(true);
+      setEntries([makeLabel('a')]);
+      expect(component.form().valid()).toBe(true);
     });
   });
 
@@ -166,13 +179,13 @@ describe('CodFrQuireLabelsPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a')]);
+      setEntries([makeLabel('a')]);
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.labels.value).toEqual([]);
+      expect(entries()).toEqual([]);
     });
 
     it('should populate labels from part.labels and mark the form pristine', async () => {
@@ -183,8 +196,8 @@ describe('CodFrQuireLabelsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.labels.value).toEqual(labels);
-      expect(component.form.pristine).toBe(true);
+      expect(entries()).toEqual(labels);
+      expect(component.form().dirty()).toBe(false);
     });
   });
 
@@ -195,11 +208,11 @@ describe('CodFrQuireLabelsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
       const value = (component as any).getValue() as CodFrQuireLabelsPart;
 
       expect(value.id).toBe('part1');
-      expect(value.labels).toEqual([makeLabel('a'), makeLabel('b')]);
+      expect(json(value.labels)).toEqual([makeLabel('a'), makeLabel('b')]);
     });
   });
 
@@ -238,28 +251,25 @@ describe('CodFrQuireLabelsPartComponent', () => {
   describe('saveLabel', () => {
     it('should append a new label when editedIndex is -1', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a')]);
+      setEntries([makeLabel('a')]);
       component.addLabel();
 
       component.saveLabel(makeLabel('b'));
 
-      expect(component.labels.value).toEqual([makeLabel('a'), makeLabel('b')]);
-      expect(component.labels.dirty).toBe(true);
+      expect(entries()).toEqual([makeLabel('a'), makeLabel('b')]);
+      expect(component.form.labels().dirty()).toBe(true);
       expect(component.editedIndex()).toBe(-1);
       expect(component.edited()).toBeUndefined();
     });
 
     it('should replace the label at editedIndex when editing an existing one', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
       component.editLabel(makeLabel('b'), 1);
 
       component.saveLabel(makeLabel('b (edited)'));
 
-      expect(component.labels.value).toEqual([
-        makeLabel('a'),
-        makeLabel('b (edited)'),
-      ]);
+      expect(entries()).toEqual([makeLabel('a'), makeLabel('b (edited)')]);
     });
   });
 
@@ -267,28 +277,28 @@ describe('CodFrQuireLabelsPartComponent', () => {
     it('should remove the label when the user confirms', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
 
       component.deleteLabel(0);
 
-      expect(component.labels.value).toEqual([makeLabel('b')]);
-      expect(component.labels.dirty).toBe(true);
+      expect(entries()).toEqual([makeLabel('b')]);
+      expect(component.form.labels().dirty()).toBe(true);
     });
 
     it('should not remove the label when the user cancels', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(false));
-      component.labels.setValue([makeLabel('a')]);
+      setEntries([makeLabel('a')]);
 
       component.deleteLabel(0);
 
-      expect(component.labels.value).toEqual([makeLabel('a')]);
+      expect(entries()).toEqual([makeLabel('a')]);
     });
 
     it('should close the editor when deleting the currently edited label', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.labels.setValue([makeLabel('a')]);
+      setEntries([makeLabel('a')]);
       component.editLabel(makeLabel('a'), 0);
 
       component.deleteLabel(0);
@@ -304,26 +314,26 @@ describe('CodFrQuireLabelsPartComponent', () => {
     it('should do nothing when index is 0', () => {
       fixture.detectChanges();
       const labels = [makeLabel('a'), makeLabel('b')];
-      component.labels.setValue(labels);
+      setEntries(labels);
 
       component.moveLabelUp(0);
 
-      expect(component.labels.value).toEqual(labels);
-      expect(component.labels.dirty).toBe(false);
+      expect(entries()).toEqual(labels);
+      expect(component.form.labels().dirty()).toBe(false);
     });
 
     it('should swap the label with the previous one', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
 
       component.moveLabelUp(1);
 
-      expect(component.labels.value).toEqual([makeLabel('b'), makeLabel('a')]);
+      expect(entries()).toEqual([makeLabel('b'), makeLabel('a')]);
     });
 
     it('should keep editedIndex tracking the moved-up label', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
       component.editLabel(makeLabel('b'), 1);
 
       component.moveLabelUp(1);
@@ -333,7 +343,7 @@ describe('CodFrQuireLabelsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced label', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
       component.editLabel(makeLabel('a'), 0);
 
       component.moveLabelUp(1);
@@ -346,26 +356,26 @@ describe('CodFrQuireLabelsPartComponent', () => {
     it('should do nothing when index is the last one', () => {
       fixture.detectChanges();
       const labels = [makeLabel('a'), makeLabel('b')];
-      component.labels.setValue(labels);
+      setEntries(labels);
 
       component.moveLabelDown(1);
 
-      expect(component.labels.value).toEqual(labels);
-      expect(component.labels.dirty).toBe(false);
+      expect(entries()).toEqual(labels);
+      expect(component.form.labels().dirty()).toBe(false);
     });
 
     it('should swap the label with the next one', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
 
       component.moveLabelDown(0);
 
-      expect(component.labels.value).toEqual([makeLabel('b'), makeLabel('a')]);
+      expect(entries()).toEqual([makeLabel('b'), makeLabel('a')]);
     });
 
     it('should keep editedIndex tracking the moved-down label', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
       component.editLabel(makeLabel('a'), 0);
 
       component.moveLabelDown(0);
@@ -375,12 +385,47 @@ describe('CodFrQuireLabelsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced label', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('a'), makeLabel('b')]);
+      setEntries([makeLabel('a'), makeLabel('b')]);
       component.editLabel(makeLabel('b'), 1);
 
       component.moveLabelDown(0);
 
       expect(component.editedIndex()).toBe(0);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+
+    it('should leave a newly bound part pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeLabel('a')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.isDirty()).toBe(false);
+    });
+  });
+
+  describe('save', () => {
+    it('should save entries without the form Symbol tags, and become pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeLabel('a')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      setEntries([makeLabel('a'), makeLabel('b')]);
+      component.form.labels().markAsDirty();
+      expect(component.isDirty()).toBe(true);
+
+      component.save();
+
+      const saved = (component.data()!.value as CodFrQuireLabelsPart).labels;
+      expect(saved).toEqual([makeLabel('a'), makeLabel('b')]);
+      saved.forEach((e) => expect(Object.getOwnPropertySymbols(e)).toEqual([]));
+      expect(component.isDirty()).toBe(false);
     });
   });
 });

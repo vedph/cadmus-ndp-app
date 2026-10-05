@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,19 +17,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { deepCopy, FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
+import { FlatLookupPipe, NgxToolsSignalValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 
-import {
-  ThesauriSet,
-  ThesaurusEntry,
-  EditedObject,
-} from '@myrmidon/cadmus-core';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import {
   CloseSaveButtonsComponent,
-  ModelEditorComponentBase,
   HelpLinkComponent,
+  ModelEditorComponentBase,
+  copyFormValue,
 } from '@myrmidon/cadmus-ui';
 
 import {
@@ -39,6 +35,15 @@ import {
 } from '../cod-fr-rulings-part';
 import { CodFrRulingEditorComponent } from '../cod-fr-ruling-editor/cod-fr-ruling-editor.component';
 
+interface CodFrRulingsPartControls {
+  entries: CodFrRuling[];
+}
+
+function toDraft(part?: CodFrRulingsPart | null): CodFrRulingsPartControls {
+  // copy: the form tags the objects in its arrays
+  return { entries: copyFormValue(part?.rulings || []) };
+}
+
 /**
  * CodFrRulingsPart editor component.
  * Thesauri: cod-fr-ruling-systems, cod-fr-ruling-types, cod-fr-ruling-features.
@@ -47,7 +52,6 @@ import { CodFrRulingEditorComponent } from '../cod-fr-ruling-editor/cod-fr-rulin
   selector: 'cadmus-cod-fr-rulings-part',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
@@ -67,91 +71,36 @@ import { CodFrRulingEditorComponent } from '../cod-fr-ruling-editor/cod-fr-rulin
   styleUrls: ['./cod-fr-rulings-part.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodFrRulingsPartComponent
-  extends ModelEditorComponentBase<CodFrRulingsPart>
-  implements OnInit
-{
+export class CodFrRulingsPartComponent extends ModelEditorComponentBase<CodFrRulingsPart> {
+  private readonly _dialogService = inject(DialogService);
+
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<CodFrRuling | undefined>(undefined);
 
   // cod-fr-ruling-systems
-  public readonly systemEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly systemEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-ruling-systems']?.entries,
+  );
   // cod-fr-ruling-types
-  public readonly typeEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly typeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-ruling-types']?.entries,
+  );
   // cod-fr-ruling-features
-  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly featureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['cod-fr-ruling-features']?.entries,
+  );
 
-  public entries: FormControl<CodFrRuling[]>;
-
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.entries = formBuilder.control([], {
-      // at least 1 entry
-      validators: NgxToolsValidators.strictMinLengthValidator(1),
-      nonNullable: true,
-    });
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      entries: this.entries,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'cod-fr-ruling-systems';
-    if (this.hasThesaurus(key)) {
-      this.systemEntries.set(thesauri[key].entries);
-    } else {
-      this.systemEntries.set(undefined);
-    }
-    key = 'cod-fr-ruling-types';
-    if (this.hasThesaurus(key)) {
-      this.typeEntries.set(thesauri[key].entries);
-    } else {
-      this.typeEntries.set(undefined);
-    }
-    key = 'cod-fr-ruling-features';
-    if (this.hasThesaurus(key)) {
-      this.featureEntries.set(thesauri[key].entries);
-    } else {
-      this.featureEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: CodFrRulingsPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    this.entries.setValue(part.rulings || []);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<CodFrRulingsPart>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-
-    // form
-    this.updateForm(data?.value);
-  }
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    // at least 1 entry
+    NgxToolsSignalValidators.strictMinLength(p.entries, 1);
+  });
 
   protected getValue(): CodFrRulingsPart {
-    let part = this.getEditedPart(
-      COD_FR_RULINGS_PART_TYPEID
+    const part = this.getEditedPart(
+      COD_FR_RULINGS_PART_TYPEID,
     ) as CodFrRulingsPart;
-    part.rulings = this.entries.value || [];
+    part.rulings = copyFormValue(this._draft().entries);
     return part;
   }
 
@@ -164,7 +113,7 @@ export class CodFrRulingsPartComponent
 
   public editRuling(ruling: CodFrRuling, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(deepCopy(ruling));
+    this.edited.set(structuredClone(ruling));
   }
 
   public closeRuling(): void {
@@ -173,15 +122,14 @@ export class CodFrRulingsPartComponent
   }
 
   public saveRuling(entry: CodFrRuling): void {
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
     if (this.editedIndex() === -1) {
       entries.push(entry);
     } else {
       entries.splice(this.editedIndex(), 1, entry);
     }
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
     this.closeRuling();
   }
 
@@ -193,11 +141,10 @@ export class CodFrRulingsPartComponent
           if (this.editedIndex() === index) {
             this.closeRuling();
           }
-          const entries = [...this.entries.value];
+          const entries = [...this.form.entries().value()];
           entries.splice(index, 1);
-          this.entries.setValue(entries);
-          this.entries.markAsDirty();
-          this.entries.updateValueAndValidity();
+          this.form.entries().value.set(entries);
+          this.form.entries().markAsDirty();
         }
       });
   }
@@ -206,13 +153,12 @@ export class CodFrRulingsPartComponent
     if (index < 1) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index - 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index - 1);
@@ -222,16 +168,15 @@ export class CodFrRulingsPartComponent
   }
 
   public moveRulingDown(index: number): void {
-    if (index + 1 >= this.entries.value.length) {
+    if (index + 1 >= this.form.entries().value().length) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index + 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index + 1);

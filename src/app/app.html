@@ -8,14 +8,14 @@
     <a mat-button routerLink="/home">Cadmus NDP</a>
 
     <!-- items menu -->
-    @if (logged && itemBrowsers) {
+    @if (logged() && itemBrowsers()) {
     <button type="button" mat-button [matMenuTriggerFor]="itemMenu">
       Items
     </button>
     }
     <mat-menu #itemMenu>
       <a mat-menu-item routerLink="/items">Items</a>
-      @for (entry of itemBrowsers; track entry.id) {
+      @for (entry of itemBrowsers(); track entry.id) {
       <a
         mat-menu-item
         [routerLink]="'item-browser/' + getItemBrowserRoute(entry.id)"
@@ -24,27 +24,27 @@
       }
     </mat-menu>
     <!-- item menu -->
-    @if (logged && !itemBrowsers) {
+    @if (logged() && !itemBrowsers()) {
     <button type="button" mat-button routerLink="/items">Items</button>
     }
 
     <!-- search menu -->
-    @if (logged) {
+    @if (logged()) {
     <button type="button" mat-button routerLink="/search">Search</button>
     }
     <!-- graph menu -->
-    @if (logged) {
+    @if (logged()) {
     <button type="button" mat-button routerLink="/graph">Graph</button>
     }
     <!-- stats menu -->
-    @if (logged) {
+    @if (logged()) {
     <button type="button" mat-button routerLink="/stats">Stats</button>
     }
 
     <span class="tb-fill-remaining-space"></span>
 
     <!-- user -->
-    @if (user) {
+    @if (user(); as user) {
     <div>
       <!-- indicators -->
       <img
@@ -96,7 +96,7 @@
     }
 
     <!-- login -->
-    @if (!logged) {
+    @if (!logged()) {
     <button
       type="button"
       mat-icon-button
@@ -107,7 +107,7 @@
     </button>
     }
     <!-- logout -->
-    @if (logged) {
+    @if (logged()) {
     <button type="button" mat-icon-button (click)="logout()">
       <mat-icon>logout</mat-icon>
     </button>
@@ -134,7 +134,7 @@
       <a rel="noopener" href="https://myrmex.github.io/overview" target="_blank"
         >Daniele Fusi</a
       >
-      - version {{ version }} -
+      - version {{ version() }} -
       <a
         href="https://www.dante.unina.it/ndp/public/frontend"
         target="_blank"

@@ -41,6 +41,19 @@ describe('CodFrRulingsPartComponent', () => {
     return { features: [feature] };
   }
 
+  // the form tags the objects in its arrays with a Symbol: compare plain copies
+  function json<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function setEntries(entries: CodFrRuling[]): void {
+    component.form.entries().value.set(entries);
+  }
+
+  function entries(): CodFrRuling[] {
+    return json(component.form.entries().value());
+  }
+
   function makeData(
     rulings: CodFrRuling[],
     thesauri?: ThesauriSet,
@@ -95,16 +108,16 @@ describe('CodFrRulingsPartComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('buildForm / validity', () => {
+  describe('form validity', () => {
     it('should be invalid with no rulings', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with at least one ruling', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1')]);
-      expect(component.form.valid).toBe(true);
+      setEntries([makeRuling('f1')]);
+      expect(component.form().valid()).toBe(true);
     });
   });
 
@@ -115,7 +128,10 @@ describe('CodFrRulingsPartComponent', () => {
       fixture.componentRef.setInput(
         'data',
         makeData([], {
-          'cod-fr-ruling-systems': { id: 'cod-fr-ruling-systems', entries: systems },
+          'cod-fr-ruling-systems': {
+            id: 'cod-fr-ruling-systems',
+            entries: systems,
+          },
         }),
       );
       fixture.detectChanges();
@@ -140,13 +156,13 @@ describe('CodFrRulingsPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1')]);
+      setEntries([makeRuling('f1')]);
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.entries.value).toEqual([]);
+      expect(entries()).toEqual([]);
     });
 
     it('should populate entries from part.rulings and mark the form pristine', async () => {
@@ -157,8 +173,8 @@ describe('CodFrRulingsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.entries.value).toEqual(rulings);
-      expect(component.form.pristine).toBe(true);
+      expect(entries()).toEqual(rulings);
+      expect(component.form().dirty()).toBe(false);
     });
   });
 
@@ -169,11 +185,11 @@ describe('CodFrRulingsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
       const value = (component as any).getValue() as CodFrRulingsPart;
 
       expect(value.id).toBe('part1');
-      expect(value.rulings).toEqual([makeRuling('f1'), makeRuling('f2')]);
+      expect(json(value.rulings)).toEqual([makeRuling('f1'), makeRuling('f2')]);
     });
   });
 
@@ -212,31 +228,25 @@ describe('CodFrRulingsPartComponent', () => {
   describe('saveRuling', () => {
     it('should append a new ruling when editedIndex is -1', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1')]);
+      setEntries([makeRuling('f1')]);
       component.addRuling();
 
       component.saveRuling(makeRuling('f2'));
 
-      expect(component.entries.value).toEqual([
-        makeRuling('f1'),
-        makeRuling('f2'),
-      ]);
-      expect(component.entries.dirty).toBe(true);
+      expect(entries()).toEqual([makeRuling('f1'), makeRuling('f2')]);
+      expect(component.form.entries().dirty()).toBe(true);
       expect(component.editedIndex()).toBe(-1);
       expect(component.edited()).toBeUndefined();
     });
 
     it('should replace the ruling at editedIndex when editing an existing one', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
       component.editRuling(makeRuling('f2'), 1);
 
       component.saveRuling({ features: ['f2', 'f3'] });
 
-      expect(component.entries.value).toEqual([
-        makeRuling('f1'),
-        { features: ['f2', 'f3'] },
-      ]);
+      expect(entries()).toEqual([makeRuling('f1'), { features: ['f2', 'f3'] }]);
     });
   });
 
@@ -244,28 +254,28 @@ describe('CodFrRulingsPartComponent', () => {
     it('should remove the ruling when the user confirms', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
 
       component.deleteRuling(0);
 
-      expect(component.entries.value).toEqual([makeRuling('f2')]);
-      expect(component.entries.dirty).toBe(true);
+      expect(entries()).toEqual([makeRuling('f2')]);
+      expect(component.form.entries().dirty()).toBe(true);
     });
 
     it('should not remove the ruling when the user cancels', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(false));
-      component.entries.setValue([makeRuling('f1')]);
+      setEntries([makeRuling('f1')]);
 
       component.deleteRuling(0);
 
-      expect(component.entries.value).toEqual([makeRuling('f1')]);
+      expect(entries()).toEqual([makeRuling('f1')]);
     });
 
     it('should close the editor when deleting the currently edited ruling', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.entries.setValue([makeRuling('f1')]);
+      setEntries([makeRuling('f1')]);
       component.editRuling(makeRuling('f1'), 0);
 
       component.deleteRuling(0);
@@ -281,29 +291,26 @@ describe('CodFrRulingsPartComponent', () => {
     it('should do nothing when index is 0', () => {
       fixture.detectChanges();
       const rulings = [makeRuling('f1'), makeRuling('f2')];
-      component.entries.setValue(rulings);
+      setEntries(rulings);
 
       component.moveRulingUp(0);
 
-      expect(component.entries.value).toEqual(rulings);
-      expect(component.entries.dirty).toBe(false);
+      expect(entries()).toEqual(rulings);
+      expect(component.form.entries().dirty()).toBe(false);
     });
 
     it('should swap the ruling with the previous one', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
 
       component.moveRulingUp(1);
 
-      expect(component.entries.value).toEqual([
-        makeRuling('f2'),
-        makeRuling('f1'),
-      ]);
+      expect(entries()).toEqual([makeRuling('f2'), makeRuling('f1')]);
     });
 
     it('should keep editedIndex tracking the moved-up ruling', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
       component.editRuling(makeRuling('f2'), 1);
 
       component.moveRulingUp(1);
@@ -313,7 +320,7 @@ describe('CodFrRulingsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced ruling', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
       component.editRuling(makeRuling('f1'), 0);
 
       component.moveRulingUp(1);
@@ -326,29 +333,26 @@ describe('CodFrRulingsPartComponent', () => {
     it('should do nothing when index is the last one', () => {
       fixture.detectChanges();
       const rulings = [makeRuling('f1'), makeRuling('f2')];
-      component.entries.setValue(rulings);
+      setEntries(rulings);
 
       component.moveRulingDown(1);
 
-      expect(component.entries.value).toEqual(rulings);
-      expect(component.entries.dirty).toBe(false);
+      expect(entries()).toEqual(rulings);
+      expect(component.form.entries().dirty()).toBe(false);
     });
 
     it('should swap the ruling with the next one', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
 
       component.moveRulingDown(0);
 
-      expect(component.entries.value).toEqual([
-        makeRuling('f2'),
-        makeRuling('f1'),
-      ]);
+      expect(entries()).toEqual([makeRuling('f2'), makeRuling('f1')]);
     });
 
     it('should keep editedIndex tracking the moved-down ruling', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
       component.editRuling(makeRuling('f1'), 0);
 
       component.moveRulingDown(0);
@@ -358,12 +362,47 @@ describe('CodFrRulingsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced ruling', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeRuling('f1'), makeRuling('f2')]);
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
       component.editRuling(makeRuling('f2'), 1);
 
       component.moveRulingDown(0);
 
       expect(component.editedIndex()).toBe(0);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+
+    it('should leave a newly bound part pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeRuling('f1')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.isDirty()).toBe(false);
+    });
+  });
+
+  describe('save', () => {
+    it('should save entries without the form Symbol tags, and become pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeRuling('f1')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      setEntries([makeRuling('f1'), makeRuling('f2')]);
+      component.form.entries().markAsDirty();
+      expect(component.isDirty()).toBe(true);
+
+      component.save();
+
+      const saved = (component.data()!.value as CodFrRulingsPart).rulings;
+      expect(saved).toEqual([makeRuling('f1'), makeRuling('f2')]);
+      saved.forEach((e) => expect(Object.getOwnPropertySymbols(e)).toEqual([]));
+      expect(component.isDirty()).toBe(false);
     });
   });
 });

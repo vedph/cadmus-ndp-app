@@ -3,18 +3,15 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
+  linkedSignal,
   model,
   output,
   signal,
+  untracked,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { form, FormField, maxLength, required } from '@angular/forms/signals';
 
 // material
 import { MatButtonModule } from '@angular/material/button';
@@ -26,7 +23,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
-import { FlatLookupPipe } from '@myrmidon/ngx-tools';
+import { FlatLookupPipe, NgxToolsSignalValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import {
   PrintFont,
@@ -35,6 +32,11 @@ import {
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
+import {
+  copyFormValue,
+  isImplicitSubmission,
+  setFieldFromChild,
+} from '@myrmidon/cadmus-ui';
 
 import { FigPlanItemLabel } from '../print-fig-plan-impl-part';
 
@@ -46,12 +48,49 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 }
 
 /**
+ * The editable draft behind the form.
+ */
+interface FigPlanItemLabelControls {
+  type: string;
+  languages: string[];
+  value: string;
+  note: string;
+  fonts: PrintFont[];
+}
+
+/**
+ * Label -> draft.
+ */
+function toDraft(label?: FigPlanItemLabel | null): FigPlanItemLabelControls {
+  return {
+    type: label?.type || '',
+    languages: [...(label?.languages || [])],
+    value: label?.value || '',
+    note: label?.note || '',
+    fonts: copyFormValue(label?.fonts || []),
+  };
+}
+
+/**
+ * Draft -> label.
+ */
+function toModel(draft: FigPlanItemLabelControls): FigPlanItemLabel {
+  return {
+    type: draft.type.trim(),
+    languages: [...draft.languages],
+    value: draft.value.trim() || undefined,
+    note: draft.note.trim() || undefined,
+    fonts: draft.fonts.length ? copyFormValue(draft.fonts) : undefined,
+  };
+}
+
+/**
  * Editor for a figurative plan item's label.
  */
 @Component({
   selector: 'cadmus-fig-plan-item-label-editor',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCheckboxModule,
     MatExpansionModule,
@@ -69,6 +108,8 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FigPlanItemLabelEditorComponent {
+  private readonly _dialogService = inject(DialogService);
+
   public readonly label = model<FigPlanItemLabel | undefined>();
   public readonly cancelEdit = output();
   // fig-plan-item-label-types
@@ -101,76 +142,36 @@ export class FigPlanItemLabelEditorComponent {
     () => this.languageEntries()?.map((e) => entryToFlag(e)) || [],
   );
 
-  public type: FormControl<string>;
-  public languages: FormControl<string[]>;
-  public value: FormControl<string | null>;
-  public note: FormControl<string | null>;
-  public fonts: FormControl<PrintFont[]>;
-  public form: FormGroup;
-
   public readonly edited = signal<PrintFont | undefined>(undefined);
   public readonly editedIndex = signal<number>(-1);
 
-  constructor(
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService,
-  ) {
-    // form
-    this.type = formBuilder.control('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(100)],
-    });
-    this.languages = formBuilder.control([], {
-      nonNullable: true,
-      validators: [Validators.maxLength(100)],
-    });
-    this.value = formBuilder.control(null, {
-      validators: [Validators.maxLength(500)],
-    });
-    this.note = formBuilder.control(null, {
-      validators: [Validators.maxLength(1000)],
-    });
-    this.fonts = formBuilder.control([], {
-      nonNullable: true,
-      validators: [Validators.required],
-    });
-    this.form = formBuilder.group({
-      type: this.type,
-      languages: this.languages,
-      value: this.value,
-      note: this.note,
-      fonts: this.fonts,
-    });
+  // the draft is rebuilt from each new bound label
+  private readonly _draft = linkedSignal(() => toDraft(this.label()));
+  public readonly form = form(this._draft, (p) => {
+    required(p.type);
+    maxLength(p.type, 100);
+    maxLength(p.languages, 100);
+    maxLength(p.value, 500);
+    maxLength(p.note, 1000);
+    // at least 1 font
+    NgxToolsSignalValidators.strictMinLength(p.fonts, 1);
+  });
 
-    // when model changes, update form
+  constructor() {
+    // when the draft mirrors the bound label, there are no unsaved edits
     effect(() => {
-      const data = this.label();
-      this.updateForm(data);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
-  private updateForm(label: FigPlanItemLabel | undefined | null): void {
-    if (!label) {
-      this.form.reset();
-    } else {
-      this.type.setValue(label.type, { emitEvent: false });
-      this.languages.setValue(label.languages || [], { emitEvent: false });
-      this.value.setValue(label.value || '', { emitEvent: false });
-      this.note.setValue(label.note || null, { emitEvent: false });
-      this.fonts.setValue(label.fonts || [], { emitEvent: false });
-    }
-
-    this.form.markAsPristine();
-  }
-
-  private getLabel(): FigPlanItemLabel {
-    return {
-      type: this.type.value,
-      languages: this.languages.value,
-      value: this.value.value || undefined,
-      note: this.note.value || undefined,
-      fonts: this.fonts.value?.length ? this.fonts.value : undefined,
-    };
+  /** True when the draft still mirrors the bound label. */
+  private isDraftInSync(draft: FigPlanItemLabelControls): boolean {
+    return JSON.stringify(draft) === JSON.stringify(toDraft(this.label()));
   }
 
   public addFont(): void {
@@ -182,6 +183,7 @@ export class FigPlanItemLabelEditorComponent {
 
   public editFont(font: PrintFont, index: number): void {
     this.editedIndex.set(index);
+    // structuredClone also drops the form's Symbol tag
     this.edited.set(structuredClone(font));
   }
 
@@ -191,15 +193,14 @@ export class FigPlanItemLabelEditorComponent {
   }
 
   public saveFont(entry: PrintFont): void {
-    const fonts = [...this.fonts.value];
+    const fonts = [...this.form.fonts().value()];
     if (this.editedIndex() === -1) {
       fonts.push(entry);
     } else {
       fonts.splice(this.editedIndex(), 1, entry);
     }
-    this.fonts.setValue(fonts);
-    this.fonts.markAsDirty();
-    this.fonts.updateValueAndValidity();
+    this.form.fonts().value.set(fonts);
+    this.form.fonts().markAsDirty();
     this.closeFont();
   }
 
@@ -211,11 +212,10 @@ export class FigPlanItemLabelEditorComponent {
           if (this.editedIndex() === index) {
             this.closeFont();
           }
-          const fonts = [...this.fonts.value];
+          const fonts = [...this.form.fonts().value()];
           fonts.splice(index, 1);
-          this.fonts.setValue(fonts);
-          this.fonts.markAsDirty();
-          this.fonts.updateValueAndValidity();
+          this.form.fonts().value.set(fonts);
+          this.form.fonts().markAsDirty();
         }
       });
   }
@@ -224,13 +224,12 @@ export class FigPlanItemLabelEditorComponent {
     if (index < 1) {
       return;
     }
-    const font = this.fonts.value[index];
-    const fonts = [...this.fonts.value];
+    const fonts = [...this.form.fonts().value()];
+    const font = fonts[index];
     fonts.splice(index, 1);
     fonts.splice(index - 1, 0, font);
-    this.fonts.setValue(fonts);
-    this.fonts.markAsDirty();
-    this.fonts.updateValueAndValidity();
+    this.form.fonts().value.set(fonts);
+    this.form.fonts().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index - 1);
@@ -240,16 +239,15 @@ export class FigPlanItemLabelEditorComponent {
   }
 
   public moveFontDown(index: number): void {
-    if (index + 1 >= this.fonts.value.length) {
+    if (index + 1 >= this.form.fonts().value().length) {
       return;
     }
-    const font = this.fonts.value[index];
-    const fonts = [...this.fonts.value];
+    const fonts = [...this.form.fonts().value()];
+    const font = fonts[index];
     fonts.splice(index, 1);
     fonts.splice(index + 1, 0, font);
-    this.fonts.setValue(fonts);
-    this.fonts.markAsDirty();
-    this.fonts.updateValueAndValidity();
+    this.form.fonts().value.set(fonts);
+    this.form.fonts().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index + 1);
@@ -259,9 +257,7 @@ export class FigPlanItemLabelEditorComponent {
   }
 
   public onLanguageIdsChange(ids: string[]): void {
-    this.languages.setValue(ids);
-    this.languages.markAsDirty();
-    this.languages.updateValueAndValidity();
+    setFieldFromChild(this.form.languages, [...(ids || [])]);
   }
 
   public cancel(): void {
@@ -269,25 +265,39 @@ export class FigPlanItemLabelEditorComponent {
   }
 
   /**
+   * Handle Enter: in a text input, save as the save button would, when it
+   * is enabled. This replaces the implicit submission of a form, which
+   * targeted only the innermost form.
+   * @param event The keydown event.
+   */
+  public onEnterKey(event: Event): void {
+    if (!isImplicitSubmission(event)) {
+      return;
+    }
+    // consume Enter even when not saving, so that it does not reach an
+    // enclosing editor, which would save itself instead
+    event.preventDefault();
+    if (this.form().valid() && this.form().dirty()) {
+      this.save();
+    }
+  }
+
+  /**
    * Saves the current form data by updating the `label` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
+   * @param pristine If true (default), the form's interaction state is
+   * cleared after saving.
    */
   public save(pristine = true): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
       // show validation errors
-      this.form.markAllAsTouched();
+      this.form().markAsTouched();
       return;
     }
 
-    const data = this.getLabel();
-    this.label.set(data);
+    this.label.set(toModel(this._draft()));
 
     if (pristine) {
-      this.form.markAsPristine();
+      this.form().reset();
     }
   }
 }

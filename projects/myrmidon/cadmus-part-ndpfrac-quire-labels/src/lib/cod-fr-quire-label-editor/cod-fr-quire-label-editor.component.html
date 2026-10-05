@@ -1,4 +1,6 @@
-<form [formGroup]="form" (submit)="save()">
+<!-- no <form> here: this editor can be nested; Enter in a text input
+     saves it via onEnterKey -->
+<div (keydown.enter)="onEnterKey($event)">
   <!-- types -->
   @if (typeFlags().length) {
     <div>
@@ -6,7 +8,7 @@
         <legend>types</legend>
         <cadmus-ui-flag-set
           [flags]="typeFlags()"
-          [checkedIds]="types.value"
+          [checkedIds]="form.types().value()"
           (checkedIdsChange)="onTypeCheckedIdsChange($event)"
         />
       </fieldset>
@@ -20,7 +22,7 @@
         <legend>positions</legend>
         <cadmus-ui-flag-set
           [flags]="positionFlags()"
-          [checkedIds]="positions.value"
+          [checkedIds]="form.positions().value()"
           (checkedIdsChange)="onPositionCheckedIdsChange($event)"
         />
       </fieldset>
@@ -31,8 +33,11 @@
   <div>
     <mat-form-field>
       <mat-label>text</mat-label>
-      <input matInput [formControl]="text" />
-      @if ($any(text).errors?.maxLength && (text.dirty || text.touched)) {
+      <input matInput [formField]="form.text" />
+      @if (
+        form.text().getError('maxLength') &&
+        (form.text().dirty() || form.text().touched())
+      ) {
         <mat-error>text too long</mat-error>
       }
     </mat-form-field>
@@ -48,7 +53,7 @@
       [refTypeEntries]="refTypeEntries()"
       [refTagEntries]="refTagEntries()"
       [featureEntries]="idFeatureEntries()"
-      [id]="handId.value || undefined"
+      [id]="form.handId().value() || undefined"
       [canSwitchMode]="true"
       [canEditTarget]="true"
       [lookupProviderOptions]="lookupProviderOptions()"
@@ -60,8 +65,11 @@
   <div>
     <mat-form-field class="long-text">
       <mat-label>ink</mat-label>
-      <input matInput [formControl]="ink" />
-      @if ($any(ink).errors?.maxLength && (ink.dirty || ink.touched)) {
+      <input matInput [formField]="form.ink" />
+      @if (
+        form.ink().getError('maxLength') &&
+        (form.ink().dirty() || form.ink().touched())
+      ) {
         <mat-error>ink too long</mat-error>
       }
     </mat-form-field>
@@ -71,8 +79,11 @@
   <div>
     <mat-form-field class="long-text">
       <mat-label>note</mat-label>
-      <textarea matInput [formControl]="note" rows="3"></textarea>
-      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+      <textarea matInput [formField]="form.note" rows="3"></textarea>
+      @if (
+        form.note().getError('maxLength') &&
+        (form.note().dirty() || form.note().touched())
+      ) {
         <mat-error>note too long</mat-error>
       }
     </mat-form-field>
@@ -89,12 +100,13 @@
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
+      (click)="save()"
       mat-icon-button
       matTooltip="Accept changes"
-      [disabled]="form.invalid || form.pristine"
+      [disabled]="form().invalid() || !form().dirty()"
     >
       <mat-icon class="mat-primary">check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>

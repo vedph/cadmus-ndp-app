@@ -4,15 +4,12 @@ import {
   computed,
   effect,
   input,
+  linkedSignal,
   model,
   output,
+  untracked,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { form, FormField } from '@angular/forms/signals';
 
 // material
 import { MatButtonModule } from '@angular/material/button';
@@ -28,6 +25,11 @@ import {
   AssertedCompositeIdsComponent,
 } from '@myrmidon/cadmus-refs-asserted-ids';
 import { ThesaurusEntry } from '@myrmidon/cadmus-core';
+import {
+  copyFormValue,
+  isImplicitSubmission,
+  setFieldFromChild,
+} from '@myrmidon/cadmus-ui';
 
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
@@ -42,12 +44,52 @@ function entryToFlag(entry: ThesaurusEntry): Flag {
 }
 
 /**
+ * The editable draft behind the form.
+ */
+interface PrintFontControls {
+  eid: string;
+  family: string;
+  sections: string[];
+  features: string[];
+  ids: AssertedCompositeId[];
+  note: string;
+}
+
+/**
+ * Print font -> draft.
+ */
+function toDraft(font?: PrintFont | null): PrintFontControls {
+  return {
+    eid: font?.eid || '',
+    family: font?.family || '',
+    sections: [...(font?.sections || [])],
+    features: [...(font?.features || [])],
+    ids: copyFormValue(font?.ids || []),
+    note: font?.note || '',
+  };
+}
+
+/**
+ * Draft -> print font.
+ */
+function toModel(draft: PrintFontControls): PrintFont {
+  return {
+    eid: draft.eid.trim() || undefined,
+    family: draft.family.trim(),
+    sections: draft.sections.length ? [...draft.sections] : undefined,
+    features: draft.features.length ? [...draft.features] : undefined,
+    ids: draft.ids.length ? copyFormValue(draft.ids) : undefined,
+    note: draft.note.trim() || undefined,
+  };
+}
+
+/**
  * Editor for a single print font.
  */
 @Component({
   selector: 'cadmus-print-font-editor',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -98,82 +140,37 @@ export class PrintFontEditorComponent {
     LookupProviderOptions | undefined
   >();
 
-  public eid: FormControl<string | null>;
-  public family: FormControl<string>;
-  public sections: FormControl<string[]>;
-  public features: FormControl<string[]>;
-  public ids: FormControl<AssertedCompositeId[]>;
-  public note: FormControl<string | null>;
-  public form: FormGroup;
+  // the draft is rebuilt from each new bound font
+  private readonly _draft = linkedSignal(() => toDraft(this.font()));
+  public readonly form = form(this._draft);
 
-  constructor(formBuilder: FormBuilder) {
-    // form
-    this.eid = formBuilder.control<string | null>(null);
-    this.family = formBuilder.control<string>('', { nonNullable: true });
-    this.sections = formBuilder.control<string[]>([], { nonNullable: true });
-    this.features = formBuilder.control<string[]>([], { nonNullable: true });
-    this.ids = formBuilder.control<AssertedCompositeId[]>([], {
-      nonNullable: true,
-    });
-    this.note = formBuilder.control<string | null>(null);
-    this.form = formBuilder.group({
-      eid: this.eid,
-      family: this.family,
-      sections: this.sections,
-      features: this.features,
-      ids: this.ids,
-      note: this.note,
-    });
-
-    // when model changes, update form
+  constructor() {
+    // when the draft mirrors the bound font, there are no unsaved edits
     effect(() => {
-      const data = this.font();
-      this.updateForm(data);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
-  private updateForm(font: PrintFont | undefined | null): void {
-    if (!font) {
-      this.form.reset();
-    } else {
-      this.eid.setValue(font.eid ?? null, { emitEvent: false });
-      this.family.setValue(font.family ?? '', { emitEvent: false });
-      this.sections.setValue(font.sections ?? [], { emitEvent: false });
-      this.features.setValue(font.features ?? [], { emitEvent: false });
-      this.ids.setValue(font.ids ?? [], { emitEvent: false });
-      this.note.setValue(font.note ?? null, { emitEvent: false });
-    }
-
-    this.form.markAsPristine();
-  }
-
-  private getFont(): PrintFont {
-    return {
-      eid: this.eid.value || undefined,
-      family: this.family.value,
-      sections: this.sections.value?.length ? this.sections.value : undefined,
-      features: this.features.value?.length ? this.features.value : undefined,
-      ids: this.ids.value?.length ? this.ids.value : undefined,
-      note: this.note.value || undefined,
-    };
+  /** True when the draft still mirrors the bound font. */
+  private isDraftInSync(draft: PrintFontControls): boolean {
+    return JSON.stringify(draft) === JSON.stringify(toDraft(this.font()));
   }
 
   public onSectionCheckedIdsChange(ids: string[]): void {
-    this.sections.setValue(ids);
-    this.sections.markAsDirty();
-    this.sections.updateValueAndValidity();
+    setFieldFromChild(this.form.sections, [...(ids || [])]);
   }
 
   public onFeatureCheckedIdsChange(ids: string[]): void {
-    this.features.setValue(ids);
-    this.features.markAsDirty();
-    this.features.updateValueAndValidity();
+    setFieldFromChild(this.form.features, [...(ids || [])]);
   }
 
   public onIdsChange(ids: AssertedCompositeId[]): void {
-    this.ids.setValue(ids);
-    this.ids.markAsDirty();
-    this.ids.updateValueAndValidity();
+    setFieldFromChild(this.form.ids, copyFormValue(ids || []));
   }
 
   public cancel(): void {
@@ -181,25 +178,39 @@ export class PrintFontEditorComponent {
   }
 
   /**
-   * Saves the current form data by updating the `data` model signal.
-   * This method can be called manually (e.g., by a Save button) or
-   * automatically (via auto-save).
-   * @param pristine If true (default), the form is marked as pristine
-   * after saving.
-   * Set to false for auto-save if you want the form to remain dirty.
+   * Handle Enter: in a text input, save as the save button would, when it
+   * is enabled. This replaces the implicit submission of a form, which
+   * targeted only the innermost form.
+   * @param event The keydown event.
+   */
+  public onEnterKey(event: Event): void {
+    if (!isImplicitSubmission(event)) {
+      return;
+    }
+    // consume Enter even when not saving, so that it does not reach an
+    // enclosing editor, which would save itself instead
+    event.preventDefault();
+    if (this.form().valid() && this.form().dirty()) {
+      this.save();
+    }
+  }
+
+  /**
+   * Saves the current form data by updating the `font` model signal.
+   * @param pristine If true (default), the form's interaction state is
+   * cleared after saving.
    */
   public save(pristine = true): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
       // show validation errors
-      this.form.markAllAsTouched();
+      this.form().markAsTouched();
       return;
     }
 
-    const data = this.getFont();
-    this.font.set(data);
+    this.font.set(toModel(this._draft()));
 
     if (pristine) {
-      this.form.markAsPristine();
+      this.form().reset();
     }
   }
 }

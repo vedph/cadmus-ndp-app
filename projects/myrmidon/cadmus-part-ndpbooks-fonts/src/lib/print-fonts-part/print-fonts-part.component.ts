@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,23 +17,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import {
-  deepCopy,
-  FlatLookupPipe,
-  NgxToolsValidators,
-} from '@myrmidon/ngx-tools';
+import { FlatLookupPipe, NgxToolsSignalValidators } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import {
   CloseSaveButtonsComponent,
-  ModelEditorComponentBase,
   HelpLinkComponent,
+  ModelEditorComponentBase,
+  copyFormValue,
 } from '@myrmidon/cadmus-ui';
-import {
-  EditedObject,
-  ThesauriSet,
-  ThesaurusEntry,
-} from '@myrmidon/cadmus-core';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import {
@@ -47,6 +39,15 @@ interface PrintFontsPartSettings {
   lookupProviderOptions?: LookupProviderOptions;
 }
 
+interface PrintFontsPartControls {
+  fonts: PrintFont[];
+}
+
+function toDraft(part?: PrintFontsPart | null): PrintFontsPartControls {
+  // copy: the form tags the objects in its arrays
+  return { fonts: copyFormValue(part?.fonts || []) };
+}
+
 /**
  * PrintFontsPart editor component.
  * Thesauri: print-font-families, print-layout-sections,
@@ -58,7 +59,6 @@ interface PrintFontsPartSettings {
   selector: 'cadmus-print-fonts-part',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
@@ -70,54 +70,53 @@ interface PrintFontsPartSettings {
     CloseSaveButtonsComponent,
     PrintFontEditorComponent,
     FlatLookupPipe,
-    HelpLinkComponent
+    HelpLinkComponent,
   ],
   templateUrl: './print-fonts-part.component.html',
   styleUrl: './print-fonts-part.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PrintFontsPartComponent
-  extends ModelEditorComponentBase<PrintFontsPart>
-  implements OnInit
-{
+export class PrintFontsPartComponent extends ModelEditorComponentBase<PrintFontsPart> {
+  private readonly _dialogService = inject(DialogService);
+
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<PrintFont | undefined>(undefined);
 
   // print-font-families
-  public readonly familyEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly familyEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['print-font-families']?.entries,
   );
   // print-layout-sections
-  public readonly sectionEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly sectionEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['print-layout-sections']?.entries,
   );
   // print-font-features
-  public readonly featureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly featureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['print-font-features']?.entries,
   );
   // doc-reference-types
-  public readonly docRefTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly docRefTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-types']?.entries,
   );
   // doc-reference-tags
-  public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly docRefTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-tags']?.entries,
   );
   // assertion-tags
-  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly assTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['assertion-tags']?.entries,
   );
   // external-id-tags
-  public readonly extIdTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly extIdTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['external-id-tags']?.entries,
   );
   // external-id-scopes
-  public readonly extIdScopeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly extIdScopeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['external-id-scopes']?.entries,
   );
   // asserted-id-features
-  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly idFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-features']?.entries,
   );
 
   // lookup options depending on role
@@ -125,120 +124,26 @@ export class PrintFontsPartComponent
     LookupProviderOptions | undefined
   >(undefined);
 
-  public fonts: FormControl<PrintFont[]>;
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    // at least 1 entry
+    NgxToolsSignalValidators.strictMinLength(p.fonts, 1);
+  });
 
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService,
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.fonts = formBuilder.control([], {
-      // at least 1 entry
-      validators: NgxToolsValidators.strictMinLengthValidator(1),
-      nonNullable: true,
-    });
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      entries: this.fonts,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'print-font-families';
-    if (this.hasThesaurus(key)) {
-      this.familyEntries.set(thesauri[key].entries);
-    } else {
-      this.familyEntries.set(undefined);
-    }
-    key = 'print-layout-sections';
-    if (this.hasThesaurus(key)) {
-      this.sectionEntries.set(thesauri[key].entries);
-    } else {
-      this.sectionEntries.set(undefined);
-    }
-    key = 'print-font-features';
-    if (this.hasThesaurus(key)) {
-      this.featureEntries.set(thesauri[key].entries);
-    } else {
-      this.featureEntries.set(undefined);
-    }
-    key = 'doc-reference-types';
-    if (this.hasThesaurus(key)) {
-      this.docRefTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.docRefTypeEntries.set(undefined);
-    }
-    key = 'doc-reference-tags';
-    if (this.hasThesaurus(key)) {
-      this.docRefTagEntries.set(thesauri[key].entries);
-    } else {
-      this.docRefTagEntries.set(undefined);
-    }
-    key = 'assertion-tags';
-    if (this.hasThesaurus(key)) {
-      this.assTagEntries.set(thesauri[key].entries);
-    } else {
-      this.assTagEntries.set(undefined);
-    }
-    key = 'external-id-tags';
-    if (this.hasThesaurus(key)) {
-      this.extIdTagEntries.set(thesauri[key].entries);
-    } else {
-      this.extIdTagEntries.set(undefined);
-    }
-    key = 'external-id-scopes';
-    if (this.hasThesaurus(key)) {
-      this.extIdScopeEntries.set(thesauri[key].entries);
-    } else {
-      this.extIdScopeEntries.set(undefined);
-    }
-    key = 'asserted-id-features';
-    if (this.hasThesaurus(key)) {
-      this.idFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.idFeatureEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: PrintFontsPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    this.fonts.setValue(part.fonts || []);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<PrintFontsPart>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-    // settings
-    this._appRepository
-      ?.getSettingFor<PrintFontsPartSettings>(
-        PRINT_FONTS_PART_TYPEID,
-        this.identity()?.roleId || undefined,
-      )
-      .then((settings) => {
-        const options = settings?.lookupProviderOptions;
-        this.lookupProviderOptions.set(options || undefined);
-      });
-    // form
-    this.updateForm(data?.value);
+  constructor() {
+    super();
+    this.initSettings<PrintFontsPartSettings>(
+      PRINT_FONTS_PART_TYPEID,
+      (settings) =>
+        this.lookupProviderOptions.set(
+          settings?.lookupProviderOptions || undefined,
+        ),
+    );
   }
 
   protected getValue(): PrintFontsPart {
-    let part = this.getEditedPart(PRINT_FONTS_PART_TYPEID) as PrintFontsPart;
-    part.fonts = this.fonts.value || [];
+    const part = this.getEditedPart(PRINT_FONTS_PART_TYPEID) as PrintFontsPart;
+    part.fonts = copyFormValue(this._draft().fonts);
     return part;
   }
 
@@ -251,7 +156,7 @@ export class PrintFontsPartComponent
 
   public editFont(entry: PrintFont, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(deepCopy(entry));
+    this.edited.set(structuredClone(entry));
   }
 
   public closeFont(): void {
@@ -260,15 +165,14 @@ export class PrintFontsPartComponent
   }
 
   public saveFont(entry: PrintFont): void {
-    const fonts = [...this.fonts.value];
+    const fonts = [...this.form.fonts().value()];
     if (this.editedIndex() === -1) {
       fonts.push(entry);
     } else {
       fonts.splice(this.editedIndex(), 1, entry);
     }
-    this.fonts.setValue(fonts);
-    this.fonts.markAsDirty();
-    this.fonts.updateValueAndValidity();
+    this.form.fonts().value.set(fonts);
+    this.form.fonts().markAsDirty();
     this.closeFont();
   }
 
@@ -280,11 +184,10 @@ export class PrintFontsPartComponent
           if (this.editedIndex() === index) {
             this.closeFont();
           }
-          const entries = [...this.fonts.value];
+          const entries = [...this.form.fonts().value()];
           entries.splice(index, 1);
-          this.fonts.setValue(entries);
-          this.fonts.markAsDirty();
-          this.fonts.updateValueAndValidity();
+          this.form.fonts().value.set(entries);
+          this.form.fonts().markAsDirty();
         }
       });
   }
@@ -293,13 +196,12 @@ export class PrintFontsPartComponent
     if (index < 1) {
       return;
     }
-    const font = this.fonts.value[index];
-    const fonts = [...this.fonts.value];
+    const fonts = [...this.form.fonts().value()];
+    const font = fonts[index];
     fonts.splice(index, 1);
     fonts.splice(index - 1, 0, font);
-    this.fonts.setValue(fonts);
-    this.fonts.markAsDirty();
-    this.fonts.updateValueAndValidity();
+    this.form.fonts().value.set(fonts);
+    this.form.fonts().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index - 1);
@@ -309,16 +211,15 @@ export class PrintFontsPartComponent
   }
 
   public moveFontDown(index: number): void {
-    if (index + 1 >= this.fonts.value.length) {
+    if (index + 1 >= this.form.fonts().value().length) {
       return;
     }
-    const font = this.fonts.value[index];
-    const fonts = [...this.fonts.value];
+    const fonts = [...this.form.fonts().value()];
+    const font = fonts[index];
     fonts.splice(index, 1);
     fonts.splice(index + 1, 0, font);
-    this.fonts.setValue(fonts);
-    this.fonts.markAsDirty();
-    this.fonts.updateValueAndValidity();
+    this.form.fonts().value.set(fonts);
+    this.form.fonts().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index + 1);

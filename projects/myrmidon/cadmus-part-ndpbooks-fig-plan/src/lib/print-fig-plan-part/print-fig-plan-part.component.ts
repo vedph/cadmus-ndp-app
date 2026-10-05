@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, OnInit, signal } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from '@angular/core';
+import { FormField, maxLength } from '@angular/forms/signals';
 
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,22 +20,19 @@ import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
-import {
-  EditedObject,
-  ThesauriSet,
-  ThesaurusEntry,
-} from '@myrmidon/cadmus-core';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import {
   CloseSaveButtonsComponent,
+  copyFormValue,
   ModelEditorComponentBase,
+  setFieldFromChild,
 } from '@myrmidon/cadmus-ui';
 import { Flag, FlagSetComponent } from '@myrmidon/cadmus-ui-flag-set';
 import {
   AssertedCompositeId,
   AssertedCompositeIdsComponent,
 } from '@myrmidon/cadmus-refs-asserted-ids';
-import { deepCopy, FlatLookupPipe } from '@myrmidon/ngx-tools';
+import { FlatLookupPipe } from '@myrmidon/ngx-tools';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import {
@@ -56,6 +53,24 @@ interface PrintFigPlanPartSettings {
   lookupProviderOptions?: LookupProviderOptions;
 }
 
+interface PrintFigPlanPartControls {
+  artistIds: AssertedCompositeId[];
+  techniques: string[];
+  features: string[];
+  description: string;
+  items: FigPlanItem[];
+}
+
+function toDraft(part?: PrintFigPlanPart | null): PrintFigPlanPartControls {
+  return {
+    artistIds: copyFormValue(part?.artistIds || []),
+    techniques: [...(part?.techniques || [])],
+    features: [...(part?.features || [])],
+    description: part?.description || '',
+    items: copyFormValue(part?.items || []),
+  };
+}
+
 /**
  * Printed book figurative part editor component.
  * Thesauri: fig-plan-techniques, fig-plan-types, fig-plan-features,
@@ -66,7 +81,7 @@ interface PrintFigPlanPartSettings {
   selector: 'cadmus-print-fig-plan-part',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCardModule,
     MatExpansionModule,
@@ -88,54 +103,47 @@ interface PrintFigPlanPartSettings {
   styleUrl: './print-fig-plan-part.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PrintFigPlanPartComponent
-  extends ModelEditorComponentBase<PrintFigPlanPart>
-  implements OnInit
-{
-  public artistIds: FormControl<AssertedCompositeId[]>;
-  public techniques: FormControl<string[]>;
-  public features: FormControl<string[]>;
-  public description: FormControl<string | null>;
-  public items: FormControl<FigPlanItem[]>;
+export class PrintFigPlanPartComponent extends ModelEditorComponentBase<PrintFigPlanPart> {
+  private readonly _dialogService = inject(DialogService);
 
   public readonly edited = signal<FigPlanItem | undefined>(undefined);
   public readonly editedIndex = signal<number>(-1);
 
   // fig-plan-techniques
-  public readonly planTechEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly planTechEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-techniques']?.entries,
   );
   // fig-plan-types
-  public readonly planTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly planTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-types']?.entries,
   );
   // fig-plan-features
-  public readonly planFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly planFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['fig-plan-features']?.entries,
   );
   // asserted-id-scopes
-  public readonly assIdScopeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly assIdScopeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-scopes']?.entries,
   );
   // asserted-id-tags
-  public readonly assIdTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly assIdTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-tags']?.entries,
   );
   // assertion-tags
-  public readonly assTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly assTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['assertion-tags']?.entries,
   );
   // doc-reference-types
-  public readonly docRefTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly docRefTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-types']?.entries,
   );
   // doc-reference-tags
-  public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly docRefTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-tags']?.entries,
   );
   // asserted-id-features
-  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly idFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-features']?.entries,
   );
 
   // flags mapped from thesaurus entries
@@ -151,145 +159,32 @@ export class PrintFigPlanPartComponent
     LookupProviderOptions | undefined
   >(undefined);
 
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService,
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.artistIds = formBuilder.control<AssertedCompositeId[]>([], {
-      nonNullable: true,
-    });
-    this.techniques = formBuilder.control<string[]>([], { nonNullable: true });
-    this.features = formBuilder.control<string[]>([], { nonNullable: true });
-    this.description = formBuilder.control<string | null>(null, {
-      validators: Validators.maxLength(1000),
-    });
-    this.items = formBuilder.control<FigPlanItem[]>([], { nonNullable: true });
-  }
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    maxLength(p.description, 1000);
+  });
 
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      artistIds: this.artistIds,
-      techniques: this.techniques,
-      features: this.features,
-      description: this.description,
-      items: this.items,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'fig-plan-techniques';
-    if (this.hasThesaurus(key)) {
-      this.planTechEntries.set(thesauri[key].entries);
-    } else {
-      this.planTechEntries.set(undefined);
-    }
-    key = 'fig-plan-types';
-    if (this.hasThesaurus(key)) {
-      this.planTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.planTypeEntries.set(undefined);
-    }
-    key = 'fig-plan-features';
-    if (this.hasThesaurus(key)) {
-      this.planFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.planFeatureEntries.set(undefined);
-    }
-    key = 'asserted-id-scopes';
-    if (this.hasThesaurus(key)) {
-      this.assIdScopeEntries.set(thesauri[key].entries);
-    } else {
-      this.assIdScopeEntries.set(undefined);
-    }
-    key = 'asserted-id-tags';
-    if (this.hasThesaurus(key)) {
-      this.assIdTagEntries.set(thesauri[key].entries);
-    } else {
-      this.assIdTagEntries.set(undefined);
-    }
-    key = 'assertion-tags';
-    if (this.hasThesaurus(key)) {
-      this.assTagEntries.set(thesauri[key].entries);
-    } else {
-      this.assTagEntries.set(undefined);
-    }
-    key = 'doc-reference-types';
-    if (this.hasThesaurus(key)) {
-      this.docRefTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.docRefTypeEntries.set(undefined);
-    }
-    key = 'doc-reference-tags';
-    if (this.hasThesaurus(key)) {
-      this.docRefTagEntries.set(thesauri[key].entries);
-    } else {
-      this.docRefTagEntries.set(undefined);
-    }
-    key = 'asserted-id-features';
-    if (this.hasThesaurus(key)) {
-      this.idFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.idFeatureEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: PrintFigPlanPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-
-    this.artistIds.setValue(part.artistIds ?? [], { emitEvent: false });
-    this.techniques.setValue(part.techniques ?? [], { emitEvent: false });
-    this.features.setValue(part.features ?? [], { emitEvent: false });
-    this.description.setValue(part.description ?? null, { emitEvent: false });
-    this.items.setValue(part.items || []);
-
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(data?: EditedObject<PrintFigPlanPart>): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-    // settings
-    this._appRepository
-      ?.getSettingFor<PrintFigPlanPartSettings>(
-        PRINT_FIG_PLAN_PART_TYPEID,
-        this.identity()?.roleId || undefined,
-      )
-      .then((settings) => {
-        const options = settings?.lookupProviderOptions;
-        this.lookupProviderOptions.set(options || undefined);
-      });
-    // form
-    this.updateForm(data?.value);
+  constructor() {
+    super();
+    this.initSettings<PrintFigPlanPartSettings>(
+      PRINT_FIG_PLAN_PART_TYPEID,
+      (settings) =>
+        this.lookupProviderOptions.set(
+          settings?.lookupProviderOptions || undefined,
+        ),
+    );
   }
 
   public onTechniqueCheckedIdsChange(ids: string[]): void {
-    this.techniques.setValue(ids);
-    this.techniques.markAsDirty();
-    this.techniques.updateValueAndValidity();
+    setFieldFromChild(this.form.techniques, [...(ids || [])]);
   }
 
   public onFeatureCheckedIdsChange(ids: string[]): void {
-    this.features.setValue(ids);
-    this.features.markAsDirty();
-    this.features.updateValueAndValidity();
+    setFieldFromChild(this.form.features, [...(ids || [])]);
   }
 
   public onArtistIdsChange(ids: AssertedCompositeId[]): void {
-    this.artistIds.setValue(ids);
-    this.artistIds.markAsDirty();
-    this.artistIds.updateValueAndValidity();
+    setFieldFromChild(this.form.artistIds, copyFormValue(ids || []));
   }
 
   public addItem(): void {
@@ -302,7 +197,8 @@ export class PrintFigPlanPartComponent
 
   public editItem(item: FigPlanItem, index: number): void {
     this.editedIndex.set(index);
-    this.edited.set(deepCopy(item));
+    // structuredClone also drops the form's Symbol tag
+    this.edited.set(structuredClone(item));
   }
 
   public closeItem(): void {
@@ -311,15 +207,14 @@ export class PrintFigPlanPartComponent
   }
 
   public saveItem(entry: FigPlanItem): void {
-    const items = [...this.items.value];
+    const items = [...this.form.items().value()];
     if (this.editedIndex() === -1) {
       items.push(entry);
     } else {
       items.splice(this.editedIndex(), 1, entry);
     }
-    this.items.setValue(items);
-    this.items.markAsDirty();
-    this.items.updateValueAndValidity();
+    this.form.items().value.set(items);
+    this.form.items().markAsDirty();
     this.closeItem();
   }
 
@@ -331,11 +226,10 @@ export class PrintFigPlanPartComponent
           if (this.editedIndex() === index) {
             this.closeItem();
           }
-          const items = [...this.items.value];
+          const items = [...this.form.items().value()];
           items.splice(index, 1);
-          this.items.setValue(items);
-          this.items.markAsDirty();
-          this.items.updateValueAndValidity();
+          this.form.items().value.set(items);
+          this.form.items().markAsDirty();
         }
       });
   }
@@ -344,13 +238,12 @@ export class PrintFigPlanPartComponent
     if (index < 1) {
       return;
     }
-    const item = this.items.value[index];
-    const items = [...this.items.value];
+    const items = [...this.form.items().value()];
+    const item = items[index];
     items.splice(index, 1);
     items.splice(index - 1, 0, item);
-    this.items.setValue(items);
-    this.items.markAsDirty();
-    this.items.updateValueAndValidity();
+    this.form.items().value.set(items);
+    this.form.items().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index - 1);
@@ -360,16 +253,15 @@ export class PrintFigPlanPartComponent
   }
 
   public moveItemDown(index: number): void {
-    if (index + 1 >= this.items.value.length) {
+    if (index + 1 >= this.form.items().value().length) {
       return;
     }
-    const item = this.items.value[index];
-    const items = [...this.items.value];
+    const items = [...this.form.items().value()];
+    const item = items[index];
     items.splice(index, 1);
     items.splice(index + 1, 0, item);
-    this.items.setValue(items);
-    this.items.markAsDirty();
-    this.items.updateValueAndValidity();
+    this.form.items().value.set(items);
+    this.form.items().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index + 1);
@@ -379,20 +271,17 @@ export class PrintFigPlanPartComponent
   }
 
   protected getValue(): PrintFigPlanPart {
-    let part = this.getEditedPart(
+    const part = this.getEditedPart(
       PRINT_FIG_PLAN_PART_TYPEID,
     ) as PrintFigPlanPart;
-
-    part.artistIds = this.artistIds.value?.length
-      ? this.artistIds.value
+    const draft = this._draft();
+    part.artistIds = draft.artistIds.length
+      ? copyFormValue(draft.artistIds)
       : undefined;
-    part.techniques = this.techniques.value || [];
-    part.features = this.features.value?.length
-      ? this.features.value
-      : undefined;
-    part.description = this.description.value?.trim() || undefined;
-    part.items = this.items.value?.length ? this.items.value : undefined;
-
+    part.techniques = [...draft.techniques];
+    part.features = draft.features.length ? [...draft.features] : undefined;
+    part.description = draft.description.trim() || undefined;
+    part.items = draft.items.length ? copyFormValue(draft.items) : undefined;
     return part;
   }
 }

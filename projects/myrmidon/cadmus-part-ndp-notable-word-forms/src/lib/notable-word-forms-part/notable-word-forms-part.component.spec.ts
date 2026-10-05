@@ -1,5 +1,6 @@
 import { Component, input, model, output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
@@ -22,6 +23,17 @@ import {
 class MockNotableWordFormEditorComponent {
   public readonly tagEntries = input<unknown>();
   public readonly langEntries = input<unknown>();
+  public readonly opTagEntries = input<unknown>();
+  public readonly refTypeEntries = input<unknown>();
+  public readonly refTagEntries = input<unknown>();
+  public readonly linkScopeEntries = input<unknown>();
+  public readonly linkTagEntries = input<unknown>();
+  public readonly linkAssTagEntries = input<unknown>();
+  public readonly linkDocRefTypeEntries = input<unknown>();
+  public readonly linkDocRefTagEntries = input<unknown>();
+  public readonly idFeatureEntries = input<unknown>();
+  public readonly lookupProviderOptions = input<unknown>();
+  public readonly cancelEdit = output();
   public readonly form = model<NotableWordForm | undefined>();
 }
 
@@ -43,6 +55,19 @@ describe('NotableWordFormsPartComponent', () => {
 
   function makeForm(value: string): NotableWordForm {
     return { value };
+  }
+
+  // the form tags the objects in its arrays with a Symbol: compare plain copies
+  function json<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function setEntries(forms: NotableWordForm[]): void {
+    component.form.entries().value.set(forms);
+  }
+
+  function entries(): NotableWordForm[] {
+    return json(component.form.entries().value());
   }
 
   function makeData(
@@ -99,16 +124,16 @@ describe('NotableWordFormsPartComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('buildForm / validity', () => {
+  describe('form validity', () => {
     it('should be invalid with no forms', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with at least one form', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare')]);
-      expect(component.form.valid).toBe(true);
+      setEntries([makeForm('amare')]);
+      expect(component.form().valid()).toBe(true);
     });
   });
 
@@ -201,6 +226,63 @@ describe('NotableWordFormsPartComponent', () => {
       );
     });
 
+    it('should pass each thesaurus to the matching editor input', async () => {
+      fixture.detectChanges();
+      const keys = [
+        'notable-word-forms-languages',
+        'notable-word-forms-tags',
+        'notable-word-forms-op-tags',
+        'doc-reference-types',
+        'doc-reference-tags',
+        'pin-link-scopes',
+        'pin-link-tags',
+        'pin-link-assertion-tags',
+        'pin-link-docref-types',
+        'pin-link-docref-tags',
+        'asserted-id-features',
+      ];
+      const thesauri: ThesauriSet = {};
+      for (const key of keys) {
+        thesauri[key] = { id: key, entries: [{ id: key, value: key }] };
+      }
+      fixture.componentRef.setInput('data', makeData([], thesauri));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      component.addForm();
+      fixture.detectChanges();
+
+      const editor = fixture.debugElement.query(
+        By.directive(MockNotableWordFormEditorComponent),
+      ).componentInstance as MockNotableWordFormEditorComponent;
+      const keyOf = (entries: unknown): string | undefined =>
+        (entries as { id: string }[] | undefined)?.[0]?.id;
+      expect({
+        langEntries: keyOf(editor.langEntries()),
+        tagEntries: keyOf(editor.tagEntries()),
+        opTagEntries: keyOf(editor.opTagEntries()),
+        refTypeEntries: keyOf(editor.refTypeEntries()),
+        refTagEntries: keyOf(editor.refTagEntries()),
+        linkScopeEntries: keyOf(editor.linkScopeEntries()),
+        linkTagEntries: keyOf(editor.linkTagEntries()),
+        linkAssTagEntries: keyOf(editor.linkAssTagEntries()),
+        linkDocRefTypeEntries: keyOf(editor.linkDocRefTypeEntries()),
+        linkDocRefTagEntries: keyOf(editor.linkDocRefTagEntries()),
+        idFeatureEntries: keyOf(editor.idFeatureEntries()),
+      }).toEqual({
+        langEntries: 'notable-word-forms-languages',
+        tagEntries: 'notable-word-forms-tags',
+        opTagEntries: 'notable-word-forms-op-tags',
+        refTypeEntries: 'doc-reference-types',
+        refTagEntries: 'doc-reference-tags',
+        linkScopeEntries: 'pin-link-scopes',
+        linkTagEntries: 'pin-link-tags',
+        linkAssTagEntries: 'pin-link-assertion-tags',
+        linkDocRefTypeEntries: 'pin-link-docref-types',
+        linkDocRefTagEntries: 'pin-link-docref-tags',
+        idFeatureEntries: 'asserted-id-features',
+      });
+    });
+
     it('should clear every entries signal when thesauri are absent', async () => {
       fixture.detectChanges();
       fixture.componentRef.setInput('data', makeData([], {}));
@@ -249,13 +331,13 @@ describe('NotableWordFormsPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare')]);
+      setEntries([makeForm('amare')]);
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.entries.value).toEqual([]);
+      expect(entries()).toEqual([]);
     });
 
     it('should populate entries from part.forms and mark the form pristine', async () => {
@@ -266,8 +348,8 @@ describe('NotableWordFormsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.entries.value).toEqual(forms);
-      expect(component.form.pristine).toBe(true);
+      expect(entries()).toEqual(forms);
+      expect(component.form().dirty()).toBe(false);
     });
   });
 
@@ -278,11 +360,14 @@ describe('NotableWordFormsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
       const value = (component as any).getValue() as NotableWordFormsPart;
 
       expect(value.id).toBe('part1');
-      expect(value.forms).toEqual([makeForm('amare'), makeForm('videre')]);
+      expect(json(value.forms)).toEqual([
+        makeForm('amare'),
+        makeForm('videre'),
+      ]);
     });
   });
 
@@ -321,28 +406,25 @@ describe('NotableWordFormsPartComponent', () => {
   describe('saveForm', () => {
     it('should append a new form when editedIndex is -1', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare')]);
+      setEntries([makeForm('amare')]);
       component.addForm();
 
       component.saveForm(makeForm('videre'));
 
-      expect(component.entries.value).toEqual([
-        makeForm('amare'),
-        makeForm('videre'),
-      ]);
-      expect(component.entries.dirty).toBe(true);
+      expect(entries()).toEqual([makeForm('amare'), makeForm('videre')]);
+      expect(component.form.entries().dirty()).toBe(true);
       expect(component.editedIndex()).toBe(-1);
       expect(component.edited()).toBeUndefined();
     });
 
     it('should replace the form at editedIndex when editing an existing one', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
       component.editForm(makeForm('videre'), 1);
 
       component.saveForm(makeForm('videre (edited)'));
 
-      expect(component.entries.value).toEqual([
+      expect(entries()).toEqual([
         makeForm('amare'),
         makeForm('videre (edited)'),
       ]);
@@ -353,28 +435,28 @@ describe('NotableWordFormsPartComponent', () => {
     it('should remove the form when the user confirms', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
 
       component.deleteForm(0);
 
-      expect(component.entries.value).toEqual([makeForm('videre')]);
-      expect(component.entries.dirty).toBe(true);
+      expect(entries()).toEqual([makeForm('videre')]);
+      expect(component.form.entries().dirty()).toBe(true);
     });
 
     it('should not remove the form when the user cancels', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(false));
-      component.entries.setValue([makeForm('amare')]);
+      setEntries([makeForm('amare')]);
 
       component.deleteForm(0);
 
-      expect(component.entries.value).toEqual([makeForm('amare')]);
+      expect(entries()).toEqual([makeForm('amare')]);
     });
 
     it('should close the editor when deleting the currently edited form', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.entries.setValue([makeForm('amare')]);
+      setEntries([makeForm('amare')]);
       component.editForm(makeForm('amare'), 0);
 
       component.deleteForm(0);
@@ -391,29 +473,26 @@ describe('NotableWordFormsPartComponent', () => {
     it('should do nothing when index is 0', () => {
       fixture.detectChanges();
       const forms = [makeForm('amare'), makeForm('videre')];
-      component.entries.setValue(forms);
+      setEntries(forms);
 
       component.moveFormUp(0);
 
-      expect(component.entries.value).toEqual(forms);
-      expect(component.entries.dirty).toBe(false);
+      expect(entries()).toEqual(forms);
+      expect(component.form.entries().dirty()).toBe(false);
     });
 
     it('should swap the form with the previous one', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
 
       component.moveFormUp(1);
 
-      expect(component.entries.value).toEqual([
-        makeForm('videre'),
-        makeForm('amare'),
-      ]);
+      expect(entries()).toEqual([makeForm('videre'), makeForm('amare')]);
     });
 
     it('should keep editedIndex tracking the moved-up form', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
       component.editForm(makeForm('videre'), 1);
 
       component.moveFormUp(1);
@@ -423,7 +502,7 @@ describe('NotableWordFormsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced form', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
       component.editForm(makeForm('amare'), 0);
 
       component.moveFormUp(1);
@@ -436,29 +515,26 @@ describe('NotableWordFormsPartComponent', () => {
     it('should do nothing when index is the last one', () => {
       fixture.detectChanges();
       const forms = [makeForm('amare'), makeForm('videre')];
-      component.entries.setValue(forms);
+      setEntries(forms);
 
       component.moveFormDown(1);
 
-      expect(component.entries.value).toEqual(forms);
-      expect(component.entries.dirty).toBe(false);
+      expect(entries()).toEqual(forms);
+      expect(component.form.entries().dirty()).toBe(false);
     });
 
     it('should swap the form with the next one', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
 
       component.moveFormDown(0);
 
-      expect(component.entries.value).toEqual([
-        makeForm('videre'),
-        makeForm('amare'),
-      ]);
+      expect(entries()).toEqual([makeForm('videre'), makeForm('amare')]);
     });
 
     it('should keep editedIndex tracking the moved-down form', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
       component.editForm(makeForm('amare'), 0);
 
       component.moveFormDown(0);
@@ -468,12 +544,43 @@ describe('NotableWordFormsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced form', () => {
       fixture.detectChanges();
-      component.entries.setValue([makeForm('amare'), makeForm('videre')]);
+      setEntries([makeForm('amare'), makeForm('videre')]);
       component.editForm(makeForm('videre'), 1);
 
       component.moveFormDown(0);
 
       expect(component.editedIndex()).toBe(0);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+
+    it('should leave a newly bound part pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeForm('amare')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.isDirty()).toBe(false);
+    });
+
+    it('should save forms without the form Symbol tags', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeForm('amare')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      component.saveForm(makeForm('videre'));
+
+      component.save();
+
+      const forms = component.data()!.value!.forms;
+      expect(forms).toEqual([makeForm('amare'), makeForm('videre')]);
+      forms.forEach((f) => expect(Object.getOwnPropertySymbols(f)).toEqual([]));
+      expect(component.isDirty()).toBe(false);
     });
   });
 });

@@ -1,10 +1,15 @@
-<form [formGroup]="form" (submit)="save()">
+<!-- no <form> here: this editor can be nested; Enter in a text input
+     saves it via onEnterKey -->
+<div (keydown.enter)="onEnterKey($event)">
   <div class="form-row">
     <!-- eid -->
     <mat-form-field>
       <mat-label>eid</mat-label>
-      <input matInput [formControl]="eid" />
-      @if ($any(eid).errors?.maxLength && (eid.dirty || eid.touched)) {
+      <input matInput [formField]="form.eid" />
+      @if (
+        form.eid().getError('maxLength') &&
+        (form.eid().dirty() || form.eid().touched())
+      ) {
         <mat-error>eid too long</mat-error>
       }
     </mat-form-field>
@@ -13,13 +18,14 @@
     @if (familyEntries()?.length) {
       <mat-form-field>
         <mat-label>family</mat-label>
-        <mat-select [formControl]="family">
+        <mat-select [formField]="form.family">
           @for (e of familyEntries(); track e.id) {
             <mat-option [value]="e.id">{{ e.value }}</mat-option>
           }
         </mat-select>
         @if (
-          $any(family).errors?.required && (family.dirty || family.touched)
+          form.family().getError('required') &&
+          (form.family().dirty() || form.family().touched())
         ) {
           <mat-error>family required</mat-error>
         }
@@ -28,14 +34,16 @@
       <!-- family (free) -->
       <mat-form-field>
         <mat-label>family</mat-label>
-        <input matInput [formControl]="family" />
+        <input matInput [formField]="form.family" />
         @if (
-          $any(family).errors?.required && (family.dirty || family.touched)
+          form.family().getError('required') &&
+          (form.family().dirty() || form.family().touched())
         ) {
           <mat-error>family required</mat-error>
         }
         @if (
-          $any(family).errors?.maxLength && (family.dirty || family.touched)
+          form.family().getError('maxLength') &&
+          (form.family().dirty() || form.family().touched())
         ) {
           <mat-error>family too long</mat-error>
         }
@@ -49,7 +57,7 @@
       <div>
         <cadmus-ui-flag-set
           [flags]="sectionFlags()"
-          [checkedIds]="sections.value"
+          [checkedIds]="form.sections().value()"
           (checkedIdsChange)="onSectionCheckedIdsChange($event)"
         />
       </div>
@@ -62,7 +70,7 @@
       <div>
         <cadmus-ui-flag-set
           [flags]="featureFlags()"
-          [checkedIds]="features.value"
+          [checkedIds]="form.features().value()"
           (checkedIdsChange)="onFeatureCheckedIdsChange($event)"
         />
       </div>
@@ -81,7 +89,7 @@
         [refTagEntries]="refTagEntries()"
         [featureEntries]="idFeatureEntries()"
         [lookupProviderOptions]="lookupProviderOptions()"
-        [ids]="ids.value || undefined"
+        [ids]="form.ids().value() || undefined"
         [canSwitchMode]="true"
         [canEditTarget]="true"
         (idsChange)="onIdsChange($event!)"
@@ -93,8 +101,11 @@
   <div>
     <mat-form-field class="long-text">
       <mat-label>note</mat-label>
-      <input matInput [formControl]="note" />
-      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+      <input matInput [formField]="form.note" />
+      @if (
+        form.note().getError('maxLength') &&
+        (form.note().dirty() || form.note().touched())
+      ) {
         <mat-error>note too long</mat-error>
       }
     </mat-form-field>
@@ -111,12 +122,13 @@
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
+      (click)="save()"
       mat-icon-button
       matTooltip="Accept changes"
-      [disabled]="form.invalid || form.pristine"
+      [disabled]="form().invalid() || !form().dirty()"
     >
       <mat-icon class="mat-primary">check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>

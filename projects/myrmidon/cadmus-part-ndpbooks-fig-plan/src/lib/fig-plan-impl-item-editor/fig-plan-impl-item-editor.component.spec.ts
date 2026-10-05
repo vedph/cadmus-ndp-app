@@ -27,10 +27,12 @@ import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 
 import { FigPlanImplItemEditorComponent } from './fig-plan-impl-item-editor.component';
 import { FigPlanItemLabelEditorComponent } from '../fig-plan-item-label-editor/fig-plan-item-label-editor.component';
-import {
-  FigPlanImplItem,
-  FigPlanItemLabel,
-} from '../print-fig-plan-impl-part';
+import { FigPlanImplItem, FigPlanItemLabel } from '../print-fig-plan-impl-part';
+
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
 
 @Component({
   selector: 'cadmus-refs-compact-citation',
@@ -38,7 +40,9 @@ import {
 })
 class MockCompactCitationComponent {
   public readonly citation = input<Citation | CitationSpan | undefined>();
-  public readonly citationChange = output<Citation | CitationSpan | undefined>();
+  public readonly citationChange = output<
+    Citation | CitationSpan | undefined
+  >();
 }
 
 @Component({
@@ -98,7 +102,9 @@ describe('FigPlanImplItemEditorComponent', () => {
   let citService: CitSchemeService;
   let dialogService: { confirm: ReturnType<typeof vi.fn> };
 
-  const FEATURE_ENTRIES: ThesaurusEntry[] = [{ id: 'feat-a', value: 'Feature A' }];
+  const FEATURE_ENTRIES: ThesaurusEntry[] = [
+    { id: 'feat-a', value: 'Feature A' },
+  ];
 
   beforeEach(async () => {
     dialogService = { confirm: vi.fn() };
@@ -160,18 +166,18 @@ describe('FigPlanImplItemEditorComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid without eid and type', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with eid and type set', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
-      expect(component.form.valid).toBe(true);
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
+      expect(component.form().valid()).toBe(true);
     });
   });
 
-  describe('updateForm (via item model effect)', () => {
+  describe('binding the model (via item model effect)', () => {
     it('should reset the form and clear editedCit when item is undefined', () => {
       fixture.componentRef.setInput('item', {
         eid: 'e1',
@@ -182,7 +188,7 @@ describe('FigPlanImplItemEditorComponent', () => {
       fixture.componentRef.setInput('item', undefined);
       fixture.detectChanges();
 
-      expect(component.eid.value).toBe('');
+      expect(component.form.eid().value()).toBe('');
       expect(component.editedCit()).toBeUndefined();
     });
 
@@ -227,7 +233,7 @@ describe('FigPlanImplItemEditorComponent', () => {
       fixture.detectChanges();
 
       const parsed = CodLocationParser.parseLocation('1r');
-      expect(component.location.value).toEqual([
+      expect(json(component.form.location().value())).toEqual([
         { start: parsed, end: parsed },
       ]);
     });
@@ -236,7 +242,10 @@ describe('FigPlanImplItemEditorComponent', () => {
       const iconographyId: AssertedCompositeId = {
         target: { gid: 'g1', label: 'L1' },
       };
-      const size: PhysicalSize = { w: { value: 1, unit: 'cm' }, h: { value: 2, unit: 'cm' } };
+      const size: PhysicalSize = {
+        w: { value: 1, unit: 'cm' },
+        h: { value: 2, unit: 'cm' },
+      };
       const labels: FigPlanItemLabel[] = [{ type: 'legend' }];
 
       fixture.componentRef.setInput('item', {
@@ -254,27 +263,29 @@ describe('FigPlanImplItemEditorComponent', () => {
       } as FigPlanImplItem);
       fixture.detectChanges();
 
-      expect(component.position.value).toBe('in-text');
-      expect(component.changeType.value).toBe('added');
-      expect(component.iconographyId.value).toEqual(iconographyId);
-      expect(component.features.value).toEqual(['feat-a']);
-      expect(component.size.value).toEqual(size);
-      expect(component.matrixType.value).toBe('wood');
-      expect(component.matrixState.value).toBe('good');
-      expect(component.matrixStateDsc.value).toBe('a description');
-      expect(component.labels.value).toEqual(labels);
-      expect(component.form.pristine).toBe(true);
+      expect(component.form.position().value()).toBe('in-text');
+      expect(component.form.changeType().value()).toBe('added');
+      expect(json(component.form.iconographyId().value())).toEqual(
+        iconographyId,
+      );
+      expect(json(component.form.features().value())).toEqual(['feat-a']);
+      expect(json(component.form.size().value())).toEqual(size);
+      expect(component.form.matrixType().value()).toBe('wood');
+      expect(component.form.matrixState().value()).toBe('good');
+      expect(component.form.matrixStateDsc().value()).toBe('a description');
+      expect(json(component.form.labels().value())).toEqual(labels);
+      expect(component.form().dirty()).toBe(false);
     });
   });
 
   describe('onCitationChange', () => {
     it('should clear the citation control when passed undefined', () => {
       fixture.detectChanges();
-      component.citation.setValue('If. I 1');
+      component.form.citation().value.set('If. I 1');
 
       component.onCitationChange(undefined);
 
-      expect(component.citation.value).toBeNull();
+      expect(component.form.citation().value()).toBe('');
     });
 
     it('should render a single citation via toString', () => {
@@ -283,8 +294,8 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       component.onCitationChange({ schemeId: 'dc', steps: [] });
 
-      expect(component.citation.value).toBe('If. I 1');
-      expect(component.citation.dirty).toBe(true);
+      expect(component.form.citation().value()).toBe('If. I 1');
+      expect(component.form.citation().dirty()).toBe(true);
     });
 
     it('should render a citation span as "a - b"', () => {
@@ -298,7 +309,7 @@ describe('FigPlanImplItemEditorComponent', () => {
         b: { schemeId: 'dc2', steps: [] },
       });
 
-      expect(component.citation.value).toBe('A - B');
+      expect(component.form.citation().value()).toBe('A - B');
     });
   });
 
@@ -310,8 +321,8 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       component.onLocationChange(range);
 
-      expect(component.location.value).toEqual(range);
-      expect(component.location.dirty).toBe(true);
+      expect(json(component.form.location().value())).toEqual(range);
+      expect(component.form.location().dirty()).toBe(true);
     });
 
     it('onIdChange should update iconographyId and mark dirty', () => {
@@ -320,8 +331,8 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       component.onIdChange(id);
 
-      expect(component.iconographyId.value).toEqual(id);
-      expect(component.iconographyId.dirty).toBe(true);
+      expect(json(component.form.iconographyId().value())).toEqual(id);
+      expect(component.form.iconographyId().dirty()).toBe(true);
     });
 
     it('onFeatureCheckedIdsChange should update features and mark dirty', () => {
@@ -329,18 +340,21 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       component.onFeatureCheckedIdsChange(['feat-a']);
 
-      expect(component.features.value).toEqual(['feat-a']);
-      expect(component.features.dirty).toBe(true);
+      expect(json(component.form.features().value())).toEqual(['feat-a']);
+      expect(component.form.features().dirty()).toBe(true);
     });
 
     it('onSizeChange should update size and mark dirty', () => {
       fixture.detectChanges();
-      const size: PhysicalSize = { w: { value: 1, unit: 'cm' }, h: { value: 2, unit: 'cm' } };
+      const size: PhysicalSize = {
+        w: { value: 1, unit: 'cm' },
+        h: { value: 2, unit: 'cm' },
+      };
 
       component.onSizeChange(size);
 
-      expect(component.size.value).toEqual(size);
-      expect(component.size.dirty).toBe(true);
+      expect(json(component.form.size().value())).toEqual(size);
+      expect(component.form.size().dirty()).toBe(true);
     });
   });
 
@@ -392,27 +406,29 @@ describe('FigPlanImplItemEditorComponent', () => {
 
     it('saveLabel should append a new label when editedLabelIndex is -1', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('legend')]);
+      component.form.labels().value.set([makeLabel('legend')]);
       component.addLabel();
 
       component.saveLabel(makeLabel('caption'));
 
-      expect(component.labels.value).toEqual([
+      expect(json(component.form.labels().value())).toEqual([
         makeLabel('legend'),
         makeLabel('caption'),
       ]);
-      expect(component.labels.dirty).toBe(true);
+      expect(component.form.labels().dirty()).toBe(true);
       expect(component.editedLabelIndex()).toBe(-1);
     });
 
     it('saveLabel should replace the label at editedLabelIndex when editing', () => {
       fixture.detectChanges();
-      component.labels.setValue([makeLabel('legend'), makeLabel('caption')]);
+      component.form
+        .labels()
+        .value.set([makeLabel('legend'), makeLabel('caption')]);
       component.editLabel(makeLabel('caption'), 1);
 
       component.saveLabel(makeLabel('caption2'));
 
-      expect(component.labels.value).toEqual([
+      expect(json(component.form.labels().value())).toEqual([
         makeLabel('legend'),
         makeLabel('caption2'),
       ]);
@@ -421,27 +437,33 @@ describe('FigPlanImplItemEditorComponent', () => {
     it('deleteLabel should remove the label when the user confirms', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.labels.setValue([makeLabel('legend'), makeLabel('caption')]);
+      component.form
+        .labels()
+        .value.set([makeLabel('legend'), makeLabel('caption')]);
 
       component.deleteLabel(0);
 
-      expect(component.labels.value).toEqual([makeLabel('caption')]);
+      expect(json(component.form.labels().value())).toEqual([
+        makeLabel('caption'),
+      ]);
     });
 
     it('deleteLabel should not remove the label when the user cancels', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(false));
-      component.labels.setValue([makeLabel('legend')]);
+      component.form.labels().value.set([makeLabel('legend')]);
 
       component.deleteLabel(0);
 
-      expect(component.labels.value).toEqual([makeLabel('legend')]);
+      expect(json(component.form.labels().value())).toEqual([
+        makeLabel('legend'),
+      ]);
     });
 
     it('deleteLabel should close the editor when deleting the edited label', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.labels.setValue([makeLabel('legend')]);
+      component.form.labels().value.set([makeLabel('legend')]);
       component.editLabel(makeLabel('legend'), 0);
 
       component.deleteLabel(0);
@@ -455,12 +477,14 @@ describe('FigPlanImplItemEditorComponent', () => {
     describe('moveLabelUp / moveLabelDown', () => {
       it('moveLabelUp should keep editedLabelIndex tracking the moved-up label', () => {
         fixture.detectChanges();
-        component.labels.setValue([makeLabel('legend'), makeLabel('caption')]);
+        component.form
+          .labels()
+          .value.set([makeLabel('legend'), makeLabel('caption')]);
         component.editLabel(makeLabel('caption'), 1);
 
         component.moveLabelUp(1);
 
-        expect(component.labels.value).toEqual([
+        expect(json(component.form.labels().value())).toEqual([
           makeLabel('caption'),
           makeLabel('legend'),
         ]);
@@ -469,7 +493,9 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       it('moveLabelUp should keep editedLabelIndex tracking the displaced label', () => {
         fixture.detectChanges();
-        component.labels.setValue([makeLabel('legend'), makeLabel('caption')]);
+        component.form
+          .labels()
+          .value.set([makeLabel('legend'), makeLabel('caption')]);
         component.editLabel(makeLabel('legend'), 0);
 
         component.moveLabelUp(1);
@@ -479,12 +505,14 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       it('moveLabelDown should keep editedLabelIndex tracking the moved-down label', () => {
         fixture.detectChanges();
-        component.labels.setValue([makeLabel('legend'), makeLabel('caption')]);
+        component.form
+          .labels()
+          .value.set([makeLabel('legend'), makeLabel('caption')]);
         component.editLabel(makeLabel('legend'), 0);
 
         component.moveLabelDown(0);
 
-        expect(component.labels.value).toEqual([
+        expect(json(component.form.labels().value())).toEqual([
           makeLabel('caption'),
           makeLabel('legend'),
         ]);
@@ -493,7 +521,9 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       it('moveLabelDown should keep editedLabelIndex tracking the displaced label', () => {
         fixture.detectChanges();
-        component.labels.setValue([makeLabel('legend'), makeLabel('caption')]);
+        component.form
+          .labels()
+          .value.set([makeLabel('legend'), makeLabel('caption')]);
         component.editLabel(makeLabel('caption'), 1);
 
         component.moveLabelDown(0);
@@ -504,13 +534,13 @@ describe('FigPlanImplItemEditorComponent', () => {
       it('should do nothing at the boundaries', () => {
         fixture.detectChanges();
         const labels = [makeLabel('legend'), makeLabel('caption')];
-        component.labels.setValue(labels);
+        component.form.labels().value.set(labels);
 
         component.moveLabelUp(0);
         component.moveLabelDown(1);
 
-        expect(component.labels.value).toEqual(labels);
-        expect(component.labels.dirty).toBe(false);
+        expect(json(component.form.labels().value())).toEqual(labels);
+        expect(component.form.labels().dirty()).toBe(false);
       });
     });
   });
@@ -522,13 +552,13 @@ describe('FigPlanImplItemEditorComponent', () => {
       component.save();
 
       expect(component.item()).toBeUndefined();
-      expect(component.eid.touched).toBe(true);
+      expect(component.form.eid().touched()).toBe(true);
     });
 
     it('should build minimal data when only eid/type are set', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
 
       component.save();
 
@@ -551,8 +581,8 @@ describe('FigPlanImplItemEditorComponent', () => {
 
     it('should round-trip location through CodLocationParser', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
       const parsed = CodLocationParser.parseLocation('1r')!;
       component.onLocationChange([{ start: parsed, end: parsed }]);
 
@@ -565,39 +595,39 @@ describe('FigPlanImplItemEditorComponent', () => {
 
     it('should trim matrixStateDsc and include set fields', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
-      component.matrixStateDsc.setValue('  a description  ');
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
+      component.form.matrixStateDsc().value.set('  a description  ');
       component.onFeatureCheckedIdsChange(['feat-a']);
       const labels: FigPlanItemLabel[] = [{ type: 'legend' }];
-      component.labels.setValue(labels);
+      component.form.labels().value.set(labels);
 
       component.save();
 
       expect(component.item()?.matrixStateDsc).toBe('a description');
       expect(component.item()?.features).toEqual(['feat-a']);
-      expect(component.item()?.labels).toEqual(labels);
+      expect(json(component.item()?.labels)).toEqual(json(labels));
     });
 
     it('should mark the form pristine by default after saving', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
 
       component.save();
 
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should keep the form dirty when saving with pristine=false', () => {
       fixture.detectChanges();
-      component.eid.setValue('e1');
-      component.type.setValue('type-a');
-      component.eid.markAsDirty();
+      component.form.eid().value.set('e1');
+      component.form.type().value.set('type-a');
+      component.form.eid().markAsDirty();
 
       component.save(false);
 
-      expect(component.form.pristine).toBe(false);
+      expect(component.form().dirty()).toBe(true);
       expect(component.item()).toBeTruthy();
     });
   });
@@ -612,5 +642,187 @@ describe('FigPlanImplItemEditorComponent', () => {
 
       expect(spy).toHaveBeenCalled();
     });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+  });
+});
+
+// the Discard button of a nested editor, not of editors nested inside it
+function discardButtonOf(host: HTMLElement): HTMLButtonElement {
+  const owner = (e: Element): Element | null => {
+    let p = e.parentElement;
+    while (p && !p.tagName.startsWith('CADMUS-')) {
+      p = p.parentElement;
+    }
+    return p;
+  };
+  const button = Array.from(
+    host.querySelectorAll<HTMLButtonElement>(
+      'button[mattooltip="Discard changes"]',
+    ),
+  ).find((b) => owner(b) === host);
+  expect(button).toBeTruthy();
+  return button!;
+}
+
+// with the real label editor nested inside the item editor
+describe('FigPlanImplItemEditorComponent (nested label editor)', () => {
+  let component: FigPlanImplItemEditorComponent;
+  let fixture: ComponentFixture<FigPlanImplItemEditorComponent>;
+
+  const ITEM: FigPlanImplItem = {
+    eid: 'e1',
+    type: 'type-a',
+    location: '1r',
+    labels: [{ type: 'legend', value: 'v', fonts: [{ family: 'Times' }] }],
+  };
+
+  function pressEnter(input: HTMLInputElement): void {
+    input.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Enter',
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  }
+
+  // open the labels tab, where the label editor lives
+  async function openLabelsTab(): Promise<void> {
+    const tab = [...fixture.nativeElement.querySelectorAll('[role=tab]')].find(
+      (t: HTMLElement) => /labels/i.test(t.textContent || ''),
+    );
+    (tab as HTMLElement).click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [FigPlanImplItemEditorComponent],
+      providers: [
+        provideNoopAnimations(),
+        { provide: DialogService, useValue: { confirm: vi.fn() } },
+      ],
+    })
+      .overrideComponent(FigPlanImplItemEditorComponent, {
+        remove: {
+          imports: [
+            CompactCitationComponent,
+            CodLocationComponent,
+            AssertedCompositeIdComponent,
+            PhysicalSizeComponent,
+          ],
+        },
+        add: {
+          imports: [
+            MockCompactCitationComponent,
+            MockCodLocationComponent,
+            MockAssertedCompositeIdComponent,
+            MockPhysicalSizeComponent,
+          ],
+        },
+      })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(FigPlanImplItemEditorComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('item', structuredClone(ITEM));
+    fixture.detectChanges();
+    await fixture.whenStable();
+  });
+
+  it('should close the label editor on its Discard button', async () => {
+    component.editLabel(component.form.labels().value()[0], 0);
+    await openLabelsTab();
+    const host: HTMLElement = fixture.nativeElement.querySelector(
+      'cadmus-fig-plan-item-label-editor',
+    );
+    expect(host).toBeTruthy();
+
+    discardButtonOf(host).click();
+    fixture.detectChanges();
+
+    expect(component.editedLabel()).toBeUndefined();
+    expect(component.editedLabelIndex()).toBe(-1);
+  });
+
+  it('should not save the item on Enter in a pristine nested label editor', async () => {
+    // the item has unsaved, valid edits
+    component.form.eid().value.set('e2');
+    component.form.eid().markAsDirty();
+    component.editLabel(component.form.labels().value()[0], 0);
+    await openLabelsTab();
+
+    const labelEditor: HTMLElement = fixture.nativeElement.querySelector(
+      'cadmus-fig-plan-item-label-editor',
+    );
+    expect(labelEditor).toBeTruthy();
+    pressEnter(labelEditor.querySelector('input')!);
+    fixture.detectChanges();
+
+    // neither the item nor the label was saved
+    expect(component.item()?.eid).toBe('e1');
+    expect(component.editedLabel()).toBeTruthy();
+  });
+
+  it('should save only the label on Enter in a dirty nested label editor', async () => {
+    component.form.eid().value.set('e2');
+    component.form.eid().markAsDirty();
+    component.editLabel(component.form.labels().value()[0], 0);
+    await openLabelsTab();
+
+    const labelEditor: HTMLElement = fixture.nativeElement.querySelector(
+      'cadmus-fig-plan-item-label-editor',
+    );
+    const input = labelEditor.querySelector('input')!;
+    input.value = 'legend 2';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+    pressEnter(input);
+    fixture.detectChanges();
+
+    // the label was saved into the item's draft, and closed...
+    expect(component.editedLabel()).toBeUndefined();
+    expect(component.form.labels().value()[0].type).toBe('legend 2');
+    // ...but the item itself was not saved
+    expect(component.item()?.eid).toBe('e1');
+  });
+
+  it('should save the item on Enter in its own input', () => {
+    component.form.eid().value.set('e2');
+    component.form.eid().markAsDirty();
+    fixture.detectChanges();
+
+    const input: HTMLInputElement =
+      fixture.nativeElement.querySelector('input[matInput]');
+    pressEnter(input);
+
+    expect(component.item()?.eid).toBe('e2');
+  });
+
+  it('should stay pristine when children echo their bound values', () => {
+    component.onLocationChange(component.form.location().value());
+    component.onFeatureCheckedIdsChange([]);
+    component.onIdChange(null);
+    component.onCitationChange(undefined);
+
+    expect(component.form().dirty()).toBe(false);
+  });
+
+  it('should not carry the location over to an item without one', async () => {
+    expect(component.form.location().value().length).toBe(1);
+
+    fixture.componentRef.setInput('item', { eid: 'e2', type: 'type-a' });
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.form.location().value()).toEqual([]);
   });
 });

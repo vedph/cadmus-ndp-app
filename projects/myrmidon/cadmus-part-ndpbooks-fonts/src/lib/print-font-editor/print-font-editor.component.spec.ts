@@ -84,7 +84,7 @@ describe('PrintFontEditorComponent', () => {
     });
   });
 
-  describe('updateForm (via font model effect)', () => {
+  describe('binding the model (via font model effect)', () => {
     it('should reset the form when font is undefined', () => {
       fixture.componentRef.setInput('font', { family: 'Times' } as PrintFont);
       fixture.detectChanges();
@@ -92,7 +92,7 @@ describe('PrintFontEditorComponent', () => {
       fixture.componentRef.setInput('font', undefined);
       fixture.detectChanges();
 
-      expect(component.family.value).toBe('');
+      expect(component.form.family().value()).toBe('');
     });
 
     it('should populate all controls from the data', () => {
@@ -111,24 +111,27 @@ describe('PrintFontEditorComponent', () => {
       fixture.componentRef.setInput('font', font);
       fixture.detectChanges();
 
-      expect(component.eid.value).toBe('font1');
-      expect(component.family.value).toBe('Times');
-      expect(component.sections.value).toEqual(['sec-a']);
-      expect(component.features.value).toEqual(['feat-a']);
-      expect(component.ids.value).toEqual(ids);
-      expect(component.note.value).toBe('a note');
-      expect(component.form.pristine).toBe(true);
+      expect(component.form.eid().value()).toBe('font1');
+      expect(component.form.family().value()).toBe('Times');
+      expect(component.form.sections().value()).toEqual(['sec-a']);
+      expect(component.form.features().value()).toEqual(['feat-a']);
+      // the form tags array items with a Symbol: compare plain copies
+      expect(JSON.parse(JSON.stringify(component.form.ids().value()))).toEqual(
+        ids,
+      );
+      expect(component.form.note().value()).toBe('a note');
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should default optional fields when absent', () => {
       fixture.componentRef.setInput('font', { family: 'Times' } as PrintFont);
       fixture.detectChanges();
 
-      expect(component.eid.value).toBeNull();
-      expect(component.sections.value).toEqual([]);
-      expect(component.features.value).toEqual([]);
-      expect(component.ids.value).toEqual([]);
-      expect(component.note.value).toBeNull();
+      expect(component.form.eid().value()).toBe('');
+      expect(component.form.sections().value()).toEqual([]);
+      expect(component.form.features().value()).toEqual([]);
+      expect(component.form.ids().value()).toEqual([]);
+      expect(component.form.note().value()).toBe('');
     });
   });
 
@@ -136,15 +139,15 @@ describe('PrintFontEditorComponent', () => {
     it('onSectionCheckedIdsChange should update sections and mark dirty', () => {
       fixture.detectChanges();
       component.onSectionCheckedIdsChange(['sec-a']);
-      expect(component.sections.value).toEqual(['sec-a']);
-      expect(component.sections.dirty).toBe(true);
+      expect(component.form.sections().value()).toEqual(['sec-a']);
+      expect(component.form.sections().dirty()).toBe(true);
     });
 
     it('onFeatureCheckedIdsChange should update features and mark dirty', () => {
       fixture.detectChanges();
       component.onFeatureCheckedIdsChange(['feat-a']);
-      expect(component.features.value).toEqual(['feat-a']);
-      expect(component.features.dirty).toBe(true);
+      expect(component.form.features().value()).toEqual(['feat-a']);
+      expect(component.form.features().dirty()).toBe(true);
     });
 
     it('onIdsChange should update ids and mark dirty', () => {
@@ -153,15 +156,15 @@ describe('PrintFontEditorComponent', () => {
         { target: { gid: 'g1', label: 'L1' } },
       ];
       component.onIdsChange(ids);
-      expect(component.ids.value).toEqual(ids);
-      expect(component.ids.dirty).toBe(true);
+      expect(component.form.ids().value()).toEqual(ids);
+      expect(component.form.ids().dirty()).toBe(true);
     });
   });
 
   describe('save', () => {
     it('should build and set minimal data by default', () => {
       fixture.detectChanges();
-      component.family.setValue('Times');
+      component.form.family().value.set('Times');
 
       component.save();
 
@@ -177,15 +180,15 @@ describe('PrintFontEditorComponent', () => {
 
     it('should include eid, sections, features, ids and note when set', () => {
       fixture.detectChanges();
-      component.eid.setValue('font1');
-      component.family.setValue('Times');
+      component.form.eid().value.set('font1');
+      component.form.family().value.set('Times');
       component.onSectionCheckedIdsChange(['sec-a']);
       component.onFeatureCheckedIdsChange(['feat-a']);
       const ids: AssertedCompositeId[] = [
         { target: { gid: 'g1', label: 'L1' } },
       ];
       component.onIdsChange(ids);
-      component.note.setValue('a note');
+      component.form.note().value.set('a note');
 
       component.save();
 
@@ -201,22 +204,22 @@ describe('PrintFontEditorComponent', () => {
 
     it('should mark the form pristine by default after saving', () => {
       fixture.detectChanges();
-      component.family.setValue('Times');
-      component.family.markAsDirty();
+      component.form.family().value.set('Times');
+      component.form.family().markAsDirty();
 
       component.save();
 
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should keep the form dirty when saving with pristine=false', () => {
       fixture.detectChanges();
-      component.family.setValue('Times');
-      component.family.markAsDirty();
+      component.form.family().value.set('Times');
+      component.form.family().markAsDirty();
 
       component.save(false);
 
-      expect(component.form.pristine).toBe(false);
+      expect(component.form().dirty()).toBe(true);
       expect(component.font()).toBeTruthy();
     });
   });
@@ -230,6 +233,30 @@ describe('PrintFontEditorComponent', () => {
       component.cancel();
 
       expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('child echoes', () => {
+    it('should stay pristine when children echo their bound values', () => {
+      fixture.componentRef.setInput('font', {
+        family: 'Times',
+        sections: ['sec-a'],
+        ids: [{ target: { gid: 'g1', label: 'L1' } }],
+      } as PrintFont);
+      fixture.detectChanges();
+
+      component.onSectionCheckedIdsChange(['sec-a']);
+      component.onFeatureCheckedIdsChange([]);
+      component.onIdsChange([{ target: { gid: 'g1', label: 'L1' } }]);
+
+      expect(component.form().dirty()).toBe(false);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
     });
   });
 });

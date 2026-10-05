@@ -1,25 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  UntypedFormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
-
-import { FlatLookupPipe, NgxToolsValidators } from '@myrmidon/ngx-tools';
-import { DialogService } from '@myrmidon/ngx-mat-tools';
-import { AuthJwtService } from '@myrmidon/auth-jwt-login';
-import {
-  CloseSaveButtonsComponent,
-  ModelEditorComponentBase,
-  HelpLinkComponent
-} from '@myrmidon/cadmus-ui';
-import {
-  EditedObject,
-  ThesauriSet,
-  ThesaurusEntry,
-} from '@myrmidon/cadmus-core';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from '@angular/core';
+import { TitleCasePipe } from '@angular/common';
 
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -36,6 +23,16 @@ import {
   MatExpansionPanelTitle,
 } from '@angular/material/expansion';
 import { MatTooltip } from '@angular/material/tooltip';
+
+import { FlatLookupPipe, NgxToolsSignalValidators } from '@myrmidon/ngx-tools';
+import { DialogService } from '@myrmidon/ngx-mat-tools';
+import {
+  CloseSaveButtonsComponent,
+  copyFormValue,
+  HelpLinkComponent,
+  ModelEditorComponentBase,
+} from '@myrmidon/cadmus-ui';
+import { ThesaurusEntry } from '@myrmidon/cadmus-core';
 import { LookupProviderOptions } from '@myrmidon/cadmus-refs-lookup';
 
 import {
@@ -43,11 +40,21 @@ import {
   NotableWordForm,
   NotableWordFormsPart,
 } from '../notable-word-forms-part';
-import { TitleCasePipe } from '@angular/common';
 import { NotableWordFormEditorComponent } from '../notable-word-form-editor/notable-word-form-editor.component';
 
 interface NotableWordFormsPartSettings {
   lookupProviderOptions?: LookupProviderOptions;
+}
+
+interface NotableWordFormsPartControls {
+  entries: NotableWordForm[];
+}
+
+function toDraft(
+  part?: NotableWordFormsPart | null,
+): NotableWordFormsPartControls {
+  // copy: the form tags the objects in its arrays
+  return { entries: copyFormValue(part?.forms || []) };
 }
 
 /**
@@ -60,7 +67,6 @@ interface NotableWordFormsPartSettings {
 @Component({
   selector: 'cadmus-notable-word-forms-part',
   imports: [
-    ReactiveFormsModule,
     MatButton,
     MatCard,
     MatCardActions,
@@ -83,52 +89,55 @@ interface NotableWordFormsPartSettings {
   styleUrl: './notable-word-forms-part.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotableWordFormsPartComponent
-  extends ModelEditorComponentBase<NotableWordFormsPart>
-  implements OnInit
-{
+export class NotableWordFormsPartComponent extends ModelEditorComponentBase<NotableWordFormsPart> {
+  private readonly _dialogService = inject(DialogService);
+
   public readonly editedIndex = signal<number>(-1);
   public readonly edited = signal<NotableWordForm | undefined>(undefined);
 
   // notable-word-forms-languages
-  public readonly langEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly langEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['notable-word-forms-languages']?.entries,
+  );
   // notable-word-forms-tags
-  public readonly tagEntries = signal<ThesaurusEntry[] | undefined>(undefined);
+  public readonly tagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['notable-word-forms-tags']?.entries,
+  );
   // notable-word-forms-op-tags
-  public readonly opTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly opTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['notable-word-forms-op-tags']?.entries,
   );
   // doc-reference-types
-  public readonly docRefTypeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly docRefTypeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-types']?.entries,
   );
   // doc-reference-tags
-  public readonly docRefTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly docRefTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['doc-reference-tags']?.entries,
   );
   // pin-link-scopes
-  public readonly pinLinkScopeEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly pinLinkScopeEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['pin-link-scopes']?.entries,
   );
   // pin-link-tags
-  public readonly pinLinkTagEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly pinLinkTagEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['pin-link-tags']?.entries,
   );
   // pin-link-assertion-tags
-  public readonly pinLinkAssertionTagEntries = signal<
+  public readonly pinLinkAssertionTagEntries = computed<
     ThesaurusEntry[] | undefined
-  >(undefined);
+  >(() => this.data()?.thesauri?.['pin-link-assertion-tags']?.entries);
   // pin-link-docref-types
-  public readonly pinLinkDocRefTypeEntries = signal<
+  public readonly pinLinkDocRefTypeEntries = computed<
     ThesaurusEntry[] | undefined
-  >(undefined);
+  >(() => this.data()?.thesauri?.['pin-link-docref-types']?.entries);
   // pin-link-docref-tags
-  public readonly pinLinkDocRefTagEntries = signal<
+  public readonly pinLinkDocRefTagEntries = computed<
     ThesaurusEntry[] | undefined
-  >(undefined);
+  >(() => this.data()?.thesauri?.['pin-link-docref-tags']?.entries);
   // asserted-id-features
-  public readonly idFeatureEntries = signal<ThesaurusEntry[] | undefined>(
-    undefined,
+  public readonly idFeatureEntries = computed<ThesaurusEntry[] | undefined>(
+    () => this.data()?.thesauri?.['asserted-id-features']?.entries,
   );
 
   // lookup options depending on role
@@ -136,136 +145,28 @@ export class NotableWordFormsPartComponent
     LookupProviderOptions | undefined
   >(undefined);
 
-  public entries: FormControl<NotableWordForm[]>;
+  private readonly _draft = linkedSignal(() => toDraft(this.data()?.value));
+  public readonly form = this.createForm(this._draft, (p) => {
+    // at least 1 entry
+    NgxToolsSignalValidators.strictMinLength(p.entries, 1);
+  });
 
-  constructor(
-    authService: AuthJwtService,
-    formBuilder: FormBuilder,
-    private _dialogService: DialogService,
-  ) {
-    super(authService, formBuilder);
-    // form
-    this.entries = formBuilder.control([], {
-      // at least 1 entry
-      validators: NgxToolsValidators.strictMinLengthValidator(1),
-      nonNullable: true,
-    });
-  }
-
-  public override ngOnInit(): void {
-    super.ngOnInit();
-  }
-
-  protected buildForm(formBuilder: FormBuilder): FormGroup | UntypedFormGroup {
-    return formBuilder.group({
-      entries: this.entries,
-    });
-  }
-
-  private updateThesauri(thesauri: ThesauriSet): void {
-    let key = 'notable-word-forms-languages';
-    if (this.hasThesaurus(key)) {
-      this.langEntries.set(thesauri[key].entries);
-    } else {
-      this.langEntries.set(undefined);
-    }
-    key = 'notable-word-forms-tags';
-    if (this.hasThesaurus(key)) {
-      this.tagEntries.set(thesauri[key].entries);
-    } else {
-      this.tagEntries.set(undefined);
-    }
-    key = 'notable-word-forms-op-tags';
-    if (this.hasThesaurus(key)) {
-      this.opTagEntries.set(thesauri[key].entries);
-    } else {
-      this.opTagEntries.set(undefined);
-    }
-    key = 'doc-reference-types';
-    if (this.hasThesaurus(key)) {
-      this.docRefTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.docRefTypeEntries.set(undefined);
-    }
-    key = 'doc-reference-tags';
-    if (this.hasThesaurus(key)) {
-      this.docRefTagEntries.set(thesauri[key].entries);
-    } else {
-      this.docRefTagEntries.set(undefined);
-    }
-    key = 'pin-link-scopes';
-    if (this.hasThesaurus(key)) {
-      this.pinLinkScopeEntries.set(thesauri[key].entries);
-    } else {
-      this.pinLinkScopeEntries.set(undefined);
-    }
-    key = 'pin-link-tags';
-    if (this.hasThesaurus(key)) {
-      this.pinLinkTagEntries.set(thesauri[key].entries);
-    } else {
-      this.pinLinkTagEntries.set(undefined);
-    }
-    key = 'pin-link-assertion-tags';
-    if (this.hasThesaurus(key)) {
-      this.pinLinkAssertionTagEntries.set(thesauri[key].entries);
-    } else {
-      this.pinLinkAssertionTagEntries.set(undefined);
-    }
-    key = 'pin-link-docref-types';
-    if (this.hasThesaurus(key)) {
-      this.pinLinkDocRefTypeEntries.set(thesauri[key].entries);
-    } else {
-      this.pinLinkDocRefTypeEntries.set(undefined);
-    }
-    key = 'pin-link-docref-tags';
-    if (this.hasThesaurus(key)) {
-      this.pinLinkDocRefTagEntries.set(thesauri[key].entries);
-    } else {
-      this.pinLinkDocRefTagEntries.set(undefined);
-    }
-    key = 'asserted-id-features';
-    if (this.hasThesaurus(key)) {
-      this.idFeatureEntries.set(thesauri[key].entries);
-    } else {
-      this.idFeatureEntries.set(undefined);
-    }
-  }
-
-  private updateForm(part?: NotableWordFormsPart | null): void {
-    if (!part) {
-      this.form.reset();
-      return;
-    }
-    this.entries.setValue(part.forms || []);
-    this.form.markAsPristine();
-  }
-
-  protected override onDataSet(
-    data?: EditedObject<NotableWordFormsPart>,
-  ): void {
-    // thesauri
-    if (data?.thesauri) {
-      this.updateThesauri(data.thesauri);
-    }
-    // settings
-    this._appRepository
-      ?.getSettingFor<NotableWordFormsPartSettings>(
-        NOTABLE_WORD_FORMS_PART_TYPEID,
-        this.identity()?.roleId || undefined,
-      )
-      .then((settings) => {
-        const options = settings?.lookupProviderOptions;
-        this.lookupProviderOptions.set(options || undefined);
-      });
-    // form
-    this.updateForm(data?.value);
+  constructor() {
+    super();
+    this.initSettings<NotableWordFormsPartSettings>(
+      NOTABLE_WORD_FORMS_PART_TYPEID,
+      (settings) =>
+        this.lookupProviderOptions.set(
+          settings?.lookupProviderOptions || undefined,
+        ),
+    );
   }
 
   protected getValue(): NotableWordFormsPart {
-    let part = this.getEditedPart(
+    const part = this.getEditedPart(
       NOTABLE_WORD_FORMS_PART_TYPEID,
     ) as NotableWordFormsPart;
-    part.forms = this.entries.value || [];
+    part.forms = copyFormValue(this._draft().entries);
     return part;
   }
 
@@ -278,6 +179,7 @@ export class NotableWordFormsPartComponent
 
   public editForm(entry: NotableWordForm, index: number): void {
     this.editedIndex.set(index);
+    // structuredClone also drops the form's Symbol tag
     this.edited.set(structuredClone(entry));
   }
 
@@ -287,15 +189,14 @@ export class NotableWordFormsPartComponent
   }
 
   public saveForm(entry: NotableWordForm): void {
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
     if (this.editedIndex() === -1) {
       entries.push(entry);
     } else {
       entries.splice(this.editedIndex(), 1, entry);
     }
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
     this.closeForm();
   }
 
@@ -307,11 +208,10 @@ export class NotableWordFormsPartComponent
           if (this.editedIndex() === index) {
             this.closeForm();
           }
-          const entries = [...this.entries.value];
+          const entries = [...this.form.entries().value()];
           entries.splice(index, 1);
-          this.entries.setValue(entries);
-          this.entries.markAsDirty();
-          this.entries.updateValueAndValidity();
+          this.form.entries().value.set(entries);
+          this.form.entries().markAsDirty();
         }
       });
   }
@@ -320,13 +220,12 @@ export class NotableWordFormsPartComponent
     if (index < 1) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index - 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index - 1);
@@ -336,16 +235,15 @@ export class NotableWordFormsPartComponent
   }
 
   public moveFormDown(index: number): void {
-    if (index + 1 >= this.entries.value.length) {
+    if (index + 1 >= this.form.entries().value().length) {
       return;
     }
-    const entry = this.entries.value[index];
-    const entries = [...this.entries.value];
+    const entries = [...this.form.entries().value()];
+    const entry = entries[index];
     entries.splice(index, 1);
     entries.splice(index + 1, 0, entry);
-    this.entries.setValue(entries);
-    this.entries.markAsDirty();
-    this.entries.updateValueAndValidity();
+    this.form.entries().value.set(entries);
+    this.form.entries().markAsDirty();
     // keep editedIndex in sync
     if (this.editedIndex() === index) {
       this.editedIndex.set(index + 1);

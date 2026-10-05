@@ -41,6 +41,19 @@ describe('PrintFontsPartComponent', () => {
     return { family };
   }
 
+  // the form tags the objects in its arrays with a Symbol: compare plain copies
+  function json<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function setEntries(entries: PrintFont[]): void {
+    component.form.fonts().value.set(entries);
+  }
+
+  function entries(): PrintFont[] {
+    return json(component.form.fonts().value());
+  }
+
   function makeData(
     fonts: PrintFont[],
     thesauri?: ThesauriSet,
@@ -95,16 +108,16 @@ describe('PrintFontsPartComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('buildForm / validity', () => {
+  describe('form validity', () => {
     it('should be invalid with no fonts', () => {
       fixture.detectChanges();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with at least one font', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times')]);
-      expect(component.form.valid).toBe(true);
+      setEntries([makeFont('Times')]);
+      expect(component.form().valid()).toBe(true);
     });
   });
 
@@ -170,13 +183,13 @@ describe('PrintFontsPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form when data value is falsy', async () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times')]);
+      setEntries([makeFont('Times')]);
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.fonts.value).toEqual([]);
+      expect(entries()).toEqual([]);
     });
 
     it('should populate fonts from part.fonts and mark the form pristine', async () => {
@@ -187,8 +200,8 @@ describe('PrintFontsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.fonts.value).toEqual(fonts);
-      expect(component.form.pristine).toBe(true);
+      expect(entries()).toEqual(fonts);
+      expect(component.form().dirty()).toBe(false);
     });
   });
 
@@ -199,11 +212,11 @@ describe('PrintFontsPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
       const value = (component as any).getValue() as PrintFontsPart;
 
       expect(value.id).toBe('part1');
-      expect(value.fonts).toEqual([makeFont('Times'), makeFont('Arial')]);
+      expect(json(value.fonts)).toEqual([makeFont('Times'), makeFont('Arial')]);
     });
   });
 
@@ -242,28 +255,25 @@ describe('PrintFontsPartComponent', () => {
   describe('saveFont', () => {
     it('should append a new font when editedIndex is -1', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times')]);
+      setEntries([makeFont('Times')]);
       component.addFont();
 
       component.saveFont(makeFont('Arial'));
 
-      expect(component.fonts.value).toEqual([
-        makeFont('Times'),
-        makeFont('Arial'),
-      ]);
-      expect(component.fonts.dirty).toBe(true);
+      expect(entries()).toEqual([makeFont('Times'), makeFont('Arial')]);
+      expect(component.form.fonts().dirty()).toBe(true);
       expect(component.editedIndex()).toBe(-1);
       expect(component.edited()).toBeUndefined();
     });
 
     it('should replace the font at editedIndex when editing an existing one', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
       component.editFont(makeFont('Arial'), 1);
 
       component.saveFont(makeFont('Arial (edited)'));
 
-      expect(component.fonts.value).toEqual([
+      expect(entries()).toEqual([
         makeFont('Times'),
         makeFont('Arial (edited)'),
       ]);
@@ -274,28 +284,28 @@ describe('PrintFontsPartComponent', () => {
     it('should remove the font when the user confirms', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
 
       component.deleteFont(0);
 
-      expect(component.fonts.value).toEqual([makeFont('Arial')]);
-      expect(component.fonts.dirty).toBe(true);
+      expect(entries()).toEqual([makeFont('Arial')]);
+      expect(component.form.fonts().dirty()).toBe(true);
     });
 
     it('should not remove the font when the user cancels', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(false));
-      component.fonts.setValue([makeFont('Times')]);
+      setEntries([makeFont('Times')]);
 
       component.deleteFont(0);
 
-      expect(component.fonts.value).toEqual([makeFont('Times')]);
+      expect(entries()).toEqual([makeFont('Times')]);
     });
 
     it('should close the editor when deleting the currently edited font', () => {
       fixture.detectChanges();
       dialogService.confirm.mockReturnValue(of(true));
-      component.fonts.setValue([makeFont('Times')]);
+      setEntries([makeFont('Times')]);
       component.editFont(makeFont('Times'), 0);
 
       component.deleteFont(0);
@@ -311,29 +321,26 @@ describe('PrintFontsPartComponent', () => {
     it('should do nothing when index is 0', () => {
       fixture.detectChanges();
       const fonts = [makeFont('Times'), makeFont('Arial')];
-      component.fonts.setValue(fonts);
+      setEntries(fonts);
 
       component.moveFontUp(0);
 
-      expect(component.fonts.value).toEqual(fonts);
-      expect(component.fonts.dirty).toBe(false);
+      expect(entries()).toEqual(fonts);
+      expect(component.form.fonts().dirty()).toBe(false);
     });
 
     it('should swap the font with the previous one', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
 
       component.moveFontUp(1);
 
-      expect(component.fonts.value).toEqual([
-        makeFont('Arial'),
-        makeFont('Times'),
-      ]);
+      expect(entries()).toEqual([makeFont('Arial'), makeFont('Times')]);
     });
 
     it('should keep editedIndex tracking the moved-up font', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
       component.editFont(makeFont('Arial'), 1);
 
       component.moveFontUp(1);
@@ -343,7 +350,7 @@ describe('PrintFontsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced font', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
       component.editFont(makeFont('Times'), 0);
 
       component.moveFontUp(1);
@@ -356,29 +363,26 @@ describe('PrintFontsPartComponent', () => {
     it('should do nothing when index is the last one', () => {
       fixture.detectChanges();
       const fonts = [makeFont('Times'), makeFont('Arial')];
-      component.fonts.setValue(fonts);
+      setEntries(fonts);
 
       component.moveFontDown(1);
 
-      expect(component.fonts.value).toEqual(fonts);
-      expect(component.fonts.dirty).toBe(false);
+      expect(entries()).toEqual(fonts);
+      expect(component.form.fonts().dirty()).toBe(false);
     });
 
     it('should swap the font with the next one', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
 
       component.moveFontDown(0);
 
-      expect(component.fonts.value).toEqual([
-        makeFont('Arial'),
-        makeFont('Times'),
-      ]);
+      expect(entries()).toEqual([makeFont('Arial'), makeFont('Times')]);
     });
 
     it('should keep editedIndex tracking the moved-down font', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
       component.editFont(makeFont('Times'), 0);
 
       component.moveFontDown(0);
@@ -388,12 +392,47 @@ describe('PrintFontsPartComponent', () => {
 
     it('should keep editedIndex tracking the displaced font', () => {
       fixture.detectChanges();
-      component.fonts.setValue([makeFont('Times'), makeFont('Arial')]);
+      setEntries([makeFont('Times'), makeFont('Arial')]);
       component.editFont(makeFont('Arial'), 1);
 
       component.moveFontDown(0);
 
       expect(component.editedIndex()).toBe(0);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+
+    it('should leave a newly bound part pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeFont('Times')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.isDirty()).toBe(false);
+    });
+  });
+
+  describe('save', () => {
+    it('should save entries without the form Symbol tags, and become pristine', async () => {
+      fixture.detectChanges();
+      fixture.componentRef.setInput('data', makeData([makeFont('Times')]));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      setEntries([makeFont('Times'), makeFont('Arial')]);
+      component.form.fonts().markAsDirty();
+      expect(component.isDirty()).toBe(true);
+
+      component.save();
+
+      const saved = (component.data()!.value as PrintFontsPart).fonts;
+      expect(saved).toEqual([makeFont('Times'), makeFont('Arial')]);
+      saved.forEach((e) => expect(Object.getOwnPropertySymbols(e)).toEqual([]));
+      expect(component.isDirty()).toBe(false);
     });
   });
 });

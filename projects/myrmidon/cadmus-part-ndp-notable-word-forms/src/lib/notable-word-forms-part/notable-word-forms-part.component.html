@@ -1,127 +1,133 @@
-<form [formGroup]="form" (submit)="save()">
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar>
-        <mat-icon>picture_in_picture</mat-icon>
-      </div>
-      <mat-card-title>
-        {{ (modelName() | titlecase) || "Notable Word Forms Part" }}
-      </mat-card-title>
-      <cadmus-help-link [url]="helpUrl()" />
-    </mat-card-header>
-    <mat-card-content>
-      <div>
-        <button
-          type="button"
-          mat-flat-button
-          color="primary"
-          (click)="addForm()"
-        >
-          <mat-icon>add_circle</mat-icon> form
-        </button>
-      </div>
-      @if (entries.value.length) {
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>value</th>
-              <th>language</th>
-              <th>tags</th>
+<!-- no <form> here: the part is saved by the save button -->
+<mat-card>
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>picture_in_picture</mat-icon>
+    </div>
+    <mat-card-title>
+      {{ (modelName() | titlecase) || 'Notable Word Forms Part' }}
+    </mat-card-title>
+    <cadmus-help-link [url]="helpUrl()" />
+  </mat-card-header>
+  <mat-card-content>
+    <div>
+      <button type="button" mat-flat-button color="primary" (click)="addForm()">
+        <mat-icon>add_circle</mat-icon> form
+      </button>
+    </div>
+    @if (form.entries().value().length) {
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>EID</th>
+            <th>value</th>
+            <th>language</th>
+            <th>rank</th>
+            <th>tags</th>
+            <th>ref. form</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (
+            entry of form.entries().value();
+            track entry;
+            let i = $index;
+            let first = $first;
+            let last = $last
+          ) {
+            <tr [class.selected]="i === editedIndex()">
+              <td class="fit-width">
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="primary"
+                  matTooltip="Edit this form"
+                  (click)="editForm(entry, i)"
+                >
+                  <mat-icon class="mat-primary">edit</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matTooltip="Move this form up"
+                  [disabled]="first"
+                  (click)="moveFormUp(i)"
+                >
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  matTooltip="Move this form down"
+                  [disabled]="last"
+                  (click)="moveFormDown(i)"
+                >
+                  <mat-icon>arrow_downward</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  mat-icon-button
+                  color="warn"
+                  matTooltip="Delete this form"
+                  (click)="deleteForm(i)"
+                >
+                  <mat-icon class="mat-warn">remove_circle</mat-icon>
+                </button>
+              </td>
+              <td>{{ entry.eid }}</td>
+              <td>{{ entry.value }}</td>
+              <td>
+                {{
+                  entry.language | flatLookup: langEntries() : 'id' : 'value'
+                }}
+              </td>
+              <td>{{ entry.rank || '' }}</td>
+              <td>
+                @for (tag of entry.tags; track tag; let tagFirst = $first) {
+                  {{ tagFirst ? '' : ', '
+                  }}{{ tag | flatLookup: tagEntries() : 'id' : 'value' }}
+                }
+              </td>
+              <td>{{ entry.referenceForm }}</td>
             </tr>
-          </thead>
-          <tbody>
-            @for (
-              entry of entries.value;
-              track entry;
-              let i = $index;
-              let first = $first;
-              let last = $last
-            ) {
-              <tr [class.selected]="i === editedIndex()">
-                <td class="fit-width">
-                  <button
-                    type="button"
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Edit this form"
-                    (click)="editForm(entry, i)"
-                  >
-                    <mat-icon class="mat-primary">edit</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    matTooltip="Move this form up"
-                    [disabled]="first"
-                    (click)="moveFormUp(i)"
-                  >
-                    <mat-icon>arrow_upward</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    matTooltip="Move this form down"
-                    [disabled]="last"
-                    (click)="moveFormDown(i)"
-                  >
-                    <mat-icon>arrow_downward</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    mat-icon-button
-                    color="warn"
-                    matTooltip="Delete this form"
-                    (click)="deleteForm(i)"
-                  >
-                    <mat-icon class="mat-warn">remove_circle</mat-icon>
-                  </button>
-                </td>
-                <td>{{ entry.value }}</td>
-                <td>{{ entry.language }}</td>
-                <td>
-                  @for (tag of entry.tags; track tag; let tagFirst = $first) {
-                    {{ tagFirst ? "" : ", "
-                    }}{{ tag | flatLookup: tagEntries() : "id" : "value" }}
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-      @if (edited()) {
-        <fieldset>
-          <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
-            <mat-expansion-panel-header>
-              <mat-panel-title>Form #{{ editedIndex() + 1 }}</mat-panel-title>
-            </mat-expansion-panel-header>
-            <cadmus-notable-word-form-editor
-              [tagEntries]="tagEntries()"
-              [langEntries]="langEntries()"
-              [opTagEntries]="opTagEntries()"
-              [refTagEntries]="docRefTagEntries()"
-              [refTypeEntries]="docRefTypeEntries()"
-              [linkScopeEntries]="pinLinkScopeEntries()"
-              [idFeatureEntries]="idFeatureEntries()"
-              [linkAssTagEntries]="pinLinkAssertionTagEntries()"
-              [linkDocRefTagEntries]="docRefTagEntries()"
-              [linkDocRefTypeEntries]="docRefTypeEntries()"
-              [lookupProviderOptions]="lookupProviderOptions()"
-              [form]="edited()"
-              (formChange)="saveForm($event!)"
-              (cancelEdit)="closeForm()"
-            />
-          </mat-expansion-panel>
-        </fieldset>
-      }
-    </mat-card-content>
-    <mat-card-actions>
-      <cadmus-close-save-buttons
-        [form]="form"
-        [noSave]="userLevel < 2"
-        (closeRequest)="close()"
-      />
-    </mat-card-actions>
-  </mat-card>
-</form>
+          }
+        </tbody>
+      </table>
+    }
+    @if (edited()) {
+      <fieldset>
+        <mat-expansion-panel [expanded]="edited()" [disabled]="!edited()">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Form #{{ editedIndex() + 1 }}</mat-panel-title>
+          </mat-expansion-panel-header>
+          <cadmus-notable-word-form-editor
+            [tagEntries]="tagEntries()"
+            [langEntries]="langEntries()"
+            [opTagEntries]="opTagEntries()"
+            [refTagEntries]="docRefTagEntries()"
+            [refTypeEntries]="docRefTypeEntries()"
+            [linkScopeEntries]="pinLinkScopeEntries()"
+            [linkTagEntries]="pinLinkTagEntries()"
+            [idFeatureEntries]="idFeatureEntries()"
+            [linkAssTagEntries]="pinLinkAssertionTagEntries()"
+            [linkDocRefTagEntries]="pinLinkDocRefTagEntries()"
+            [linkDocRefTypeEntries]="pinLinkDocRefTypeEntries()"
+            [lookupProviderOptions]="lookupProviderOptions()"
+            [form]="edited()"
+            (formChange)="saveForm($event!)"
+            (cancelEdit)="closeForm()"
+          />
+        </mat-expansion-panel>
+      </fieldset>
+    }
+  </mat-card-content>
+  <mat-card-actions>
+    <cadmus-close-save-buttons
+      [form]="form"
+      [noSave]="userLevel < 2"
+      (closeRequest)="close()"
+      (saveRequest)="save()"
+    />
+  </mat-card-actions>
+</mat-card>

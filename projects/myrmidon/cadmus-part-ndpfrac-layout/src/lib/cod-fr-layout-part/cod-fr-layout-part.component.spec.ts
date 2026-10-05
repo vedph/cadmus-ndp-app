@@ -19,6 +19,11 @@ import { EditedObject, PartIdentity, ThesauriSet } from '@myrmidon/cadmus-core';
 import { CodFrLayoutPartComponent } from './cod-fr-layout-part.component';
 import { CodFrLayoutPart } from '../cod-fr-layout-part';
 
+// the form tags the objects in its arrays with a Symbol: compare plain copies
+function json<T>(value: T): T {
+  return value === undefined ? value : JSON.parse(JSON.stringify(value));
+}
+
 @Component({
   selector: 'cadmus-cod-layout-formula',
   template: '',
@@ -94,9 +99,14 @@ describe('CodFrLayoutPartComponent', () => {
       ],
     })
       .overrideComponent(CodFrLayoutPartComponent, {
-        remove: { imports: [CodLayoutFormulaComponent, DecoratedCountsComponent] },
+        remove: {
+          imports: [CodLayoutFormulaComponent, DecoratedCountsComponent],
+        },
         add: {
-          imports: [MockCodLayoutFormulaComponent, MockDecoratedCountsComponent],
+          imports: [
+            MockCodLayoutFormulaComponent,
+            MockDecoratedCountsComponent,
+          ],
         },
       })
       .compileComponents();
@@ -141,21 +151,21 @@ describe('CodFrLayoutPartComponent', () => {
   describe('buildForm / validity', () => {
     it('should be invalid when formula is empty', () => {
       fixture.detectChanges();
-      expect(component.formula.invalid).toBe(true);
+      expect(component.form.formula().invalid()).toBe(true);
     });
 
     it('should be invalid when columnCount is less than 1', () => {
       fixture.detectChanges();
-      component.formula.setValue('BO 1 = 2');
-      component.columnCount.setValue(0);
-      expect(component.form.invalid).toBe(true);
+      component.form.formula().value.set('BO 1 = 2');
+      component.form.columnCount().value.set(0);
+      expect(component.form().invalid()).toBe(true);
     });
 
     it('should be valid with formula and columnCount set', () => {
       fixture.detectChanges();
-      component.formula.setValue('BO 1 = 2');
-      component.columnCount.setValue(1);
-      expect(component.form.valid).toBe(true);
+      component.form.formula().value.set('BO 1 = 2');
+      component.form.columnCount().value.set(1);
+      expect(component.form().valid()).toBe(true);
     });
   });
 
@@ -179,7 +189,12 @@ describe('CodFrLayoutPartComponent', () => {
         'data',
         makeData(
           {},
-          { 'physical-size-units': { id: 'physical-size-units', entries: units } },
+          {
+            'physical-size-units': {
+              id: 'physical-size-units',
+              entries: units,
+            },
+          },
         ),
       );
       fixture.detectChanges();
@@ -201,13 +216,13 @@ describe('CodFrLayoutPartComponent', () => {
   describe('onDataSet (form)', () => {
     it('should reset the form and formulaData when data value is falsy', async () => {
       fixture.detectChanges();
-      component.formula.setValue('BO 1 = 2');
+      component.form.formula().value.set('BO 1 = 2');
 
       fixture.componentRef.setInput('data', { value: undefined, thesauri: {} });
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.formula.value).toBe('');
+      expect(component.form.formula().value()).toBe('');
       expect(component.formulaData()).toEqual({
         prefix: 'BO',
         formula: '',
@@ -236,19 +251,19 @@ describe('CodFrLayoutPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      expect(component.formula.value).toBe('IT 1 = 2');
-      expect(component.dimensions.value).toEqual(dimensions);
-      expect(component.pricking.value).toBe('p1');
-      expect(component.columnCount.value).toBe(2);
-      expect(component.features.value).toEqual(['f1']);
-      expect(component.counts.value).toEqual(counts);
-      expect(component.note.value).toBe('a note');
+      expect(component.form.formula().value()).toBe('IT 1 = 2');
+      expect(json(component.form.dimensions().value())).toEqual(dimensions);
+      expect(component.form.pricking().value()).toBe('p1');
+      expect(component.form.columnCount().value()).toBe(2);
+      expect(json(component.form.features().value())).toEqual(['f1']);
+      expect(json(component.form.counts().value())).toEqual(counts);
+      expect(component.form.note().value()).toBe('a note');
       expect(component.formulaData()).toEqual({
         prefix: 'IT',
         formula: 'IT 1 = 2',
         dimensions,
       });
-      expect(component.form.pristine).toBe(true);
+      expect(component.form().dirty()).toBe(false);
     });
 
     it('should default the formulaData prefix to BO when the formula has no recognizable prefix', async () => {
@@ -266,13 +281,13 @@ describe('CodFrLayoutPartComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
 
-      component.formula.setValue('  BO 1 = 2  ');
-      component.pricking.setValue('  p1  ');
-      component.columnCount.setValue(3);
+      component.form.formula().value.set('  BO 1 = 2  ');
+      component.form.pricking().value.set('  p1  ');
+      component.form.columnCount().value.set(3);
       component.onFeatureCheckedIdsChange(['f1']);
       const counts: DecoratedCount[] = [{ id: 'c1', value: 1 }];
       component.onCountsChange(counts);
-      component.note.setValue('  a note  ');
+      component.form.note().value.set('  a note  ');
 
       const value = (component as any).getValue() as CodFrLayoutPart;
 
@@ -288,7 +303,7 @@ describe('CodFrLayoutPartComponent', () => {
       fixture.componentRef.setInput('data', makeData({}));
       fixture.detectChanges();
       await fixture.whenStable();
-      component.formula.setValue('BO 1 = 2');
+      component.form.formula().value.set('BO 1 = 2');
 
       const value = (component as any).getValue() as CodFrLayoutPart;
 
@@ -304,16 +319,16 @@ describe('CodFrLayoutPartComponent', () => {
     it('onFeatureCheckedIdsChange should update features and mark dirty', () => {
       fixture.detectChanges();
       component.onFeatureCheckedIdsChange(['f1']);
-      expect(component.features.value).toEqual(['f1']);
-      expect(component.features.dirty).toBe(true);
+      expect(json(component.form.features().value())).toEqual(['f1']);
+      expect(component.form.features().dirty()).toBe(true);
     });
 
     it('onCountsChange should update counts and mark dirty', () => {
       fixture.detectChanges();
       const counts: DecoratedCount[] = [{ id: 'c1', value: 1 }];
       component.onCountsChange(counts);
-      expect(component.counts.value).toEqual(counts);
-      expect(component.counts.dirty).toBe(true);
+      expect(json(component.form.counts().value())).toEqual(counts);
+      expect(component.form.counts().dirty()).toBe(true);
     });
   });
 
@@ -335,10 +350,10 @@ describe('CodFrLayoutPartComponent', () => {
       component.onFormulaDataChange(data);
 
       expect(component.formulaData()).toEqual(data);
-      expect(component.formula.value).toBe('IT 1 = 2');
-      expect(component.formula.dirty).toBe(true);
-      expect(component.dimensions.value).toEqual(dimensions);
-      expect(component.dimensions.dirty).toBe(true);
+      expect(component.form.formula().value()).toBe('IT 1 = 2');
+      expect(component.form.formula().dirty()).toBe(true);
+      expect(json(component.form.dimensions().value())).toEqual(dimensions);
+      expect(component.form.dimensions().dirty()).toBe(true);
     });
 
     it('should be reflected in getValue()', () => {
@@ -355,6 +370,61 @@ describe('CodFrLayoutPartComponent', () => {
 
       const value = (component as any).getValue() as CodFrLayoutPart;
       expect(value.dimensions).toEqual(dimensions);
+    });
+  });
+
+  describe('dirty state and formula data', () => {
+    async function bindSample(): Promise<void> {
+      fixture.detectChanges();
+      fixture.componentRef.setInput(
+        'data',
+        makeData({ formula: 'BO 250 × 160 = 30 [190] 40', columnCount: 1 }),
+      );
+      fixture.detectChanges();
+      await fixture.whenStable();
+    }
+
+    it('should leave a newly bound part pristine', async () => {
+      await bindSample();
+      expect(component.isDirty()).toBe(false);
+    });
+
+    it('should stay pristine when the formula editor echoes its data', async () => {
+      await bindSample();
+      const data = structuredClone(component.formulaData());
+
+      component.onFormulaDataChange(data);
+      component.onCountsChange([]);
+
+      expect(component.isDirty()).toBe(false);
+      // the formula editor gets back its own object
+      expect(component.formulaData()).toBe(data);
+    });
+
+    it('should become dirty when the formula changes', async () => {
+      await bindSample();
+
+      component.onFormulaDataChange({
+        ...component.formulaData(),
+        formula: 'BO 250 × 160 = 30 [190] 41',
+      });
+
+      expect(component.isDirty()).toBe(true);
+    });
+
+    it('should become dirty when only the features change', async () => {
+      await bindSample();
+
+      component.onFeatureCheckedIdsChange(['f1']);
+
+      expect(component.isDirty()).toBe(true);
+    });
+  });
+
+  describe('template', () => {
+    it('should render no <form> element', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
     });
   });
 });

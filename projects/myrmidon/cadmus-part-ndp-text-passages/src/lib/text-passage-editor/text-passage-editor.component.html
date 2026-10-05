@@ -1,12 +1,14 @@
-<form [formGroup]="form" (submit)="save()">
+<!-- no <form> here: this editor is nested in the part editor; Enter in a
+     text input saves it via onEnterKey -->
+<div (keydown.enter)="onEnterKey($event)">
   <!-- location -->
   @if (!citSchemeKey()) {
     <mat-form-field>
       <mat-label>location</mat-label>
-      <input matInput [formControl]="freeCitation" />
+      <input matInput [formField]="form.freeCitation" />
       @if (
-        $any(freeCitation).errors?.maxLength &&
-        (freeCitation.dirty || freeCitation.touched)
+        form.freeCitation().getError('maxLength') &&
+        (form.freeCitation().dirty() || form.freeCitation().touched())
       ) {
         <mat-error>location too long</mat-error>
       }
@@ -16,7 +18,7 @@
       <legend>location</legend>
       <cadmus-refs-compact-citation
         [schemeKeys]="[citSchemeKey()!]"
-        [citation]="citation.value || undefined"
+        [citation]="form.citation().value() || undefined"
         (citationChange)="onCitationChange($event!)"
       />
     </fieldset>
@@ -26,7 +28,7 @@
     @if (tagEntries()?.length) {
       <mat-form-field>
         <mat-label>tag</mat-label>
-        <mat-select [formControl]="tag">
+        <mat-select [formField]="form.tag">
           @for (e of tagEntries(); track e.id) {
             <mat-option [value]="e.id">{{ e.value }}</mat-option>
           }
@@ -36,8 +38,11 @@
       <!-- tag (free) -->
       <mat-form-field>
         <mat-label>tag</mat-label>
-        <input matInput [formControl]="tag" />
-        @if ($any(tag).errors?.maxLength && (tag.dirty || tag.touched)) {
+        <input matInput [formField]="form.tag" />
+        @if (
+          form.tag().getError('maxLength') &&
+          (form.tag().dirty() || form.tag().touched())
+        ) {
           <mat-error>tag too long</mat-error>
         }
       </mat-form-field>
@@ -49,7 +54,7 @@
     <legend>features</legend>
     <cadmus-thesaurus-entries-picker
       [availableEntries]="featureEntries()!"
-      [entries]="this.features.value"
+      [entries]="featurePickerEntries()"
       [hierarchicLabels]="true"
       (entriesChange)="onFeaturesChange($event!)"
     />
@@ -59,8 +64,11 @@
   <div>
     <mat-form-field class="long-text">
       <mat-label>text</mat-label>
-      <textarea matInput [formControl]="text" rows="3"></textarea>
-      @if ($any(text).errors?.maxLength && (text.dirty || text.touched)) {
+      <textarea matInput [formField]="form.text" rows="3"></textarea>
+      @if (
+        form.text().getError('maxLength') &&
+        (form.text().dirty() || form.text().touched())
+      ) {
         <mat-error>text too long</mat-error>
       }
     </mat-form-field>
@@ -69,15 +77,21 @@
   <div>
     <mat-form-field class="long-text">
       <mat-label>note</mat-label>
-      <textarea matInput [formControl]="note" rows="3"></textarea>
-      @if ($any(note).errors?.maxLength && (note.dirty || note.touched)) {
+      <textarea matInput [formField]="form.note" rows="3"></textarea>
+      @if (
+        form.note().getError('maxLength') &&
+        (form.note().dirty() || form.note().touched())
+      ) {
         <mat-error>note too long</mat-error>
       }
     </mat-form-field>
   </div>
   <!-- form validation -->
   <div>
-    @if (form.hasError("atLeastOneRequired") && (form.touched || form.dirty)) {
+    @if (
+      form().getError('atLeastOneRequired') &&
+      (form().touched() || form().dirty())
+    ) {
       <small class="mat-error">Please provide a citation.</small>
     }
   </div>
@@ -92,12 +106,13 @@
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
       mat-icon-button
       matTooltip="Accept changes"
-      [disabled]="form.invalid || form.pristine"
+      [disabled]="form().invalid() || !form().dirty()"
+      (click)="save()"
     >
       <mat-icon class="mat-primary">check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>
