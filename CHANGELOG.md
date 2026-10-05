@@ -1,5 +1,6 @@
 # History
 
+- 2026-10-05: updated Angular and packages.
 - 2026-09-27: added mock help parameters to `env.js`.
 
 ## 2.0.4
