@@ -1,5 +1,6 @@
 # History
 
+- 2026-10-14: updated Angular and packages.
 - 2026-10-05:
   - updated Angular and packages.
   - ⚠️ migrated to signal-based forms bumping all major versions to 2.
