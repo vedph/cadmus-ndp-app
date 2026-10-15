@@ -66,7 +66,6 @@ export const appConfig: ApplicationConfig = {
       withXhr(),
       withInterceptors([jwtInterceptor]),
       withInterceptorsFromDi(),
-      withJsonpSupport(),
     ),
     // vendor
     {
