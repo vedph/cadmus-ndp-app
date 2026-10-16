@@ -14,14 +14,14 @@ minimumReleaseAgeExclude:
   - '@myrmidon/cadmus-thesaurus-store@0.1.5 || 1.0.0'
   - '@myrmidon/paged-data-browsers@5.2.3 || 6.0.0'
   - '@vitest/expect@4.1.7'
-  - '@vitest/mocker@4.1.7'
+  - '@vitest/mocker@4.1.7 || 5.0.5'
   - '@vitest/pretty-format@4.1.7'
   - '@vitest/runner@4.1.7'
   - '@vitest/snapshot@4.1.7'
-  - '@vitest/spy@4.1.7'
+  - '@vitest/spy@4.1.7 || 5.0.5'
   - '@vitest/utils@4.1.7'
   - echarts@6.1.0
-  - vitest@4.1.7
+  - vitest@4.1.7 || 5.0.5
   - '@myrmidon/auth-jwt-admin@9.0.0'
   - '@myrmidon/auth-jwt-login@9.0.0'
   - '@myrmidon/cadmus-api@15.0.0 || 15.0.1 || 15.0.3'
@@ -107,6 +107,7 @@ minimumReleaseAgeExclude:
   - marked@18.0.12 || 18.0.13 || 18.0.14
   - '@myrmidon/cadmus-part-codicology-location-ranges@0.0.1 || 0.0.2 || 0.0.3'
   - '@myrmidon/cod-layout-view@2.0.3'
-  - '@myrmidon/taxo-store-api@1.1.0 || 1.2.1'
-  - '@myrmidon/taxo-store-editor@1.1.0 || 1.2.1'
-  - '@myrmidon/taxo-store-picker@1.0.2 || 1.2.1'
+  - '@myrmidon/taxo-store-api@1.1.0 || 1.2.1 || 1.3.0'
+  - '@myrmidon/taxo-store-editor@1.1.0 || 1.2.1 || 1.3.0'
+  - '@myrmidon/taxo-store-picker@1.0.2 || 1.2.1 || 1.3.0'
+  - ngx-markdown@22.1.1
