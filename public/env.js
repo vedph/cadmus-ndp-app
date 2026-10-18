@@ -5,7 +5,7 @@
   // environment-dependent settings
   window.__env.apiUrl = "http://localhost:5172/api/";
   // window.__env.biblioApiUrl = "http://localhost:60058/api/";
-  window.__env.version = "2.0.4";
+  window.__env.version = "3.0.0";
   // enable thesaurus import in thesaurus list for admins
   window.__env.thesImportEnabled = true;
   // MOL

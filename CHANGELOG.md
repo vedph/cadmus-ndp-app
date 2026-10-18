@@ -1,6 +1,10 @@
 # History
 
-- 2026-10-18: updated packages.
+## 3.0.0
+
+- 2026-10-18:
+  - updated packages.
+  - updated `nginx.conf` for modules.
 - 2026-10-16: updated Angular and packages.
 - 2026-10-15: updated packages.
 - 2026-10-14: updated Angular and packages.
