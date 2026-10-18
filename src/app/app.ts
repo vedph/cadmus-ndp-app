@@ -217,8 +217,8 @@ export class App implements OnInit, OnDestroy {
   private configureTaxoLookup(storage: RamStorageService): void {
     storage.store(LOOKUP_TAXOSTORE_CONFIGS_KEY, [
       {
-        treeId: 'topics',
-        treeName: 'topics',
+        treeId: 'descriptors',
+        treeName: 'descriptors',
         canEdit: true,
         canAdd: true,
         canDelete: false,
@@ -231,17 +231,24 @@ export class App implements OnInit, OnDestroy {
         canDelete: false,
       },
       {
-        treeId: 'descriptors',
-        treeName: 'descriptors',
+        treeId: 'toponyms',
+        treeName: 'toponyms',
+        canEdit: false,
+        canAdd: false,
+        canDelete: false,
+      },
+      {
+        treeId: 'topics',
+        treeName: 'topics',
         canEdit: true,
         canAdd: true,
         canDelete: false,
       },
       {
-        treeId: 'toponyms',
-        treeName: 'toponyms',
-        canEdit: false,
-        canAdd: false,
+        treeId: 'people',
+        treeName: 'people',
+        canEdit: true,
+        canAdd: true,
         canDelete: false,
       },
     ] as TaxoStoreLookupConfig[]);
