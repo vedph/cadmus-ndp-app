@@ -25,7 +25,7 @@
     "build:libs": "node scripts/build-libs.mjs"
   },
   "private": true,
-  "packageManager": "pnpm@12.14.0",
+  "packageManager": "pnpm@12.15.0",
   "dependencies": {
     "3d-force-graph": "^1.80.1",
     "@angular/animations": "^22.2.3",
@@ -41,8 +41,8 @@
     "@auth0/angular-jwt": "^5.2.0",
     "@jean-merelis/ngx-monaco-editor": "^21.0.0",
     "@maplibre/ngx-maplibre-gl": "^22.3.0",
-    "@myrmidon/auth-jwt-admin": "^10.0.0",
-    "@myrmidon/auth-jwt-login": "^10.0.0",
+    "@myrmidon/auth-jwt-admin": "^10.0.1",
+    "@myrmidon/auth-jwt-login": "^10.0.1",
     "@myrmidon/cadmus-api": "^20.0.0",
     "@myrmidon/cadmus-cod-location": "^10.0.5",
     "@myrmidon/cadmus-codicology-ui": "^16.0.0",
@@ -137,7 +137,7 @@
     "d3-force": "^3.0.0",
     "echarts": "^6.1.0",
     "force-graph": "^1.52.0",
-    "maplibre-gl": "^6.14.0",
+    "maplibre-gl": "^6.15.0",
     "marked": "^18.1.1",
     "monaco-editor": "^0.47.0",
     "ngx-echarts": "^22.0.0",
@@ -159,7 +159,7 @@
     "vitest": "^5.0.5"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.64.9"
+    "@rollup/rollup-win32-arm64-msvc": "^4.65.0"
   },
   "pnpm": {
     "overrides": {
