@@ -1,5 +1,7 @@
 # History
 
+## 3.0.1
+
 - 2026-10-23: updated packages.
 
 ## 3.0.0
