@@ -1,5 +1,7 @@
 # History
 
+- 2026-10-24: fixes to reset password page.
+
 ## 3.0.1
 
 - 2026-10-23: updated packages.
