@@ -1,5 +1,9 @@
 # History
 
+## 3.0.3
+
+- 2026-11-14: updated Angular and packages.
+
 ## 3.0.2
 
 - 2026-11-10: updated Angular and packages.
