@@ -25,7 +25,7 @@
     "build:libs": "node scripts/build-libs.mjs"
   },
   "private": true,
-  "packageManager": "pnpm@12.18.0",
+  "packageManager": "pnpm@12.21.0",
   "dependencies": {
     "3d-force-graph": "^1.80.2",
     "@angular/animations": "^22.2.6",
@@ -63,7 +63,7 @@
     "@myrmidon/cadmus-mat-physical-state": "^10.0.3",
     "@myrmidon/cadmus-part-codicology-bindings": "^16.0.0",
     "@myrmidon/cadmus-part-codicology-contents": "^16.0.1",
-    "@myrmidon/cadmus-part-codicology-decorations": "^16.0.0",
+    "@myrmidon/cadmus-part-codicology-decorations": "^16.0.1",
     "@myrmidon/cadmus-part-codicology-edits": "^16.0.0",
     "@myrmidon/cadmus-part-codicology-hands": "^16.0.0",
     "@myrmidon/cadmus-part-codicology-layouts": "^16.0.0",
@@ -159,6 +159,6 @@
     "vitest": "^5.1.0"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-arm64-msvc": "^4.68.3"
+    "@rollup/rollup-win32-arm64-msvc": "^4.68.4"
   }
 }

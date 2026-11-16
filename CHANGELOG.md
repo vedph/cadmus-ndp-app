@@ -1,5 +1,7 @@
 # History
 
+- 2026-11-16: updated packages (decorations description text limit increased to 5000).
+
 ## 3.0.3
 
 - 2026-11-14: updated Angular and packages.
