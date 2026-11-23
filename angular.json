@@ -110,20 +110,24 @@
     "@myrmidon/cadmus-part-ndpfrac-quire-labels": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpfrac-quire-labels",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-quire-labels/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-quire-labels",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-quire-labels/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-quire-labels/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-quire-labels/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpfrac-quire-labels"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -136,20 +140,24 @@
     "@myrmidon/cadmus-part-ndpfrac-pg": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpfrac-pg",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-pg/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-pg",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-pg/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-pg/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-pg/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpfrac-pg"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -162,20 +170,24 @@
     "@myrmidon/cadmus-part-ndpfrac-rulings": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpfrac-rulings",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-rulings/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-rulings",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-rulings/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-rulings/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-rulings/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpfrac-rulings"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -188,20 +200,24 @@
     "@myrmidon/cadmus-part-ndpfrac-support": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpfrac-support",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-support/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-support",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-support/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpfrac-support"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -214,20 +230,24 @@
     "@myrmidon/cadmus-part-ndpfrac-layout": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpfrac-layout",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-layout/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpfrac-layout",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpfrac-layout/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpfrac-layout"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -240,20 +260,24 @@
     "@myrmidon/cadmus-part-ndpbooks-fonts": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpbooks-fonts",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpbooks-fonts/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpbooks-fonts",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fonts/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fonts/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fonts/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpbooks-fonts"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -266,20 +290,24 @@
     "@myrmidon/cadmus-part-ndpbooks-pg": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpbooks-pg",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpbooks-pg/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpbooks-pg",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-pg/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-pg/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-pg/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpbooks-pg"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -292,20 +320,24 @@
     "@myrmidon/cadmus-part-ndpbooks-fig-plan": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpbooks-fig-plan/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpbooks-fig-plan"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -318,20 +350,24 @@
     "@myrmidon/cadmus-part-ndpdrw-tech": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpdrw-tech",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpdrw-tech/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpdrw-tech",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-tech/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpdrw-tech"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -344,20 +380,24 @@
     "@myrmidon/cadmus-part-ndpdrw-pg": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndpdrw-pg",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndpdrw-pg/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndpdrw-pg",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-pg/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-pg/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndpdrw-pg/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndpdrw-pg"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -370,20 +410,24 @@
     "@myrmidon/cadmus-part-ndp-notable-word-forms": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndp-notable-word-forms",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndp-notable-word-forms/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndp-notable-word-forms",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndp-notable-word-forms/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndp-notable-word-forms/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndp-notable-word-forms/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndp-notable-word-forms"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -396,20 +440,24 @@
     "@myrmidon/cadmus-part-ndp-pg": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndp-pg",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndp-pg/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndp-pg",
       "prefix": "cadmus",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndp-pg/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndp-pg/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndp-pg/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndp-pg"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
@@ -422,20 +470,24 @@
     "@myrmidon/cadmus-part-ndp-text-passages": {
       "projectType": "library",
       "root": "projects/myrmidon/cadmus-part-ndp-text-passages",
-      "sourceRoot": "projects/myrmidon/cadmus-part-ndp-text-passages/src",
+      "sourceRoot": "projects/myrmidon/cadmus-part-ndp-text-passages",
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "@angular/build:ng-packagr",
+          "builder": "@angular/build:library",
           "configurations": {
             "production": {
               "tsConfig": "projects/myrmidon/cadmus-part-ndp-text-passages/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/myrmidon/cadmus-part-ndp-text-passages/tsconfig.lib.json"
+              "compilationMode": "full"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "production",
+          "options": {
+            "tsConfig": "projects/myrmidon/cadmus-part-ndp-text-passages/tsconfig.lib.json",
+            "outputPath": "dist/myrmidon/cadmus-part-ndp-text-passages"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",

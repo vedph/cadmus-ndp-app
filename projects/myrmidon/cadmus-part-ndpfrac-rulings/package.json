@@ -1,6 +1,9 @@
 {
   "name": "@myrmidon/cadmus-part-ndpfrac-rulings",
   "version": "2.0.0",
+  "exports": {
+    ".": "./src/public-api.ts"
+  },
   "description": "Cadmus - NDP FRAC rulings part.",
   "keywords": [
     "Cadmus",
@@ -22,9 +25,6 @@
     "@myrmidon/cadmus-core": "^20.0.0",
     "@myrmidon/cadmus-state": "^20.0.0",
     "@myrmidon/cadmus-ui": "^20.0.1"
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
   },
   "sideEffects": false
 }

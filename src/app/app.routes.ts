@@ -63,6 +63,14 @@ export const routes: Routes = [
       ),
     canActivate: [jwtGuard],
   },
+  {
+    path: 'items/:id/history',
+    loadComponent: () =>
+      import('@myrmidon/cadmus-ui-history').then(
+        (module) => module.ItemHistoryPageComponent,
+      ),
+    canActivate: [jwtGuard],
+  },
   // cadmus - thesauri
   {
     path: 'thesauri/:id',
@@ -84,16 +92,22 @@ export const routes: Routes = [
   {
     path: 'items/:iid/general',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-general-pg').then(
-        (module) => module.CADMUS_PART_GENERAL_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-general-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_GENERAL_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
   {
     path: 'items/:iid/philology',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-philology-pg').then(
-        (module) => module.CADMUS_PART_PHILOLOGY_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-philology-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_PHILOLOGY_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
@@ -101,8 +115,11 @@ export const routes: Routes = [
   {
     path: 'items/:iid/codicology',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-codicology-pg').then(
-        (module) => module.CADMUS_PART_CODICOLOGY_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-codicology-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_CODICOLOGY_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
@@ -110,8 +127,11 @@ export const routes: Routes = [
   {
     path: 'items/:iid/geography',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-geo-pg').then(
-        (module) => module.CADMUS_PART_GEO_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-geo-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_GEO_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
@@ -119,8 +139,11 @@ export const routes: Routes = [
   {
     path: 'items/:iid/epigraphy',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-epigraphy-pg').then(
-        (module) => module.CADMUS_PART_EPIGRAPHY_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-epigraphy-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_EPIGRAPHY_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
@@ -128,8 +151,11 @@ export const routes: Routes = [
   {
     path: 'items/:iid/ndp',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-ndp-pg').then(
-        (module) => module.CADMUS_PART_NDP_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-ndp-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_NDP_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
@@ -137,8 +163,11 @@ export const routes: Routes = [
   {
     path: 'items/:iid/ndp-frac',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-ndpfrac-pg').then(
-        (module) => module.CADMUS_PART_NDPFRAC_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-ndpfrac-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_NDPFRAC_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
@@ -146,8 +175,11 @@ export const routes: Routes = [
   {
     path: 'items/:iid/ndp-books',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-ndpbooks-pg').then(
-        (module) => module.CADMUS_PART_NDPBOOKS_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-ndpbooks-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_NDPBOOKS_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
@@ -155,17 +187,23 @@ export const routes: Routes = [
   {
     path: 'items/:iid/ndp-drawings',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-ndpdrw-pg').then(
-        (module) => module.CADMUS_PART_NDPDRAWING_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-ndpdrw-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_NDPDRAWING_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },
-  // iconography
+  // iconography parts
   {
     path: 'items/:iid/iconography',
     loadChildren: () =>
-      import('@myrmidon/cadmus-part-iconography-pg').then(
-        (module) => module.CADMUS_PART_ICONOGRAPHY_PG_ROUTES,
+      Promise.all([
+        import('@myrmidon/cadmus-part-iconography-pg'),
+        import('@myrmidon/cadmus-ui-history'),
+      ]).then(([module, history]) =>
+        history.withHistoryRoutes(module.CADMUS_PART_ICONOGRAPHY_PG_ROUTES),
       ),
     canActivate: [jwtGuard],
   },

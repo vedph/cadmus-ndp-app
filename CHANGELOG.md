@@ -1,5 +1,8 @@
 # History
 
+## 3.1.0
+
+- 2026-11-23: 🆕 added history.
 - 2026-11-16: updated packages (decorations description text limit increased to 5000).
 
 ## 3.0.3

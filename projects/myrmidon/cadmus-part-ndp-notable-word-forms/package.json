@@ -1,6 +1,9 @@
 {
   "name": "@myrmidon/cadmus-part-ndp-notable-word-forms",
   "version": "2.0.0",
+  "exports": {
+    ".": "./src/public-api.ts"
+  },
   "description": "Cadmus - notable word forms part.",
   "keywords": [
     "Cadmus",
@@ -18,9 +21,6 @@
     "@angular/common": "^22.2.1",
     "@angular/core": "^22.2.1",
     "@angular/material": "^22.2.1"
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
   },
   "sideEffects": false
 }
