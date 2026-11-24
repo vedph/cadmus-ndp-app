@@ -43,7 +43,7 @@ services:
     image: vedph2020/cadmus-ndp-api:18.1.0
     container_name: cadmus-ndp-api
     ports:
-      - 5172:8080
+      - 127.0.0.1:5172:8080
     depends_on:
       cadmus-ndp-mongo:
         condition: service_healthy
@@ -70,10 +70,10 @@ services:
 
   # Cadmus NDP App
   cadmus-ndp-app:
-    image: vedph2020/cadmus-ndp-app:3.1.1
+    image: vedph2020/cadmus-ndp-app:3.1.2
     container_name: cadmus-ndp-app
     ports:
-      - 4200:80
+      - 127.0.0.1:4200:80
     depends_on:
       - cadmus-ndp-api
     # volumes:
